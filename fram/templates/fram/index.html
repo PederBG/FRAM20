@@ -1,0 +1,116 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Raster Reprojection</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <link href="{% static 'css/map.css' %}" rel="stylesheet">
+
+    <!-- The next line is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!-- Passing django data to external js -->
+    <script>
+    var layerinfo = {'OpticClose': "{{ opticclose | safe | linebreaks }}",
+                     'OpticMos': "{{ opticmos | safe | linebreaks }}",
+                     'SARClose': "{{ sarclose | safe | linebreaks }}",
+                     'SARMos': "{{ sarmos | safe | linebreaks }}",
+                     'SeaIce': "{{ seaice | safe | linebreaks }}",
+                     'IceDrift': "{{ icedrift | safe | linebreaks }}"
+                    }
+    var positions = [];
+    {% for pos in positions %}
+      positions.push("{{ pos }}")
+    {% endfor %}
+     </script>
+    <script src="{% static 'js/map.js' %}"></script>
+  </head>
+  <body>
+    <!-- MAP LOGIC -->
+    <div id="map" class="map">
+      <!--<div class="loader"></div>
+      <div class="fadeout"></div>
+      <div id="marker" title="Marker" style="z-index: 10;"></div>-->
+      <div class="center-view ol-control">
+        <button onclick="setDefaultView()">X</button>
+      </div>
+      <!--<div class="remove-positions ol-control">
+        <button onclick="setDefaultView()">Positon</button>
+      </div>-->
+      <div id='LayerInfoContainer'>
+        <div id='LayerInfo'></div>
+        <span id="close" onclick="closeLayerInfo()">&times;</span>
+      </div>
+    </div>
+    <ul class="layercontrol-container">
+      <li class="layercontrol">
+        <button name="opticclose" class='layer-buttons' id="btOpticClose" type="button">Optic-Close</button>
+        <div class='layer-options-container'>
+          <input name="opticclose" type="range" min="1" max="100" value="100" class="slider" id="OpticClose">
+          <button class='layer-info' id="btOpticCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="terrabig" class='layer-buttons' id="btOpticMos" type="button">Optic-Mosaic</button>
+        <div class='layer-options-container'>
+          <input name="terrabig" type="range" min="1" max="100" value="100" class="slider" id="OpticMos">
+          <button class='layer-info' id="btOpticMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <lili class="layercontrol">
+        <button name="s1b2" class='layer-buttons' id="btSARClose" type="button">SAR-Close</button>
+        <div class='layer-options-container'>
+          <input name="s1b2" type="range" min="1" max="100" value="100" class="slider" id="SARClose">
+          <button class='layer-info' id="btSARCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </lili>
+      <lili class="layercontrol">
+        <button name="s1mosaic" class='layer-buttons' id="btSARMos" type="button">SAR-Mosaic</button>
+        <div class='layer-options-container'>
+          <input name="s1mosaic" type="range" min="1" max="100" value="100" class="slider" id="SARMos">
+          <button class='layer-info' id="btSARMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </lili>
+      <lili class="layercontrol">
+        <button name="bathymetry" class='layer-buttons' id="btBathymetry" type="button">Bathymetry</button>
+        <div class='layer-options-container'>
+          <input name="bathymetry" type="range" min="1" max="100" value="100" class="slider" id="Bathymetry">
+          <button class='layer-info' id="btBathymetryInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </lili>
+      <lili class="layercontrol">
+        <button name="iceconc" class='layer-buttons' id="btSeaIce" type="button">Sea-ice</button>
+        <div class='layer-options-container'>
+          <input name="iceconc" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">
+          <button class='layer-info' id="btSeaIceInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </lili>
+      <lili class="layercontrol">
+        <button name="icequiverwarp" class='layer-buttons' id="btIceDrift" type="button">Ice-Drift</button>
+        <div class='layer-options-container'>
+          <input name="icequiverwarp" type="range" min="1" max="100" value="100" class="slider" id="IceDrift">
+          <button class='layer-info' id="btIceDriftInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </lili>
+      <li class="layercontrol">
+        <button name="landedge" class='layer-buttons' id="btLandEdge" type="button">Land-Edge</button>
+        <div class='layer-options-container'>
+          <input name="landedge" type="range" min="1" max="100" value="100" class="slider" id="LandEdge">
+          <button class='layer-info' id="btLandEdgeInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="gridlines" class='layer-buttons' id="btGridLines" type="button">Grid-Lines</button>
+        <div class='layer-options-container'>
+          <input name="gridlines" type="range" min="1" max="100" value="100" class="slider" id="GridLines">
+          <button class='layer-info' id="btGridLinesInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+    </ul>
+
+    <!-- _____ -->
+  </body>
+</html>
