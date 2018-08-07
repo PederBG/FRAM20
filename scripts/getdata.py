@@ -48,18 +48,17 @@ def clean():
     cmd = 'rm -r ' + TMPDIR + ' && rm -r ' + s1Name + '*'
     subprocess.call(cmd, shell=True)
 
-
-# --------------------------------- S1 CLOSE-UP ------------------------------- #
-
-def getS1(bbox): # bbox should be .geojson format
-    outfile = 's1c'
-    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW,
-                  'https://colhub.met.no/#/home')
+# --------------------------------- GET S1 FILES ------------------------------- #
+def getS1Files(bbox="bbox.geojson", max_files=1, polarization='hh'):
+    print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s' %(bbox, max_files, polarization))
+    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
+    # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y-%m-%d').replace('-', '')
     yestdate = (DATE - timedelta(1)).strftime('%Y-%m-%d').replace('-', '')
 
     footprint = geojson_to_wkt(read_geojson(bbox))
     products = api.query(footprint,
+                    # ("20180804", "20180805"),
                      (yestdate, date),
                      platformname='Sentinel-1',
                      producttype='GRD',
@@ -70,31 +69,52 @@ def getS1(bbox): # bbox should be .geojson format
         quit()
     print("Found", len(products), "Sentinel-1 images.")
 
-    products_df = api.to_dataframe(products).sort_values('size',
-                    ascending=False).index[0]
-    s1Name = api.get_product_odata(products_df)["title"]
-    product_size = int(api.get_product_odata(products_df)["size"])
-    #for i in range(len(products_df)):
-    print "Name:", s1Name + ", size:", str(product_size / 1000000), "MB."
-    api.download(products_df)
+    products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
 
-    # UNZIPPING DOWNLOADED FILE
-    print("Unzipping product...")
-    zip_ref = zipfile.ZipFile(s1Name + '.zip')
-    zip_ref.extractall()
-    zip_ref.close()
+    downloadNames = []
+
+    for i in range(len(products_df)):
+        if i == max_files: # Prevents too large mosaic file
+            break
+        product_size = int(api.get_product_odata(products_df.index[i])["size"])
+        product_name = api.get_product_odata(products_df.index[i])["title"]
+        # downloadNames.append(TMPDIR + product_name)
+        print "Name:", product_name, "size:", str(product_size / 1000000), "MB."
+
+        api.download(products_df.index[i], TMPDIR)
+
+        # UNZIPPING DOWNLOADED FILE
+        print("Unzipping product...")
+        zip_ref = zipfile.ZipFile(TMPDIR + product_name + '.zip')
+        zip_ref.extractall(TMPDIR)
+        zip_ref.close()
+
+        geofiles = glob.glob(TMPDIR + product_name + '.SAFE/measurement/*')
+        # FINDING RIGHT POLARIZATION FILE (now using HH-polarization)
+        if '-' + polarization + '-' in geofiles[0]:
+            downloadNames.append(geofiles[0])
+        else:
+            downloadNames.append(geofiles[1])
+
+    return downloadNames
+
+
+# --------------------------------- S1 CLOSE-UP ------------------------------- #
+def getS1():
+    outfile = 's1c'
+    s1Name = getS1Files()[0]
 
     # PROCESSING FILE
     print("Processing files...")
     tmpfile = TMPDIR + 's1tmp'
     print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
     cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 40 40 -order 3' + \
-        ' -dstnodata 0 ' + s1Name + '.SAFE/manifest.safe ' + tmpfile + '.tif'
+        ' -dstnodata 0 ' + s1Name + ' ' + tmpfile + '.tif'
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
     print('Tiling image and removing color bands')
-    cmd = GDALHOME + 'gdal_translate -b 1 -co TILED=YES ' + tmpfile + '.tif ' + \
+    cmd = GDALHOME + 'gdal_translate -co TILED=YES ' + tmpfile + '.tif ' + \
         outfile + '.tif'
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
@@ -147,66 +167,17 @@ def getTerra():
 # --------------------------------- S1 MOSAIC -------------------------------- #
 def getS1Mos(bbox="bbox.geojson", max_num=2): # bbox should be .geojson format
     outfile = "s1mos.tif" # name of the finished result
-
-    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
-    # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
-    date = DATE.strftime('%Y-%m-%d').replace('-', '')
-    yestdate = (DATE - timedelta(1)).strftime('%Y-%m-%d').replace('-', '')
-
-    footprint = geojson_to_wkt(read_geojson(bbox))
-    products = api.query(footprint,
-                    #  ("20180804", "20180805"),
-                     (yestdate, date),
-                     platformname='Sentinel-1',
-                     producttype='GRD',
-                     sensoroperationalmode='EW'
-                     )
-    if len(products) == 0:
-        print("No files found at date: " + date)
-        quit()
-    print("Found", len(products), "Sentinel-1 images.")
-
-    products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
-
-    downloadNames = []
-
-    for i in range(len(products_df)):
-        if i == max_num: # Prevents too large mosaic file
-            break
-        product_size = int(api.get_product_odata(products_df.index[i])["size"])
-        product_name = api.get_product_odata(products_df.index[i])["title"]
-        downloadNames.append(product_name)
-        print "Name:", product_name, "size:", str(product_size / 1000000), "MB."
-
-        api.download(products_df.index[i])
-
-    # downloadNames = ['S1A_EW_GRDM_1SDH_20180804T082602_20180804T082707_023094_028204_8657',
-    #                  'S1B_EW_GRDM_1SDH_20180804T091444_20180804T091524_012111_0164D0_6844'
-    #                 ]
-
     tmpfiles = "" # arguments when making virtual mosaic
+    downloadNames = getS1Files(max_files=max_num)
+    print(downloadNames)
 
     for i in range(len(downloadNames)):
-
-        # UNZIPPING DOWNLOADED FILE
-        print("Unzipping product...")
-        zip_ref = zipfile.ZipFile(downloadNames[i] + '.zip')
-        zip_ref.extractall(TMPDIR)
-        zip_ref.close()
-
-        geofiles = glob.glob(downloadNames[i] + '.SAFE/measurement/*')
-        # FINDING RIGHT POLARIZATION FILE (now using HH-polarization)
-        if '-hh-' in geofiles[0]:
-            geofile = geofiles[0]
-        else:
-            geofile = geofiles[1]
-
         tmpfile = TMPDIR + 's1mostmp' + str(i) + '.tif'
 
         # PROCESSING EACH FILE
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
         cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 40 40 -order 3' + \
-        ' -dstnodata 0 ' + geofile + ' ' + tmpfile
+        ' -dstnodata 0 ' + downloadNames[i] + ' ' + tmpfile
         tmpfiles += tmpfile + ' '
         print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
@@ -265,7 +236,7 @@ def getSeaIce():
     subprocess.call(cmd, shell=True)
 
     print("Building overview images")
-    cmd = '%sgdaladdo -r average %s 2 4 8 16 32' %(GDALHOME, outfile)
+    cmd = '%sgdaladdo -r average %s 2 4 8 16' %(GDALHOME, outfile)
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
@@ -274,7 +245,7 @@ def getSeaIce():
 
 
 def getIceDrift():
-    outfile = 'icedrift.tif'
+    outfile = 'icedrift_test.tif'
 
     # TODO: Difference between sh-polstere and nh-polstere ice drift ??
 
@@ -285,9 +256,9 @@ def getIceDrift():
     startdate = "20180803" #TODO: remove
     enddate = "20180805" #TODO: remove
 
-    query = 'ftp://osisaf.met.no/prod/ice/drift_lr/merged/ice_drift_sh_' + \
+    query = 'ftp://osisaf.met.no/prod/ice/drift_lr/merged/ice_drift_nh_' + \
     'polstere-625_multi-oi_%s1200-%s1200.nc' %(startdate, enddate)
-    # urllib.urlretrieve(query, 'tmpfile.nc')
+    urllib.urlretrieve(query, 'tmpfile.nc')
 
     # MAKE QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
     print('Converting NETCDF bands to numpy arrays')
@@ -308,7 +279,7 @@ def getIceDrift():
     fig.add_axes(ax)
     plt.quiver(x, y, dx, dy, scale=900, width=0.001)
     fig.savefig(TMPDIR + 'quivertmp.png', transparent=False, format='png')
-    Image.open(TMPDIR + 'quivertmp.png').convert('RGB').save(TMPDIR + 'quivertmp.jpg','JPEG')
+    Image.open(TMPDIR + 'quivertmp.png').convert('L').save(TMPDIR + 'quivertmp.jpg','JPEG')
 
     # GETTING GEOREFERENCING INFO
     sizeX, sizeY, = Image.open(TMPDIR + 'quivertmp.jpg').size
@@ -319,17 +290,55 @@ def getIceDrift():
     cornerX = gt[0]
     cornerY = gt[3]
     pxsizeX = gt[1]
-    pxsizeY =-gt[5]
-
-    # TODO: new_pixel_size = (old_pixel_size / (new_im_size /old_im_size)) * 1000
+    pxsizeY = gt[5]
 
     print(cornerX, cornerY, pxsizeX, pxsizeY)
 
-    f = open(TMPDIR + "quivertmp.jwg", "w")
-    f.write()
+    # Formula: new_pixel_size = (old_pixel_size / (new_im_size /old_im_size))
+    new_pxsizeX = (pxsizeX / (sizeX / float(xc)))
+    new_pxsizeY = (pxsizeY / (sizeY / float(yc)))
 
+    jwg_string = "%s\n0.00000000000\n0.00000000000\n%s\n%s\n%s" \
+     %(new_pxsizeX*1000, new_pxsizeY*1000, cornerX*1000, cornerY*1000)
 
-getIceDrift()
+    f = open(TMPDIR + "quivertmp.jgw", "w")
+    f.write(jwg_string)
+    f.close()
+
+    # PROCESSING FILE
+    print("Processing files...")
+
+    tmpfile = TMPDIR + 'quivertmp.tif'
+    tmpfile2 = TMPDIR + 'quivertmp2.tif'
+    tmpfile3 = TMPDIR + 'quivertmp3.tif'
+
+    print('Converting from worldfile to geotiff')
+    cmd = '%sgdal_translate -of GTiff %s %s' %(GDALHOME, TMPDIR + 'quivertmp.jpg', tmpfile)
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+    print('Removing noise around arrows')
+    cmd = '%sgdal_calc.py -A %s --outfile=%s --calc="255*(A>220)"' %(GDALHOME, tmpfile, tmpfile2)
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+    print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
+    cmd = GDALHOME + 'gdalwarp -t_srs ' + PROJ + \
+        ' -srcnodata 255 -dstalpha ' + tmpfile2 + ' ' + tmpfile3
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+    print('Tiling image')
+    cmd = '%sgdal_translate -co TILED=YES %s %s' %(GDALHOME, tmpfile3, outfile)
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+    print("Building overview images")
+    cmd = '%sgdaladdo -r average %s 2 4 8 16' %(GDALHOME, outfile)
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+# getIceDrift()
 
 
 
