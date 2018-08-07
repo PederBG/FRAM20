@@ -48,26 +48,39 @@ def clean():
     cmd = 'rm -r ' + TMPDIR + ' && rm -r ' + s1Name + '*'
     subprocess.call(cmd, shell=True)
 
-# --------------------------------- GET S1 FILES ------------------------------- #
-def getS1Files(bbox="bbox.geojson", max_files=1, polarization='hh'):
-    print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s' %(bbox, max_files, polarization))
-    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
-    # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
+# --------------------------------- HELP FUNCTIONS------------------------------- #
+def getSentinelFiles(bbox="bbox.geojson", max_files=1, polarization='hh', platform='s1'):
+    print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
+        %(bbox, max_files, polarization, platform))
+    # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
+    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y-%m-%d').replace('-', '')
     yestdate = (DATE - timedelta(1)).strftime('%Y-%m-%d').replace('-', '')
 
     footprint = geojson_to_wkt(read_geojson(bbox))
-    products = api.query(footprint,
-                    # ("20180804", "20180805"),
-                     (yestdate, date),
-                     platformname='Sentinel-1',
-                     producttype='GRD',
-                     sensoroperationalmode='EW'
-                     )
+    if platform == 's1':
+        products = api.query(footprint,
+                        #  ("20180805", "20180807"),
+                         (yestdate, date),
+                         platformname='Sentinel-1',
+                         producttype='GRD',
+                         sensoroperationalmode='EW'
+                         )
+    elif platform == 's2':
+        products = api.query(footprint,
+                         ("20180805", "20180807"),
+                        #  (yestdate, date),
+                         platformname='Sentinel-2',
+                         cloudcoverpercentage=(0, 60) # TODO: find reasonable threshold
+                         )
+    else:
+        print('Not a valid platform!')
+        quit()
+
     if len(products) == 0:
         print("No files found at date: " + date)
         quit()
-    print("Found", len(products), "Sentinel-1 images.")
+    print("Found", len(products), "Sentinel images.")
 
     products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
 
@@ -83,47 +96,82 @@ def getS1Files(bbox="bbox.geojson", max_files=1, polarization='hh'):
 
         api.download(products_df.index[i], TMPDIR)
 
-        # UNZIPPING DOWNLOADED FILE
-        print("Unzipping product...")
-        zip_ref = zipfile.ZipFile(TMPDIR + product_name + '.zip')
-        zip_ref.extractall(TMPDIR)
-        zip_ref.close()
+        if platform == 's1':
+            # UNZIPPING DOWNLOADED FILE
+            print("Unzipping product...")
+            zip_ref = zipfile.ZipFile(TMPDIR + product_name + '.zip')
+            zip_ref.extractall(TMPDIR)
+            zip_ref.close()
 
-        geofiles = glob.glob(TMPDIR + product_name + '.SAFE/measurement/*')
-        # FINDING RIGHT POLARIZATION FILE (now using HH-polarization)
-        if '-' + polarization + '-' in geofiles[0]:
-            downloadNames.append(geofiles[0])
-        else:
-            downloadNames.append(geofiles[1])
+            geofiles = glob.glob(TMPDIR + product_name + '.SAFE/measurement/*')
+            # FINDING RIGHT POLARIZATION FILE (now using HH-polarization)
+            if '-' + polarization + '-' in geofiles[0]:
+                downloadNames.append(geofiles[0])
+            else:
+                downloadNames.append(geofiles[1])
 
+        elif platform == 's2':
+            downloadNames.append(product_name)
     return downloadNames
+
+def tileImage(infile, outfile):
+    print('Tiling image')
+    cmd = '%sgdal_translate -of GTiff -co TILED=YES %s %s' %(GDALHOME, infile, outfile)
+    subprocess.call(cmd, shell=True)
+
+
+def buildImageOverviews(outfile, num=5):
+    print("Building overview images")
+    opt = ['2', '4', '8', '16', '32', '64']
+    overviews = ""
+    for i in range(num):
+        overviews += opt[i] + ' '
+    cmd = '%sgdaladdo -r average %s %s' %(GDALHOME, outfile, overviews[:-1])
+    subprocess.call(cmd, shell=True)
+#-------------------------------------------------------------------------------#
+
 
 
 # --------------------------------- S1 CLOSE-UP ------------------------------- #
 def getS1():
-    outfile = 's1c'
-    s1Name = getS1Files()[0]
+    outfile = 's1c.tif'
+    s1Name = getSentinelFiles()[0]
 
     # PROCESSING FILE
     print("Processing files...")
-    tmpfile = TMPDIR + 's1tmp'
+    tmpfile = TMPDIR + 's1tmp.tif'
     print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
     cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 40 40 -order 3' + \
-        ' -dstnodata 0 ' + s1Name + ' ' + tmpfile + '.tif'
+        ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
-    print('Tiling image and removing color bands')
-    cmd = GDALHOME + 'gdal_translate -co TILED=YES ' + tmpfile + '.tif ' + \
-        outfile + '.tif'
+    tileImage(tmpfile, outfile)
+    buildImageOverviews(outfile)
+    print('Sentinel-1 image is ready')
+
+# --------------------------------- S2 CLOSE-UP ------------------------------- #
+def getS2():
+    outfile = 's2c.tif'
+    # s2Name = getSentinelFiles(platform='s2')[0]
+    s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
+
+    s2FullName = 'SENTINEL2_L1C:"/vsizip/%s/%s.zip/%s.SAFE/MTD_MSIL1C.xml":TCI:EPSG_32627' \
+        %(TMPDIR, s2Name, s2Name)
+
+    tmpfile = TMPDIR + 's2tmp.tif'
+
+    # PROCESSING FILE
+    print("Processing files...")
+    print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
+    cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 10 10 -order 3' + \
+        ' -dstnodata 0 ' + s2FullName + ' ' + tmpfile
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
-    print("Building overview images")
-    cmd = GDALHOME + 'gdaladdo -r average ' + outfile + '.tif 2 4 8 16 32'
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
+    tileImage(tmpfile, outfile)
+    buildImageOverviews(outfile)
+    print('Sentinel-2 image is ready')
 
 # --------------------------------- TERRA MOSAIC ------------------------------- #
 def getTerra():
@@ -152,23 +200,15 @@ def getTerra():
     tmpfile = glob.glob('tmp/**.jpg')[0]
 
     # PROCESSING FILE
-    print('Converting jpg/jwg to tiled geotiff')
-    cmd = GDALHOME + 'gdal_translate -of GTiff -co TILED=YES ' + tmpfile + ' ' + \
-        outfile + '.tif'
-    print("CMD: " + cmd)
-    subprocess.call(str(cmd), shell=True)
-
-    print("Building overview images")
-    cmd = GDALHOME + 'gdaladdo -r average ' + outfile + '.tif 2 4 8 16 32'
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
+    tileImage(tmpfile, outfile)
+    buildImageOverviews(outfile)
+    print('Terra MODIS mosaic is ready')
 
 # --------------------------------- S1 MOSAIC -------------------------------- #
 def getS1Mos(bbox="bbox.geojson", max_num=2): # bbox should be .geojson format
     outfile = "s1mos.tif" # name of the finished result
     tmpfiles = "" # arguments when making virtual mosaic
-    downloadNames = getS1Files(max_files=max_num)
+    downloadNames = getSentinelFiles(max_files=max_num)
     print(downloadNames)
 
     for i in range(len(downloadNames)):
@@ -188,14 +228,10 @@ def getS1Mos(bbox="bbox.geojson", max_num=2): # bbox should be .geojson format
     subprocess.call(cmd, shell=True)
 
     print('Generating real, tiled mosaic from the virtual file')
-    cmd = GDALHOME + 'gdal_translate -co TILED=YES ' + TMPDIR + 'tmp.vrt ' + outfile
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
 
-    print("Building overview images")
-    cmd = GDALHOME + 'gdaladdo -r average ' + outfile + ' 2 4 8 16 32'
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
+    tileImage(TMPDIR + 'tmp.vrt', outfile)
+    buildImageOverviews(outfile)
+    print('Sentinel-1 mosaic is ready')
 
 
 # --------------------------------- SeaIce ----------------------------------- #
@@ -230,22 +266,13 @@ def getSeaIce():
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
-    print('Tiling image')
-    cmd = '%sgdal_translate -co TILED=YES %s %s' %(GDALHOME, tmpfile2, outfile)
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
-    print("Building overview images")
-    cmd = '%sgdaladdo -r average %s 2 4 8 16' %(GDALHOME, outfile)
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
+    tileImage(tmpfile2, outfile)
+    buildImageOverviews(outfile, num=4)
+    print('Sea ice concentration image is ready')
 
 # --------------------------------- IceDrift --------------------------------- #
-
-
 def getIceDrift():
-    outfile = 'icedrift_test.tif'
+    outfile = 'icedrift_test2.tif'
 
     # TODO: Difference between sh-polstere and nh-polstere ice drift ??
 
@@ -328,17 +355,10 @@ def getIceDrift():
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
-    print('Tiling image')
-    cmd = '%sgdal_translate -co TILED=YES %s %s' %(GDALHOME, tmpfile3, outfile)
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
+    tileImage(tmpfile3, outfile)
+    buildImageOverviews(outfile, num=4)
+    print('Ice drift image is ready')
 
-    print("Building overview images")
-    cmd = '%sgdaladdo -r average %s 2 4 8 16' %(GDALHOME, outfile)
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
-# getIceDrift()
 
 
 
