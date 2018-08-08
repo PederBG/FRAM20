@@ -151,29 +151,6 @@ def buildImageOverviews(outfile, num=5):
     subprocess.call(cmd, shell=True)
 #-------------------------------------------------------------------------------#
 
-
-
-# --------------------------------- S1 CLOSE-UP ------------------------------- #
-def getS1():
-    outfile = OUTDIR + 's1c.tif'
-    s1Name = getSentinelFiles()[0]
-    if not s1Name:
-        return False
-
-    # PROCESSING FILE
-    print("Processing files...")
-    tmpfile = TMPDIR + 's1tmp.tif'
-    print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-    cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 40 40 -order 3' + \
-        ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
-    print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
-
-    tileImage(tmpfile, outfile)
-    buildImageOverviews(outfile)
-    print('Sentinel-1 image is ready \n')
-    return outfile
-
 # --------------------------------- S2 CLOSE-UP ------------------------------- #
 def getS2():
     outfile = OUTDIR + 's2c.tif'
@@ -182,7 +159,7 @@ def getS2():
         return False
     # s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
 
-    s2FullName = 'SENTINEL2_L1C:"/vsizip/%s/%s.zip/%s.SAFE/MTD_MSIL1C.xml":TCI:EPSG_32627' \
+    s2FullName = 'SENTINEL2_L1C:"/vsizip/%s%s.zip/%s.SAFE/MTD_MSIL1C.xml":TCI:EPSG_32627' \
         %(TMPDIR, s2Name, s2Name)
 
     tmpfile = TMPDIR + 's2tmp.tif'
@@ -191,7 +168,7 @@ def getS2():
     print("Processing files...")
     print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
     cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 10 10 -order 3' + \
-        ' -dstnodata 0 ' + s2FullName + ' ' + tmpfile
+        ' -srcnodata 0 -dstalpha ' + s2FullName + ' ' + tmpfile
     print("CMD: " + cmd)
     subprocess.call(cmd, shell=True)
 
@@ -233,6 +210,27 @@ def getTerra():
     tileImage(tmpfile, outfile)
     buildImageOverviews(outfile)
     print('Terra MODIS mosaic is ready \n')
+    return outfile
+
+# --------------------------------- S1 CLOSE-UP ------------------------------- #
+def getS1():
+    outfile = OUTDIR + 's1c.tif'
+    s1Name = getSentinelFiles()[0]
+    if not s1Name:
+        return False
+
+    # PROCESSING FILE
+    print("Processing files...")
+    tmpfile = TMPDIR + 's1tmp.tif'
+    print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
+    cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + ' -tr 40 40 -order 3' + \
+        ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
+    print("CMD: " + cmd)
+    subprocess.call(cmd, shell=True)
+
+    tileImage(tmpfile, outfile)
+    buildImageOverviews(outfile)
+    print('Sentinel-1 image is ready \n')
     return outfile
 
 # --------------------------------- S1 MOSAIC -------------------------------- #
@@ -405,20 +403,20 @@ def getIceDrift():
 
 # ------------------------------ GETTING DATA -------------------------------- #
 outfiles = [
-    getS1(),
     getS2(),
     getTerra(),
+    getS1(),
     getS1Mos(),
     getSeaIce(),
     getIceDrift()
 ]
-print('Created files: ' + outfiles + '\n')
 # outfiles = ['2018-08-08/s1c.tif', '2018-08-08/s2c.tif', '2018-08-08/terramos',
 #     '2018-08-08/s1mos.tif', '2018-08-08/seaice.tif', '2018-08-08/icedrift.tif']
+print('Created files: ' + str(outfiles) + '\n')
 
 # ---------------------------- UPLOAD TO GEOSERVER ---------------------------- #
 cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
-cat.create_workspace(str(DATE.date()), str(DATE.date()) + 'uri')
+# cat.create_workspace(str(DATE.date()), str(DATE.date()) + 'uri')
 
 ws = cat.get_workspace( str(DATE.date()) )
 
@@ -428,7 +426,7 @@ for layerdata in outfiles:
     cat.create_coveragestore(name = layername,
                              data = layerdata,
                              workspace = ws,
-                             overwrite = False)
+                             overwrite = True)
 
 print('Sensor data for ' + str(DATE.date()) + ' has been successfully uploaded!')
 print('Process finished')

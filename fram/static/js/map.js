@@ -11,8 +11,8 @@ var map;
 var numInFlightTiles = 0;
 var layerdict;
 var static_layerinfo = {
-  'Bathymetry': "<h3>Bathmetry Polar Map</h3>Source: ahocevar, ahocevar.com/geoserver",
-  'LandEdge': "<h3>LandEdge</h3>Source: NASA's EOSDIS, worldview.earthdata.nasa.gov<br>Pixel size: 255.9x255.9m / pixel<br>Raw size: 222MB"
+  'Bathymetry': "<p><b>Bathmetry Polar Map</b><br>Source: ahocevar, ahocevar.com/geoserver</p>",
+  'LandEdge': "<p><b>LandEdge</b><br>Source: NASA's EOSDIS, worldview.earthdata.nasa.gov<br>Pixel size: 255.9x255.9m / pixel<br>Raw size: 222MB</p>"
 }
 
 // setInterval(function(){ console.trace(); }, 3000);
@@ -25,12 +25,12 @@ var defaultView = new ol.View({
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
 
-function setCustomLayerSource (name){
+function setCustomLayerSource (workspace, name){
   return new ol.source.TileWMS({
       url: 'http://localhost:8080/geoserver/wms',
       //url: 'http://192.168.38.113:8080/geoserver/wms',
       params: {
-        'LAYERS': 'cite:' + name,
+        'LAYERS': workspace + ':' + name,
         'TILED': true,
         transparent: true,
         format: 'image/png',
@@ -70,19 +70,23 @@ fetch(url).then(function(response) {
   baselayer = new ol.layer.Tile({
     source: new ol.source.WMTS(/** @type {!olx.source.WMTSOptions} */ (options))
   });
-
   // Waiting for http response..
-  // The order here desides z-index for images
-  var layernames = ["iceconc", "terrabig", "s1mosaic", "s1b2", "icequiverwarp", /*"s1c",*/ "landedge"];
+
+  // The order here decides z-index for images
+  // var layernames = ["iceconc", "terra2"/*, "opticclose"*/, "s1mosv2", "s1b2",  "s2"/*, "s1_clouds", "terra_clouds"*/, "icequiverwarp", "landedge"];
+  var layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
+  var workspace_name = '2018-08-08'
   layerdict = {
     "base": baselayer,
-    "bathymetry": bathlayer
+    "bathymetry": bathlayer,
   };
   //Creating and adding all custom layers
   for (var i = 0; i < layernames.length; i++) {
-    layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(layernames[i]) });
+    layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(workspace_name, layernames[i]) });
     layerdict[layernames[i]].setVisible(false);
   }
+  layerdict['landedge'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'landedge') });
+  layerdict['landedge'].setVisible(false);
 
 // Adding markers
   var pointFeatures = [];
@@ -222,11 +226,11 @@ function ToggleLayer(bt){
   var active = layerdict[bt.name].getVisible();
   layerdict[bt.name].setVisible(!active);
   if (!active){
-    $('#'+bt.id).css("background-color", "green")
+    $('#'+bt.id).css("background-color", "gray")
     $('#'+bt.id).next().css('visibility', 'visible')
   }
   else{
-    $('#'+bt.id).css("background-color", "lightgray")
+    $('#'+bt.id).css("background", "transparent")
     $('#'+bt.id).next().css('visibility', 'hidden')
   }
 }
@@ -280,9 +284,9 @@ $(document).ready(function() {
   $('#btLandEdge').click(function() {
     ToggleLayer(this);
   });
-  $('#btGridLines').click(function() {
+  /*$('#btGridLines').click(function() {
     ToggleLayer(this);
-  });
+  });*/
 
   document.getElementById("OpticClose").addEventListener('mouseup', function() {
     layerdict[this.name].setOpacity(this.value / 100);
@@ -308,8 +312,9 @@ $(document).ready(function() {
   document.getElementById("LandEdge").addEventListener('mouseup', function() {
     layerdict[this.name].setOpacity(this.value / 100);
   });
-  document.getElementById("GridLines").addEventListener('mouseup', function() {
+  /*document.getElementById("GridLines").addEventListener('mouseup', function() {
     layerdict[this.name].setOpacity(this.value / 100);
-  });
+  });*/
+
 
 });

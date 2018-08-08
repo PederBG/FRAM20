@@ -3,6 +3,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+
     <title>Raster Reprojection</title>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
     <link href="{% static 'css/map.css' %}" rel="stylesheet">
@@ -34,8 +40,8 @@
       <!--<div class="loader"></div>
       <div class="fadeout"></div>
       <div id="marker" title="Marker" style="z-index: 10;"></div>-->
-      <div class="center-view ol-control">
-        <button onclick="setDefaultView()">X</button>
+      <div class="ol-control center-view">
+        <button onclick="setDefaultView()">&#9974;</button>
       </div>
       <!--<div class="remove-positions ol-control">
         <button onclick="setDefaultView()">Positon</button>
@@ -47,54 +53,54 @@
     </div>
     <ul class="layercontrol-container">
       <li class="layercontrol">
-        <button name="opticclose" class='layer-buttons' id="btOpticClose" type="button">Optic-Close</button>
+        <button name="s2c" class='layer-buttons' id="btOpticClose" type="button">Optic-Close</button>
         <div class='layer-options-container'>
-          <input name="opticclose" type="range" min="1" max="100" value="100" class="slider" id="OpticClose">
+          <input name="s2c" type="range" min="1" max="100" value="100" class="slider" id="OpticClose">
           <button class='layer-info' id="btOpticCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
       <li class="layercontrol">
-        <button name="terrabig" class='layer-buttons' id="btOpticMos" type="button">Optic-Mosaic</button>
+        <button name="terramos" class='layer-buttons' id="btOpticMos" type="button">Optic-Mosaic</button>
         <div class='layer-options-container'>
-          <input name="terrabig" type="range" min="1" max="100" value="100" class="slider" id="OpticMos">
+          <input name="terramos" type="range" min="1" max="100" value="100" class="slider" id="OpticMos">
           <button class='layer-info' id="btOpticMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
-      <lili class="layercontrol">
-        <button name="s1b2" class='layer-buttons' id="btSARClose" type="button">SAR-Close</button>
+      <li class="layercontrol">
+        <button name="s1c" class='layer-buttons' id="btSARClose" type="button">SAR-Close</button>
         <div class='layer-options-container'>
-          <input name="s1b2" type="range" min="1" max="100" value="100" class="slider" id="SARClose">
+          <input name="s1c" type="range" min="1" max="100" value="100" class="slider" id="SARClose">
           <button class='layer-info' id="btSARCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </lili>
-      <lili class="layercontrol">
-        <button name="s1mosaic" class='layer-buttons' id="btSARMos" type="button">SAR-Mosaic</button>
+      </li>
+      <li class="layercontrol">
+        <button name="s1mos" class='layer-buttons' id="btSARMos" type="button">SAR-Mosaic</button>
         <div class='layer-options-container'>
-          <input name="s1mosaic" type="range" min="1" max="100" value="100" class="slider" id="SARMos">
+          <input name="s1mos" type="range" min="1" max="100" value="100" class="slider" id="SARMos">
           <button class='layer-info' id="btSARMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </lili>
-      <lili class="layercontrol">
+      </li>
+      <li class="layercontrol">
         <button name="bathymetry" class='layer-buttons' id="btBathymetry" type="button">Bathymetry</button>
         <div class='layer-options-container'>
           <input name="bathymetry" type="range" min="1" max="100" value="100" class="slider" id="Bathymetry">
           <button class='layer-info' id="btBathymetryInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </lili>
-      <lili class="layercontrol">
-        <button name="iceconc" class='layer-buttons' id="btSeaIce" type="button">Sea-ice</button>
+      </li>
+      <li class="layercontrol">
+        <button name="seaice" class='layer-buttons' id="btSeaIce" type="button">Sea-ice</button>
         <div class='layer-options-container'>
-          <input name="iceconc" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">
+          <input name="seaice" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">
           <button class='layer-info' id="btSeaIceInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </lili>
-      <lili class="layercontrol">
-        <button name="icequiverwarp" class='layer-buttons' id="btIceDrift" type="button">Ice-Drift</button>
+      </li>
+      <li class="layercontrol">
+        <button name="icedrift" class='layer-buttons' id="btIceDrift" type="button">Ice-Drift</button>
         <div class='layer-options-container'>
-          <input name="icequiverwarp" type="range" min="1" max="100" value="100" class="slider" id="IceDrift">
+          <input name="icedrift" type="range" min="1" max="100" value="100" class="slider" id="IceDrift">
           <button class='layer-info' id="btIceDriftInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </lili>
+      </li>
       <li class="layercontrol">
         <button name="landedge" class='layer-buttons' id="btLandEdge" type="button">Land-Edge</button>
         <div class='layer-options-container'>
@@ -102,14 +108,19 @@
           <button class='layer-info' id="btLandEdgeInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
-      <li class="layercontrol">
+      <!--<li class="layercontrol">
         <button name="gridlines" class='layer-buttons' id="btGridLines" type="button">Grid-Lines</button>
         <div class='layer-options-container'>
           <input name="gridlines" type="range" min="1" max="100" value="100" class="slider" id="GridLines">
           <button class='layer-info' id="btGridLinesInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
-      </li>
+      </li>-->
     </ul>
+    <div id='dates-div'>
+        <span class='arrow'>&#9664;</span>
+        <span id='used-date'>08-08-2018</span>
+        <span class='arrow'>&#9654;</span>
+    </div>
 
     <!-- _____ -->
   </body>
