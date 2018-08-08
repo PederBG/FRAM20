@@ -1,12 +1,32 @@
 """
-Download all sensor data needed to create the image layers.
+Written by PederBG, 2018-08
 
-S1 Close-up
-S1 Mosaic using ESA's quicklooks
-S1 Mosaic using raw data
-Terra MODIS Mosaic
+This script will download and process up-to-date sensor data from multiple sources
+and upload them as GeoTiff layers in a running geoserver. The geoserver will then
+handle feeding layer-tiles to the front-end on request.
+
+The script is meant to run as a cron job every day (or in a longer interval).
+
+Layers:
+    Sentinel-1 Optic Image Close-up (s2c)
+
+    Terra MODIS Optic Mosaic (terramos)
+
+    Sentinel-1 SAR High Resolution Close-up (s1c)
+
+    Sentinel-1 SAR High Resolution Mosaic (s1mos)
+
+    AMSR-2 Global Sea Ice Concentration (seaice)
+
+    Low Resolution Sea Ice Drift (icedrift)
+
+    S1 Mosaic using ESA's quicklooks (not in use)
+
+
+NOTE: This script is written for Python 2.7. This is due to some library restrictions
 
 """
+
 from datetime import date, datetime, timedelta
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
 import zipfile
@@ -18,29 +38,30 @@ import gdal
 import urllib
 import Image
 import netCDF4 as nc
+from geoserver.catalog import Catalog
 
 np.set_printoptions(threshold=np.nan) # for ice-drift quiverplot
 
 
 GDALHOME = '/usr/bin/'
 TMPDIR = 'tmp/'
+DATE = datetime.today()
+OUTDIR = str(DATE.date()) + '/'
 RUNDIR = os.getcwd()
 DATE = datetime.today()
-TDIR = DATE.date()
 COLHUB_UNAME = 'PederBG'
 COLHUB_PW = 'Copernicus'
 PROJ = 'EPSG:3413'
+
 
 if not os.path.isdir(GDALHOME):
     print('GDALHOME path is not set')
     exit()
 
-# if not os.path.isdir(TMPDIR):
-#     subprocess.call('mkdir ' + TMPDIR, shell=True)
-#     subprocess.call('mkdir ' + TMPDIR + 's1mos_output', shell=True)
-#     subprocess.call('mkdir ' + TMPDIR + 's1mos_translate', shell=True)
-#     subprocess.call('mkdir ' + TMPDIR + 's1mos_warp', shell=True)
-#     subprocess.call('mkdir ' + TMPDIR + 's1mos_vrt_mosaic', shell=True)
+if not os.path.isdir(TMPDIR):
+    subprocess.call('mkdir ' + TMPDIR, shell=True)
+if not os.path.isdir(OUTDIR):
+    subprocess.call('mkdir ' + OUTDIR, shell=True)
 
 
 def clean():
@@ -68,18 +89,18 @@ def getSentinelFiles(bbox="bbox.geojson", max_files=1, polarization='hh', platfo
                          )
     elif platform == 's2':
         products = api.query(footprint,
-                         ("20180805", "20180807"),
-                        #  (yestdate, date),
+                        #  ("20180805", "20180807"),
+                         (yestdate, date),
                          platformname='Sentinel-2',
                          cloudcoverpercentage=(0, 60) # TODO: find reasonable threshold
                          )
     else:
         print('Not a valid platform!')
-        quit()
+        return False
 
     if len(products) == 0:
         print("No files found at date: " + date)
-        quit()
+        return False
     print("Found", len(products), "Sentinel images.")
 
     products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
@@ -134,8 +155,10 @@ def buildImageOverviews(outfile, num=5):
 
 # --------------------------------- S1 CLOSE-UP ------------------------------- #
 def getS1():
-    outfile = 's1c.tif'
+    outfile = OUTDIR + 's1c.tif'
     s1Name = getSentinelFiles()[0]
+    if not s1Name:
+        return False
 
     # PROCESSING FILE
     print("Processing files...")
@@ -148,13 +171,16 @@ def getS1():
 
     tileImage(tmpfile, outfile)
     buildImageOverviews(outfile)
-    print('Sentinel-1 image is ready')
+    print('Sentinel-1 image is ready \n')
+    return outfile
 
 # --------------------------------- S2 CLOSE-UP ------------------------------- #
 def getS2():
-    outfile = 's2c.tif'
-    # s2Name = getSentinelFiles(platform='s2')[0]
-    s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
+    outfile = OUTDIR + 's2c.tif'
+    s2Name = getSentinelFiles(platform='s2')[0]
+    if not s2Name:
+        return False
+    # s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
 
     s2FullName = 'SENTINEL2_L1C:"/vsizip/%s/%s.zip/%s.SAFE/MTD_MSIL1C.xml":TCI:EPSG_32627' \
         %(TMPDIR, s2Name, s2Name)
@@ -171,11 +197,12 @@ def getS2():
 
     tileImage(tmpfile, outfile)
     buildImageOverviews(outfile)
-    print('Sentinel-2 image is ready')
+    print('Sentinel-2 image is ready \n')
+    return outfile
 
 # --------------------------------- TERRA MOSAIC ------------------------------- #
 def getTerra():
-    outfile = 'terramos'
+    outfile = OUTDIR + 'terramos'
 
     # DOWNLOADING NEWEST FILE WITH HTTP
     # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)
@@ -188,13 +215,16 @@ def getTerra():
     'format=image/jpeg&width=4530&height=3599'
     print("Query: " + query)
 
-    urllib.urlretrieve (query, TMPDIR + "terra.zip")
+    urllib.urlretrieve(query, TMPDIR + "terra.zip")
 
     # UNZIPPING DOWNLOADED FILE
     print("Unzipping product...")
-    zip_ref = zipfile.ZipFile(TMPDIR + 'terra' + '.zip')
-    zip_ref.extractall(TMPDIR)
-    zip_ref.close()
+    try:
+        zip_ref = zipfile.ZipFile(TMPDIR + 'terra' + '.zip')
+        zip_ref.extractall(TMPDIR)
+        zip_ref.close()
+    except zipfile.BadZipfile:
+        return False
 
     # FINDING FILE NAME
     tmpfile = glob.glob('tmp/**.jpg')[0]
@@ -202,13 +232,17 @@ def getTerra():
     # PROCESSING FILE
     tileImage(tmpfile, outfile)
     buildImageOverviews(outfile)
-    print('Terra MODIS mosaic is ready')
+    print('Terra MODIS mosaic is ready \n')
+    return outfile
 
 # --------------------------------- S1 MOSAIC -------------------------------- #
-def getS1Mos(bbox="bbox.geojson", max_num=2): # bbox should be .geojson format
-    outfile = "s1mos.tif" # name of the finished result
+def getS1Mos(bbox="bbox.geojson", max_num=4): # bbox should be .geojson format
+    outfile = OUTDIR + "s1mos.tif" # name of the finished result
+
     tmpfiles = "" # arguments when making virtual mosaic
     downloadNames = getSentinelFiles(max_files=max_num)
+    if not downloadNames:
+        return False
     print(downloadNames)
 
     for i in range(len(downloadNames)):
@@ -231,12 +265,13 @@ def getS1Mos(bbox="bbox.geojson", max_num=2): # bbox should be .geojson format
 
     tileImage(TMPDIR + 'tmp.vrt', outfile)
     buildImageOverviews(outfile)
-    print('Sentinel-1 mosaic is ready')
+    print('Sentinel-1 mosaic is ready \n')
+    return outfile
 
 
 # --------------------------------- SeaIce ----------------------------------- #
 def getSeaIce():
-    outfile = 'seaice.tif'
+    outfile = OUTDIR + 'seaice.tif'
 
     # DOWNLOADING NEWEST FILE WITH HTTP
     month = DATE.strftime("%b").lower()
@@ -259,7 +294,9 @@ def getSeaIce():
     cmd = GDALHOME + 'gdalwarp -of GTiff -t_srs ' + PROJ + \
         ' -dstnodata 0 -dstalpha ' + rawfile + ' ' + tmpfile
     print("CMD: " + cmd)
-    subprocess.call(cmd, shell=True)
+    code = subprocess.call(cmd, shell=True)
+    if code != 0:
+        return False
 
     print('Converting from palette to rgba')
     cmd = '%spct2rgb.py -of GTiff -rgba %s %s' %(GDALHOME, tmpfile, tmpfile2)
@@ -268,24 +305,28 @@ def getSeaIce():
 
     tileImage(tmpfile2, outfile)
     buildImageOverviews(outfile, num=4)
-    print('Sea ice concentration image is ready')
+    print('Sea ice concentration image is ready \n')
+    return outfile
+
 
 # --------------------------------- IceDrift --------------------------------- #
 def getIceDrift():
-    outfile = 'icedrift_test2.tif'
-
-    # TODO: Difference between sh-polstere and nh-polstere ice drift ??
+    outfile = OUTDIR + 'icedrift.tif'
 
     # DOWNLOADING NEWEST FILE WITH FTP
-    enddate = DATE.strftime('%Y-%m-%d').replace('-', '')
-    startdate = (DATE - timedelta(2)).strftime('%Y-%m-%d').replace('-', '')
+    enddate = (DATE - timedelta(1)).strftime('%Y-%m-%d').replace('-', '')
+    startdate = (DATE - timedelta(3)).strftime('%Y-%m-%d').replace('-', '')
 
-    startdate = "20180803" #TODO: remove
-    enddate = "20180805" #TODO: remove
+    # startdate = "20180803" #TODO: remove
+    # enddate = "20180805" #TODO: remove
 
     query = 'ftp://osisaf.met.no/prod/ice/drift_lr/merged/ice_drift_nh_' + \
     'polstere-625_multi-oi_%s1200-%s1200.nc' %(startdate, enddate)
-    urllib.urlretrieve(query, 'tmpfile.nc')
+    print('Query: ' + query)
+    try:
+        urllib.urlretrieve(query, 'tmpfile.nc')
+    except IOError:
+        return False
 
     # MAKE QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
     print('Converting NETCDF bands to numpy arrays')
@@ -357,7 +398,40 @@ def getIceDrift():
 
     tileImage(tmpfile3, outfile)
     buildImageOverviews(outfile, num=4)
-    print('Ice drift image is ready')
+    print('Ice drift image is ready \n')
+    return outfile
+
+
+
+# ------------------------------ GETTING DATA -------------------------------- #
+outfiles = [
+    getS1(),
+    getS2(),
+    getTerra(),
+    getS1Mos(),
+    getSeaIce(),
+    getIceDrift()
+]
+print('Created files: ' + outfiles + '\n')
+# outfiles = ['2018-08-08/s1c.tif', '2018-08-08/s2c.tif', '2018-08-08/terramos',
+#     '2018-08-08/s1mos.tif', '2018-08-08/seaice.tif', '2018-08-08/icedrift.tif']
+
+# ---------------------------- UPLOAD TO GEOSERVER ---------------------------- #
+cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
+cat.create_workspace(str(DATE.date()), str(DATE.date()) + 'uri')
+
+ws = cat.get_workspace( str(DATE.date()) )
+
+for layerdata in outfiles:
+    layername = layerdata.split('/')[1].split('.')[0]
+    print('Adding ' + layername + ' to geoserver...')
+    cat.create_coveragestore(name = layername,
+                             data = layerdata,
+                             workspace = ws,
+                             overwrite = False)
+
+print('Sensor data for ' + str(DATE.date()) + ' has been successfully uploaded!')
+print('Process finished')
 
 
 
@@ -367,10 +441,7 @@ def getIceDrift():
 
 
 
-
-
-
-# ------------------------------ S1 MOSAIC (old) ----------------------------- #
+# ------------------------------ S1 MOSAIC (not used) ----------------------------- #
 def makeProductsFile():
     api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
 
