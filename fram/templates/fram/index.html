@@ -27,10 +27,12 @@
                      'SeaIce': "{{ seaice | safe | linebreaks }}",
                      'IceDrift': "{{ icedrift | safe | linebreaks }}"
                     }
-    var positions = [];
-    {% for pos in positions %}
-      positions.push("{{ pos }}")
-    {% endfor %}
+      var positions = new Map([
+        {% for k, v in positions.items %}
+        ["{{ k }}", "{{ v }}"]
+        {% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]);
      </script>
     <script src="{% static 'js/map.js' %}"></script>
   </head>
@@ -117,9 +119,9 @@
       </li>-->
     </ul>
     <div id='dates-div'>
-        <span class='arrow'>&#9664;</span>
-        <span id='used-date'>08-08-2018</span>
-        <span class='arrow'>&#9654;</span>
+        <span class='arrow' id='back'>&#9664;</span>
+        <span id='used-date'>{{last_pos_date}}</span>
+        <span class='arrow' id='forward'>&#9654;</span>
     </div>
 
     <!-- _____ -->

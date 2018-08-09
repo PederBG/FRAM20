@@ -8,6 +8,8 @@ proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
 
 
 var map;
+var vectorLayer;
+var allPointFeatures, activePointFeatures, markerStyle;
 var numInFlightTiles = 0;
 var layerdict;
 var static_layerinfo = {
@@ -75,35 +77,44 @@ fetch(url).then(function(response) {
   // The order here decides z-index for images
   // var layernames = ["iceconc", "terra2"/*, "opticclose"*/, "s1mosv2", "s1b2",  "s2"/*, "s1_clouds", "terra_clouds"*/, "icequiverwarp", "landedge"];
   var layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
-  var workspace_name = '2018-08-08'
+  var workspace_default= '2018-08-08'
   layerdict = {
     "base": baselayer,
     "bathymetry": bathlayer,
   };
   //Creating and adding all custom layers
-  for (var i = 0; i < layernames.length; i++) {
-    layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(workspace_name, layernames[i]) });
-    layerdict[layernames[i]].setVisible(false);
+  function addCustomLayers(workspace){
+      for (var i = 0; i < layernames.length; i++) {
+        layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(workspace, layernames[i]) });
+        layerdict[layernames[i]].setVisible(false);
+      }
   }
+  addCustomLayers(workspace_default);
+  console.log(positions);
   layerdict['landedge'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'landedge') });
   layerdict['landedge'].setVisible(false);
 
 // Adding markers
-  var pointFeatures = [];
+  allPointFeatures = [];
+  activePointFeatures = [];
 
-  positions.forEach(function(element) {
-    var tmp = element.split(',');
+
+  Array.from(positions.keys()).forEach(function(element) {
+    var grid = positions.get(element).split(',');
     var tmpPoint = new ol.geom.Point(
-        ol.proj.transform( [parseFloat( tmp[1] ), parseFloat( tmp[0] )] , 'EPSG:4326', 'EPSG:3413' )
+        ol.proj.transform( [parseFloat( grid[1] ), parseFloat( grid[0] )] , 'EPSG:4326', 'EPSG:3413' )
     );
     var marker2 = new ol.Feature({
     geometry: tmpPoint
   });
-    pointFeatures.push( new ol.Feature({ geometry: tmpPoint}) );
+    tmp = new ol.Feature({ geometry: tmpPoint})
+    allPointFeatures.push(tmp);
+    activePointFeatures.push(tmp);
   });
 
+
   // Changing last point to an arrow (station location)
-  pointFeatures[pointFeatures.length - 1].setStyle(
+  allPointFeatures[allPointFeatures.length - 1].setStyle(
       new ol.style.Style({
           image: new ol.style.RegularShape({
             fill: new ol.style.Fill({color: 'red'}),
@@ -115,14 +126,7 @@ fetch(url).then(function(response) {
           })
         })
     );
-
-  // Source and vector layer
-  var vectorSource = new ol.source.Vector({
-      projection: 'EPSG:3413',
-      features: pointFeatures
-  });
-
-  var style = new ol.style.Style({
+  markerStyle = new ol.style.Style({
       image: new ol.style.Circle({
           fill: new ol.style.Fill({
               color: 'rgba(200, 50, 50, 1)'
@@ -134,10 +138,9 @@ fetch(url).then(function(response) {
           radius: 3
       }),
   });
-
-  var vectorLayer = new ol.layer.Vector({
-      source: vectorSource,
-      style: style
+  vectorLayer = new ol.layer.Vector({
+      source: new ol.source.Vector({projection: 'EPSG:3413',features: allPointFeatures}),
+      style: markerStyle
   });
   vectorLayer.setZIndex(3);
 
@@ -316,5 +319,31 @@ $(document).ready(function() {
     layerdict[this.name].setOpacity(this.value / 100);
   });*/
 
+  function changeDate(btn){
+    if (btn.id == 'forward'){
+      if (activePointFeatures.length < allPointFeatures.length){
+        activePointFeatures.push(allPointFeatures[activePointFeatures.length])
+      } else return false;
+    }
+    else{
+      if (activePointFeatures.length > 0){
+        activePointFeatures.pop()
+      } else return false;
+    }
+    $('#used-date').html(Array.from(positions.keys())[activePointFeatures.length-1]);
+    map.removeLayer(vectorLayer);
+    vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
+        style: markerStyle
+    });
+    map.addLayer(vectorLayer);
+
+  }
+  $('#forward').click(function() {
+    changeDate(this)
+  });
+  $('#back').click(function() {
+    changeDate(this)
+  });
 
 });

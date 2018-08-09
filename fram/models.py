@@ -7,6 +7,7 @@ class Position(models.Model):
     def __str__(self):
         return str(self.date) + ": " + self.grid
 
+
 class Layer(models.Model):
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     opticclose = models.TextField(max_length=20000)
