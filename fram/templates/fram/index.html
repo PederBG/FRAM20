@@ -33,6 +33,7 @@
         {% if not forloop.last %},{% endif %}
         {% endfor %}
       ]);
+      latestDate = "{{ last_date_str }}"
      </script>
     <script src="{% static 'js/map.js' %}"></script>
   </head>
@@ -120,7 +121,7 @@
     </ul>
     <div id='dates-div'>
         <span class='arrow' id='back'>&#9664;</span>
-        <span id='used-date'>{{last_pos_date}}</span>
+        <span id='used-date'>{{last_date_str}}</span>
         <span class='arrow' id='forward'>&#9654;</span>
     </div>
 

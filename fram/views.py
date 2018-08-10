@@ -10,10 +10,11 @@ from django.http import HttpResponse
 def index(request):
     positions = {}
     for pos in Position.objects.all():
-        positions[pos.date] = pos.grid
+        positions[str(pos.date)] = pos.grid
     context = {
         'positions': positions,
-        'last_pos_date': Position.objects.all().last().date,
+        'last_date': Position.objects.all().last().date,
+        'last_date_str': str(Position.objects.all().last().date),
         'opticclose': Layer.objects.filter(position=Position.objects.last()).values('opticclose')[0]['opticclose'],
         'opticmos': Layer.objects.filter(position=Position.objects.last()).values('opticmos')[0]['opticmos'],
         'sarclose': Layer.objects.filter(position=Position.objects.last()).values('sarclose')[0]['sarclose'],

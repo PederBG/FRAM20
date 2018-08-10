@@ -9,7 +9,7 @@ proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
 
 var map;
 var vectorLayer;
-var allPointFeatures, activePointFeatures, markerStyle;
+var allPointFeatures, activePointFeatures, markerStyle, layernames;
 var numInFlightTiles = 0;
 var layerdict;
 var static_layerinfo = {
@@ -23,7 +23,7 @@ var defaultView = new ol.View({
   center: ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413"),
   rotation: Math.PI / 7, // Quick fix instead of changing projections
   zoom: 5,
-  minZoom: 3,
+  minZoom: 3.5,
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
 
@@ -76,8 +76,9 @@ fetch(url).then(function(response) {
 
   // The order here decides z-index for images
   // var layernames = ["iceconc", "terra2"/*, "opticclose"*/, "s1mosv2", "s1b2",  "s2"/*, "s1_clouds", "terra_clouds"*/, "icequiverwarp", "landedge"];
-  var layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
-  var workspace_default= '2018-08-08'
+  layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
+  var workspace_default = latestDate
+  console.log(workspace_default);
   layerdict = {
     "base": baselayer,
     "bathymetry": bathlayer,
@@ -102,7 +103,7 @@ fetch(url).then(function(response) {
   Array.from(positions.keys()).forEach(function(element) {
     var grid = positions.get(element).split(',');
     var tmpPoint = new ol.geom.Point(
-        ol.proj.transform( [parseFloat( grid[1] ), parseFloat( grid[0] )] , 'EPSG:4326', 'EPSG:3413' )
+        ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
     );
     var marker2 = new ol.Feature({
     geometry: tmpPoint
@@ -337,6 +338,10 @@ $(document).ready(function() {
         style: markerStyle
     });
     map.addLayer(vectorLayer);
+
+    layernames.forEach(function(name) {
+      layerdict[name].setSource( setCustomLayerSource( Array.from(positions.keys())[activePointFeatures.length-1], name ) );
+    });
 
   }
   $('#forward').click(function() {

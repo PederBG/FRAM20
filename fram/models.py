@@ -10,12 +10,12 @@ class Position(models.Model):
 
 class Layer(models.Model):
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
-    opticclose = models.TextField(max_length=20000)
-    opticmos = models.TextField(max_length=20000)
-    sarclose = models.TextField(max_length=20000)
-    sarmos = models.TextField(max_length=20000)
-    seaice = models.TextField(max_length=20000)
-    icedrift = models.TextField(max_length=20000)
+    opticclose = models.TextField(max_length=20000, default='No info available')
+    opticmos = models.TextField(max_length=20000, default='No info available')
+    sarclose = models.TextField(max_length=20000, default='No info available')
+    sarmos = models.TextField(max_length=20000, default='No info available')
+    seaice = models.TextField(max_length=20000, default='No info available')
+    icedrift = models.TextField(max_length=20000, default='No info available')
 
     def __str__(self):
         return "Layers from date " + str(self.position.date)

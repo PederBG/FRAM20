@@ -35,6 +35,7 @@ import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 import gdal
+from gdalconst import *
 import urllib
 import Image
 import netCDF4 as nc
@@ -47,9 +48,11 @@ class Download(object):
     def __init__(self, **kwargs):
 
         # Argument options
-        self.DATE = None
-        self.GRID = None
-        self.BBOX = None
+        self.DATE = datetime.today().date()
+        self.GRID = False
+        self.BBOX = 'bbox.geojson'
+        self.OUTDIR = None
+        self.TMPDIR = None
 
         # Static options
         self.GDALHOME = '/usr/bin/'
@@ -58,27 +61,20 @@ class Download(object):
         self.COLHUB_UNAME = 'PederBG'
         self.COLHUB_PW = 'Copernicus'
         self.PROJ = 'EPSG:3413'
+        self.PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 
         if( kwargs.get('date') ):
             self.DATE = kwargs.get('date')
-            self.OUTDIR = str(self.DATE) + '/'
-        else:
-            self.DATE = datetime.today().date()
-            self.OUTDIR = str(self.DATE) + '/'
+
+        self.OUTDIR = self.PATH + str(self.DATE) + '/'
+        self.TMPDIR = self.PATH + 'tmp/'
 
         if( kwargs.get('grid') ):
             self.GRID = kwargs.get('grid')
-            self.bbox = makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
-        else:
-            self.GRID = False
-            self.BBOX = 'bbox.geojson'
 
+        if( kwargs.get('target') ):
+            self.OUTDIR = kwargs.get('target') + '/' + str(self.DATE) + '/'
 
-
-        # Check gdalhome path
-        if not os.path.isdir(self.GDALHOME):
-            print('GDALHOME path is not set')
-            exit()
 
         # Make dirs if they don't exist
         if not os.path.isdir(self.TMPDIR):
@@ -87,12 +83,22 @@ class Download(object):
         if not os.path.isdir(self.OUTDIR):
             print('Making OUTDIR...')
             subprocess.call('mkdir ' + self.OUTDIR, shell=True)
+
+        if (self.GRID):
+            self.BBOX = makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
+
+
+        # Check gdalhome path
+        if not os.path.isdir(self.GDALHOME):
+            print('GDALHOME path is not set')
+            exit()
+
     # ---------------------------------------------------------
 
 
     def clean(self):
-        s1Name = "yolo"
-        cmd = 'rm -r ' + self.TMPDIR + ' && rm -r ' + s1Name + '*'
+        print('\nCleaning used files...')
+        cmd = 'rm -r ' + self.TMPDIR
         subprocess.call(cmd, shell=True)
 
     # --------------------------------- HELP FUNCTIONS------------------------------- #
@@ -102,21 +108,21 @@ class Download(object):
         api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://colhub.met.no/#/home')
         # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
         date = self.DATE.strftime('%Y%m%d')
-        yestdate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
+        yestdate = (self.DATE - timedelta(2)).strftime('%Y%m%d')
 
         footprint = geojson_to_wkt(read_geojson(bbox))
         if platform == 's1':
             products = api.query(footprint,
-                            #  ("20180805", "20180807"),
-                             (yestdate, date),
+                            # ("20180805", "20180807"),
+                            (yestdate, date),
                              platformname='Sentinel-1',
                              producttype='GRD',
                              sensoroperationalmode='EW'
                              )
         elif platform == 's2':
             products = api.query(footprint,
-                            #  ("20180805", "20180807"),
-                             (yestdate, date),
+                            # ("20180805", "20180807"),
+                            (yestdate, date),
                              platformname='Sentinel-2',
                              cloudcoverpercentage=(0, 60) # TODO: find reasonable threshold
                              )
@@ -129,19 +135,26 @@ class Download(object):
             return [False]
         print("Found", len(products), "Sentinel images.")
 
-        products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
+        if platform == 's2':
+            products_df = api.to_dataframe(products).sort_values(['cloudcoverpercentage', 'size'], ascending=[True, True])
+            products_df = products_df.head(1)
+        else:
+            products_df = api.to_dataframe(products).sort_values('size', ascending=True)
 
         downloadNames = []
 
         for i in range(len(products_df)):
             if i == max_files: # Prevents too large mosaic file
                 break
-            product_size = int(api.get_product_odata(products_df.index[i])["size"])
-            product_name = api.get_product_odata(products_df.index[i])["title"]
-            # downloadNames.append(self.TMPDIR + product_name)
-            print "Name:", product_name, "size:", str(product_size / 1000000), "MB."
+            product_size = float(products_df['size'].values[i].split(' ')[0])
+            product_name = products_df['filename'].values[i][:-5]
+            product_clouds = ''
+            if platform == 's2':
+                product_clouds = ', Cloudcover: ' + str(products_df['cloudcoverpercentage'].values[i])
+            print("Name: %s, size: %s MB%s" %(product_name, product_size, product_clouds))
 
-            api.download(products_df.index[i], self.TMPDIR)
+
+            api.download(products_df['uuid'][i], self.TMPDIR)
 
             if platform == 's1':
                 # UNZIPPING DOWNLOADED FILE
@@ -184,9 +197,13 @@ class Download(object):
         if not s2Name:
             return False
         # s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
+        s2FileName = '/vsizip/%s%s.zip/%s.SAFE/MTD_MSIL1C.xml' %(self.TMPDIR, s2Name, s2Name)
 
-        s2FullName = 'SENTINEL2_L1C:"/vsizip/%s%s.zip/%s.SAFE/MTD_MSIL1C.xml":TCI:EPSG_32627' \
-            %(self.TMPDIR, s2Name, s2Name)
+        ds = gdal.Open(s2FileName, GA_ReadOnly)
+        rawEPSG = ds.GetSubDatasets()[0][0].split(':')[-1]
+        ds = None
+
+        s2FullName = 'SENTINEL2_L1C:"%s":TCI:%s' %(s2FileName, rawEPSG)
 
         tmpfile = self.TMPDIR + 's2tmp.tif'
 
@@ -227,7 +244,7 @@ class Download(object):
             return False
 
         # FINDING FILE NAME
-        tmpfile = glob.glob('tmp/**.jpg')[0]
+        tmpfile = glob.glob(self.TMPDIR + '**.jpg')[0]
 
         # PROCESSING FILE
         self.tileImage(tmpfile, outfile)
@@ -254,11 +271,11 @@ class Download(object):
         print('Sentinel-1 image is ready \n')
         return outfile
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, outfile, max_num=3): # bbox should be .geojson format
+    def getS1Mos(self, outfile, max_num=3):
 
         tmpfiles = "" # arguments when making virtual mosaic
         downloadNames = self.getSentinelFiles(self.BBOX, max_files=max_num)
-        if not downloadNames:
+        if not downloadNames[0]:
             return False
         print(downloadNames)
 
@@ -287,8 +304,8 @@ class Download(object):
     # --------------------------------- SeaIce ----------------------------------- #
     def getSeaIce(self, outfile):
         # DOWNLOADING NEWEST FILE WITH HTTP
-        month = self.DATE.strftime("%b").lower()
         yestdate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
+        month = (self.DATE - timedelta(1)).strftime("%b").lower()
         year = yestdate[:4]
 
         query = 'https://seaice.uni-bremen.de/data/amsr2/asi_daygrid_swath/n6250' + \
@@ -354,7 +371,7 @@ class Download(object):
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
-        plt.quiver(x, y, dx, dy, scale=900, width=0.001)
+        plt.quiver(x, y, dx, dy, scale=1100, width=0.0007)
         fig.savefig(self.TMPDIR + 'quivertmp.png', transparent=False, format='png')
         Image.open(self.TMPDIR + 'quivertmp.png').convert('L').save(self.TMPDIR + 'quivertmp.jpg','JPEG')
 
@@ -436,17 +453,18 @@ def makeGeojson(grid, outfile):
 # ------------------------------ GETTING DATA -------------------------------- #
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,"hd:g:o:",["help","date=","grid=","only=","overwrite"])
+        opts, args = getopt.getopt(argv,"hd:g:t:o:",["help","date=","grid=","target=","only=","overwrite"])
     except getopt.GetoptError:
         print('Invalid arguments. Add "-h" for help.')
         sys.exit(2)
 
-    date, grid, only, overwrite = None, None, None, False
+    date, grid, only, target, overwrite = None, None, None, None, False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n-h               Show help\n\
 -d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
--g, --grid       Set center grid for sentinel imagery capture (format: north-decimal,east-decimal)\n\
+-g, --grid       Set center grid for sentinel imagery capture (format: east-decimal,north-decimal)\n\
+-t, --target     Set path to target directory (format: path/to/target)\n\
 -o, --only       Only create specified layer (format: layername)\n\
 --overwrite      Overwrite layers in geoserver'
             )
@@ -458,6 +476,8 @@ def main(argv):
                 date = datetime.strptime(arg, '%Y%m%d').date()
         elif opt in ("-g", "--grid"):
             grid = arg
+        elif opt in ("-t", "--target"):
+            target = arg
         elif opt in ("-o", "--only"):
             only = arg
         elif opt in ("--overwrite"):
@@ -465,8 +485,8 @@ def main(argv):
     if not opts:
         print('WARNING: No arguments provided. Using defaults.')
     # ---------------------------------------
-    
-    d = Download(date=date, grid=grid) # Making download instance
+
+    d = Download(date=date, grid=grid, target=target) # Making download instance
 
     functions = {
         's2c' : d.getS2,
@@ -478,7 +498,6 @@ def main(argv):
     }
 
     outfiles = []
-
     if only:
         outfiles.append( functions[only](d.OUTDIR + only + '.tif') )
     else:
@@ -487,6 +506,7 @@ def main(argv):
             outfiles.append( v(d.OUTDIR + k + '.tif') )
 
     print('Created files: ' + str(outfiles) + '\n')
+    # d.clean()
 
     # ---------------------------- UPLOAD TO GEOSERVER ---------------------------- #
     cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
@@ -497,7 +517,7 @@ def main(argv):
 
     for layerdata in outfiles:
         if layerdata:
-            layername = layerdata.split('/')[1].split('.')[0]
+            layername = layerdata.split('/')[-1].split('.')[0]
             print('Adding ' + layername + ' to geoserver...')
             cat.create_coveragestore(name = layername,
                                      data = layerdata,
