@@ -42,34 +42,53 @@ from geoserver.catalog import Catalog
 
 np.set_printoptions(threshold=np.nan) # for ice-drift quiverplot
 
-class Command(object):
+class Download(object):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+
         # Argument options
-        self.DATE = datetime.today().date()
-        self.GRID = False
-        self.BBOX = "bbox.geojson" # default
+        self.DATE = None
+        self.GRID = None
+        self.BBOX = None
 
         # Static options
         self.GDALHOME = '/usr/bin/'
         self.TMPDIR = 'tmp/'
-        self.OUTDIR = str(self.DATE) + '/'
         self.RUNDIR = os.getcwd()
         self.COLHUB_UNAME = 'PederBG'
         self.COLHUB_PW = 'Copernicus'
         self.PROJ = 'EPSG:3413'
 
+        if( kwargs.get('date') ):
+            self.DATE = kwargs.get('date')
+            self.OUTDIR = str(self.DATE) + '/'
+        else:
+            self.DATE = datetime.today().date()
+            self.OUTDIR = str(self.DATE) + '/'
 
+        if( kwargs.get('grid') ):
+            self.GRID = kwargs.get('grid')
+            self.bbox = makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
+        else:
+            self.GRID = False
+            self.BBOX = 'bbox.geojson'
+
+
+
+        # Check gdalhome path
         if not os.path.isdir(self.GDALHOME):
             print('GDALHOME path is not set')
             exit()
 
-    def makeDirs(self):
-        self.OUTDIR = str(self.DATE) + '/'
+        # Make dirs if they don't exist
         if not os.path.isdir(self.TMPDIR):
+            print('Making TMPDIR...')
             subprocess.call('mkdir ' + self.TMPDIR, shell=True)
         if not os.path.isdir(self.OUTDIR):
+            print('Making OUTDIR...')
             subprocess.call('mkdir ' + self.OUTDIR, shell=True)
+    # ---------------------------------------------------------
+
 
     def clean(self):
         s1Name = "yolo"
@@ -80,8 +99,8 @@ class Command(object):
     def getSentinelFiles(self, bbox, max_files=1, polarization='hh', platform='s1'):
         print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
             %(bbox, max_files, polarization, platform))
-        # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://colhub.met.no/#/home')
-        api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
+        api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://colhub.met.no/#/home')
+        # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
         date = self.DATE.strftime('%Y%m%d')
         yestdate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
 
@@ -103,11 +122,11 @@ class Command(object):
                              )
         else:
             print('Not a valid platform!')
-            return False
+            return [False]
 
         if len(products) == 0:
             print("No files found at date: " + date)
-            return False
+            return [False]
         print("Found", len(products), "Sentinel images.")
 
         products_df = api.to_dataframe(products) #.sort_values('size', ascending=True)
@@ -159,10 +178,9 @@ class Command(object):
     #-------------------------------------------------------------------------------#
 
     # --------------------------------- S2 CLOSE-UP ------------------------------- #
-    def getS2(self):
-        outfile = self.OUTDIR + 's2c.tif'
-        # s2Name = self.getSentinelFiles(self.BBOX, platform='s2')[0]
-        s2Name = 'S2A_MSIL1C_20180807T164901_N0206_R026_T27XWM_20180807T201734'
+    def getS2(self, outfile):
+        s2Name = self.getSentinelFiles(self.BBOX, platform='s2')[0]
+        # s2Name = 'S2A_MSIL1C_20180807T164901_N0206_R026_T27XWM_20180807T201734'
         if not s2Name:
             return False
         # s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
@@ -177,7 +195,6 @@ class Command(object):
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
         cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 10 10 -order 3' + \
             ' -srcnodata 0 -dstalpha ' + s2FullName + ' ' + tmpfile
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         self.tileImage(tmpfile, outfile)
@@ -186,9 +203,7 @@ class Command(object):
         return outfile
 
     # --------------------------------- TERRA MOSAIC ------------------------------- #
-    def getTerra(self):
-        outfile = self.OUTDIR + 'terramos'
-
+    def getTerra(self, outfile):
         # DOWNLOADING NEWEST FILE WITH HTTP
         # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)
         time = str(self.DATE) # NASA changed the date format
@@ -221,8 +236,7 @@ class Command(object):
         return outfile
 
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
-    def getS1(self):
-        outfile = self.OUTDIR + 's1c.tif'
+    def getS1(self, outfile):
         s1Name = self.getSentinelFiles(self.BBOX)[0]
         if not s1Name:
             return False
@@ -233,17 +247,14 @@ class Command(object):
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
         cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 40 40 -order 3' + \
             ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         self.tileImage(tmpfile, outfile)
         self.buildImageOverviews(outfile)
         print('Sentinel-1 image is ready \n')
         return outfile
-
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, max_num=4): # bbox should be .geojson format
-        outfile = self.OUTDIR + "s1mos.tif" # name of the finished result
+    def getS1Mos(self, outfile, max_num=3): # bbox should be .geojson format
 
         tmpfiles = "" # arguments when making virtual mosaic
         downloadNames = self.getSentinelFiles(self.BBOX, max_files=max_num)
@@ -259,12 +270,10 @@ class Command(object):
             cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 40 40 -order 3' + \
             ' -dstnodata 0 ' + downloadNames[i] + ' ' + tmpfile
             tmpfiles += tmpfile + ' '
-            print("CMD: " + cmd)
             subprocess.call(cmd, shell=True)
 
         print('Making a virtual mosaic file')
         cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp.vrt ' + tmpfiles
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         print('Generating real, tiled mosaic from the virtual file')
@@ -276,9 +285,7 @@ class Command(object):
 
 
     # --------------------------------- SeaIce ----------------------------------- #
-    def getSeaIce(self):
-        outfile = self.OUTDIR + 'seaice.tif'
-
+    def getSeaIce(self, outfile):
         # DOWNLOADING NEWEST FILE WITH HTTP
         month = self.DATE.strftime("%b").lower()
         yestdate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
@@ -299,14 +306,12 @@ class Command(object):
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
         cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + \
             ' -dstnodata 0 -dstalpha ' + rawfile + ' ' + tmpfile
-        print("CMD: " + cmd)
         code = subprocess.call(cmd, shell=True)
         if code != 0:
             return False
 
         print('Converting from palette to rgba')
         cmd = '%spct2rgb.py -of GTiff -rgba %s %s' %(self.GDALHOME, tmpfile, tmpfile2)
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         self.tileImage(tmpfile2, outfile)
@@ -316,9 +321,7 @@ class Command(object):
 
 
     # --------------------------------- IceDrift --------------------------------- #
-    def getIceDrift(self):
-        outfile = self.OUTDIR + 'icedrift.tif'
-
+    def getIceDrift(self, outfile):
         # DOWNLOADING NEWEST FILE WITH FTP
         enddate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
         startdate = (self.DATE - timedelta(3)).strftime('%Y%m%d')
@@ -388,18 +391,15 @@ class Command(object):
 
         print('Converting from worldfile to geotiff')
         cmd = '%sgdal_translate -of GTiff %s %s' %(self.GDALHOME, self.TMPDIR + 'quivertmp.jpg', tmpfile)
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         print('Removing noise around arrows')
         cmd = '%sgdal_calc.py -A %s --outfile=%s --calc="255*(A>220)"' %(self.GDALHOME, tmpfile, tmpfile2)
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
         cmd = self.GDALHOME + 'gdalwarp -t_srs ' + self.PROJ + \
             ' -srcnodata 255 -dstalpha ' + tmpfile2 + ' ' + tmpfile3
-        print("CMD: " + cmd)
         subprocess.call(cmd, shell=True)
 
         self.tileImage(tmpfile3, outfile)
@@ -407,14 +407,16 @@ class Command(object):
         print('Ice drift image is ready \n')
         return outfile
 
-    def makeGeojson(self, grid, outfile):
-        east = grid.split(',')[0]
-        north = grid.split(',')[1]
+# ---------------------------------------------------------------------------- #
 
-        topRight = str( float(east) - 0.001 ) + ',' + north
-        bottomRight = str( float(east) - 0.001 ) + ',' + str( float(north) - 0.001 )
-        bottomLeft = east + ',' + str( float(north) - 0.001 )
-        json_string = '{"type":"FeatureCollection","features":[\n\
+def makeGeojson(grid, outfile):
+    east = grid.split(',')[0]
+    north = grid.split(',')[1]
+
+    topRight = str( float(east) - 0.001 ) + ',' + north
+    bottomRight = str( float(east) - 0.001 ) + ',' + str( float(north) - 0.001 )
+    bottomLeft = east + ',' + str( float(north) - 0.001 )
+    json_string = '{"type":"FeatureCollection","features":[\n\
     {"type":"Feature","properties":{},"geometry":{\n\
         "type":"Polygon","coordinates":[[\n\
             [' + grid + '],\n\
@@ -425,70 +427,86 @@ class Command(object):
         ]]\n\
     }}\n\
 ]}'
-        f = open(outfile, "w")
-        f.write(json_string)
-        f.close()
-        return outfile
+    f = open(outfile, "w")
+    f.write(json_string)
+    f.close()
+    return outfile
 
 
-    # ------------------------------ GETTING DATA -------------------------------- #
-    def main(self, argv):
-        try:
-            opts, args = getopt.getopt(argv,"hd:g:",["date=","grid="])
-        except getopt.GetoptError:
-            print('Invalid arguments. Add "-h" for help.')
-            sys.exit(2)
-        for opt, arg in opts:
-            if opt == '-h':
-                print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n-h         \
-      Show help\n-d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
--g, --grid       Set center grid for sentinel imagery capture (format: north-decimal,east-decimal)\n'
-                )
-                sys.exit()
-            elif opt in ("-d", "--date"):
-                if '-' in arg:
-                    self.DATE = datetime.strptime(arg, '%Y-%m-%d').date()
-                else:
-                    self.DATE = datetime.strptime(arg, '%Y%m%d').date()
-            elif opt in ("-g", "--grid"):
-                self.GRID = arg
-        self.makeDirs()
-        if self.GRID:
-            self.BBOX = self.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
-        if not opts:
-            print('WARNING: No arguments provided. Using defaults.')
-        quit()
-        outfiles = [
-            self.getS2(),
-            self.getTerra(),
-            self.getS1(),
-            self.getS1Mos(),
-            self.getSeaIce(),
-            self.getIceDrift()
-        ]
-        # outfiles = ['2018-08-08/s2c.tif', '2018-08-08/terramos',
-        # '2018-08-08/s1c.tif', '2018-08-08/s1mos.tif', '2018-08-08/seaice.tif', '2018-08-08/icedrift.tif']
-        print('Created files: ' + str(outfiles) + '\n')
+# ------------------------------ GETTING DATA -------------------------------- #
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv,"hd:g:o:",["help","date=","grid=","only=","overwrite"])
+    except getopt.GetoptError:
+        print('Invalid arguments. Add "-h" for help.')
+        sys.exit(2)
 
-        # ---------------------------- UPLOAD TO GEOSERVER ---------------------------- #
-        cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
+    date, grid, only, overwrite = None, None, None, False
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n-h               Show help\n\
+-d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
+-g, --grid       Set center grid for sentinel imagery capture (format: north-decimal,east-decimal)\n\
+-o, --only       Only create specified layer (format: layername)\n\
+--overwrite      Overwrite layers in geoserver'
+            )
+            sys.exit()
+        elif opt in ("-d", "--date"):
+            if '-' in arg:
+                date = datetime.strptime(arg, '%Y-%m-%d').date()
+            else:
+                date = datetime.strptime(arg, '%Y%m%d').date()
+        elif opt in ("-g", "--grid"):
+            grid = arg
+        elif opt in ("-o", "--only"):
+            only = arg
+        elif opt in ("--overwrite"):
+            overwrite = True
+    if not opts:
+        print('WARNING: No arguments provided. Using defaults.')
+    # ---------------------------------------
+    
+    d = Download(date=date, grid=grid) # Making download instance
 
-        ws = cat.get_workspace( str(self.DATE) )
-        if ws is None:
-            cat.create_workspace(str(self.DATE), str(self.DATE) + 'uri')
+    functions = {
+        's2c' : d.getS2,
+        'terramos' : d.getTerra,
+        's1c' : d.getS1,
+        's1mos' : d.getS1Mos,
+        'seaice' : d.getSeaIce,
+        'icedrift' : d.getIceDrift
+    }
 
-        for layerdata in outfiles:
+    outfiles = []
+
+    if only:
+        outfiles.append( functions[only](d.OUTDIR + only + '.tif') )
+    else:
+        for k, v in functions.iteritems():
+            print('\nMaking layer: ' + k + '...')
+            outfiles.append( v(d.OUTDIR + k + '.tif') )
+
+    print('Created files: ' + str(outfiles) + '\n')
+
+    # ---------------------------- UPLOAD TO GEOSERVER ---------------------------- #
+    cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
+
+    ws = cat.get_workspace( str(d.DATE) )
+    if ws is None:
+        cat.create_workspace(str(d.DATE), str(d.DATE) + 'uri')
+
+    for layerdata in outfiles:
+        if layerdata:
             layername = layerdata.split('/')[1].split('.')[0]
             print('Adding ' + layername + ' to geoserver...')
             cat.create_coveragestore(name = layername,
                                      data = layerdata,
                                      workspace = ws,
-                                     overwrite = True)
+                                     overwrite = overwrite)
 
-        print('Sensor data for ' + str(self.DATE) + ' has been successfully uploaded!')
-        print('Process finished')
+    print('Sensor data for ' + str(d.DATE) + ' has been successfully uploaded!')
+    print('Process finished')
 
 
 if __name__ == "__main__":
-    cmd = Command()
-    cmd.main(sys.argv[1:])
+    main(sys.argv[1:])

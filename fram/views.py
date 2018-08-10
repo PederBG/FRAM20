@@ -8,8 +8,12 @@ from django.http import HttpResponse
 
 
 def index(request):
-    context = { # fucking hater queryset...
-        'positions': Position.objects.values_list('grid', flat=True),
+    positions = {}
+    for pos in Position.objects.all():
+        positions[pos.date] = pos.grid
+    context = {
+        'positions': positions,
+        'last_pos_date': Position.objects.all().last().date,
         'opticclose': Layer.objects.filter(position=Position.objects.last()).values('opticclose')[0]['opticclose'],
         'opticmos': Layer.objects.filter(position=Position.objects.last()).values('opticmos')[0]['opticmos'],
         'sarclose': Layer.objects.filter(position=Position.objects.last()).values('sarclose')[0]['sarclose'],
@@ -17,5 +21,4 @@ def index(request):
         'seaice': Layer.objects.filter(position=Position.objects.last()).values('seaice')[0]['seaice'],
         'icedrift': Layer.objects.filter(position=Position.objects.last()).values('icedrift')[0]['icedrift'],
         }
-    # print(context['opticmos'][0]['opticmos'])
     return render(request, 'fram/index.html', context)
