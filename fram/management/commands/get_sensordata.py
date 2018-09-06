@@ -23,3 +23,6 @@ class Command(BaseCommand):
             '20180728', '-18,82.4', targetPath)
         print(cmd)
         subprocess.call(cmd, shell=True)
+
+        # Creating layer info
+        

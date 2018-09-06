@@ -23,7 +23,7 @@ Layers:
     S1 Mosaic using ESA's quicklooks (not in use)
 
 
-NOTE: This script is written for Python 2.7. This is due to some library restrictions
+NOTE: This script is written for Python 2.7. This is due to some library restrictions.
 
 """
 
@@ -59,9 +59,19 @@ class Download(object):
         self.TMPDIR = 'tmp/'
         self.RUNDIR = os.getcwd()
         self.COLHUB_UNAME = 'PederBG'
-        self.COLHUB_PW = 'Copernicus'
+        self.COLHUB_PW = 'Copernicus' # Not sensitiv data
         self.PROJ = 'EPSG:3413'
         self.PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
+
+        # Return values
+        # self.returns = {
+        #     's2c': [],
+        #     'terramos': [],
+        #     's1c': [],
+        #     's1mos': [],
+        #     'seaice': [],
+        #     'icedrift': []
+        # }
 
         if( kwargs.get('date') ):
             self.DATE = kwargs.get('date')
@@ -91,7 +101,7 @@ class Download(object):
         # Check gdalhome path
         if not os.path.isdir(self.GDALHOME):
             print('GDALHOME path is not set')
-            exit()
+            sys.exit(1)
 
     # ---------------------------------------------------------
 
@@ -102,6 +112,7 @@ class Download(object):
         subprocess.call(cmd, shell=True)
 
     # --------------------------------- HELP FUNCTIONS------------------------------- #
+    # Help function for downloading satellite products
     def getSentinelFiles(self, bbox, max_files=1, polarization='hh', platform='s1'):
         print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
             %(bbox, max_files, polarization, platform))
@@ -148,11 +159,14 @@ class Download(object):
                 break
             product_size = float(products_df['size'].values[i].split(' ')[0])
             product_name = products_df['filename'].values[i][:-5]
+
             product_clouds = ''
             if platform == 's2':
                 product_clouds = ', Cloudcover: ' + str(products_df['cloudcoverpercentage'].values[i])
             print("Name: %s, size: %s MB%s" %(product_name, product_size, product_clouds))
 
+            # if max_files == 1: # No point with ingestion date in mosaics with several images
+            #     self.returns[platform + 'c'] = products_df['ingestiondate'].values[i]
 
             api.download(products_df['uuid'][i], self.TMPDIR)
 
@@ -188,15 +202,13 @@ class Download(object):
             overviews += opt[i] + ' '
         cmd = '%sgdaladdo -r average %s %s' %(self.GDALHOME, outfile, overviews[:-1])
         subprocess.call(cmd, shell=True)
-    #-------------------------------------------------------------------------------#
+    #-------------------------- END HELP FUNCTIONS ----------------------------#
 
-    # --------------------------------- S2 CLOSE-UP ------------------------------- #
+    # ------------------------------ S2 CLOSE-UP ----------------------------- #
     def getS2(self, outfile):
         s2Name = self.getSentinelFiles(self.BBOX, platform='s2')[0]
-        # s2Name = 'S2A_MSIL1C_20180807T164901_N0206_R026_T27XWM_20180807T201734'
         if not s2Name:
             return False
-        # s2Name = 'S2A_MSIL1C_20180806T171901_N0206_R012_T27XWM_20180806T204942'
         s2FileName = '/vsizip/%s%s.zip/%s.SAFE/MTD_MSIL1C.xml' %(self.TMPDIR, s2Name, s2Name)
 
         ds = gdal.Open(s2FileName, GA_ReadOnly)
@@ -388,7 +400,7 @@ class Download(object):
 
         print(cornerX, cornerY, pxsizeX, pxsizeY)
 
-        # Formula: new_pixel_size = (old_pixel_size / (new_im_size /old_im_size))
+        # Formula: new_pixel_size = (old_pixel_size / (new_im_size / old_im_size))
         new_pxsizeX = (pxsizeX / (sizeX / float(xc)))
         new_pxsizeY = (pxsizeY / (sizeY / float(yc)))
 
@@ -424,7 +436,7 @@ class Download(object):
         print('Ice drift image is ready \n')
         return outfile
 
-# ---------------------------------------------------------------------------- #
+# --------------------------- END CLASS DOWNLOAD  ---------------------------- #
 
 def makeGeojson(grid, outfile):
     east = grid.split(',')[0]
@@ -450,24 +462,29 @@ def makeGeojson(grid, outfile):
     return outfile
 
 
-# ------------------------------ GETTING DATA -------------------------------- #
+# --------------------------- GETTING DATA (MAIN) ---------------------------- #
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,"hd:g:t:o:",["help","date=","grid=","target=","only=","overwrite"])
+        opts, args = getopt.getopt(argv,"hd:g:t:o:",["help", "test", "date=","grid=","target=","only=","overwrite"])
     except getopt.GetoptError:
-        print('Invalid arguments. Add "-h" for help.')
-        sys.exit(2)
+        print('Invalid arguments. Add "-h" or "--help" for help.')
+        sys.exit(1)
 
     date, grid, only, target, overwrite = None, None, None, None, False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n-h               Show help\n\
+            print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n\
+-h, --help       Show help\n\
+--test           Test that all packages and system variables work properly\n\
 -d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
 -g, --grid       Set center grid for sentinel imagery capture (format: east-decimal,north-decimal)\n\
 -t, --target     Set path to target directory (format: path/to/target)\n\
 -o, --only       Only create specified layer (format: layername)\n\
 --overwrite      Overwrite layers in geoserver'
             )
+            sys.exit()
+        elif opt in ("--help"):
+            print("All packages and sytem variables seems to work properly.")
             sys.exit()
         elif opt in ("-d", "--date"):
             if '-' in arg:
