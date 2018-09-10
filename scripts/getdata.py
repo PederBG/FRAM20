@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 """
 Written by PederBG, 2018-08
 
@@ -465,7 +467,7 @@ def makeGeojson(grid, outfile):
 # --------------------------- GETTING DATA (MAIN) ---------------------------- #
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,"hd:g:t:o:",["help", "test", "date=","grid=","target=","only=","overwrite"])
+        opts, args = getopt.getopt(argv,"hd:g:o:",["help", "test", "date=","grid=","target=","only=","overwrite"])
     except getopt.GetoptError:
         print('Invalid arguments. Add "-h" or "--help" for help.')
         sys.exit(1)
@@ -473,7 +475,7 @@ def main(argv):
     date, grid, only, target, overwrite = None, None, None, None, False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print('Usage: getdata.py [OPTIONS...]\n\nHelp options:\n\
+            print('Usage: ./getdata.py [OPTIONS...]\n\nHelp options:\n\
 -h, --help       Show help\n\
 --test           Test that all packages and system variables work properly\n\
 -d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
@@ -483,7 +485,7 @@ def main(argv):
 --overwrite      Overwrite layers in geoserver'
             )
             sys.exit()
-        elif opt in ("--help"):
+        elif opt in ("--test"):
             print("All packages and sytem variables seems to work properly.")
             sys.exit()
         elif opt in ("-d", "--date"):
