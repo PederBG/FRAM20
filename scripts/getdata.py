@@ -38,10 +38,12 @@ import numpy.ma as ma
 import matplotlib.pyplot as plt
 import gdal
 from gdalconst import *
-import urllib
+import urllib, urllib2
 import Image
 import netCDF4 as nc
 from geoserver.catalog import Catalog
+
+import fram_functions as funcs
 
 np.set_printoptions(threshold=np.nan) # for ice-drift quiverplot
 
@@ -65,16 +67,6 @@ class Download(object):
         self.PROJ = 'EPSG:3413'
         self.PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-        # Return values
-        # self.returns = {
-        #     's2c': [],
-        #     'terramos': [],
-        #     's1c': [],
-        #     's1mos': [],
-        #     'seaice': [],
-        #     'icedrift': []
-        # }
-
         if( kwargs.get('date') ):
             self.DATE = kwargs.get('date')
 
@@ -97,7 +89,7 @@ class Download(object):
             subprocess.call('mkdir ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
-            self.BBOX = makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
+            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
 
 
         # Check gdalhome path
@@ -108,107 +100,10 @@ class Download(object):
     # ---------------------------------------------------------
 
 
-    def clean(self):
-        print('\nCleaning used files...')
-        cmd = 'rm -r ' + self.TMPDIR
-        subprocess.call(cmd, shell=True)
-
-    # --------------------------------- HELP FUNCTIONS------------------------------- #
-    # Help function for downloading satellite products
-    def getSentinelFiles(self, bbox, max_files=1, polarization='hh', platform='s1'):
-        print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
-            %(bbox, max_files, polarization, platform))
-        api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://colhub.met.no/#/home')
-        # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
-        date = self.DATE.strftime('%Y%m%d')
-        yestdate = (self.DATE - timedelta(2)).strftime('%Y%m%d')
-
-        footprint = geojson_to_wkt(read_geojson(bbox))
-        if platform == 's1':
-            products = api.query(footprint,
-                            # ("20180805", "20180807"),
-                            (yestdate, date),
-                             platformname='Sentinel-1',
-                             producttype='GRD',
-                             sensoroperationalmode='EW'
-                             )
-        elif platform == 's2':
-            products = api.query(footprint,
-                            # ("20180805", "20180807"),
-                            (yestdate, date),
-                             platformname='Sentinel-2',
-                             cloudcoverpercentage=(0, 60) # TODO: find reasonable threshold
-                             )
-        else:
-            print('Not a valid platform!')
-            return [False]
-
-        if len(products) == 0:
-            print("No files found at date: " + date)
-            return [False]
-        print("Found", len(products), "Sentinel images.")
-
-        if platform == 's2':
-            products_df = api.to_dataframe(products).sort_values(['cloudcoverpercentage', 'size'], ascending=[True, True])
-            products_df = products_df.head(1)
-        else:
-            products_df = api.to_dataframe(products).sort_values('size', ascending=True)
-
-        downloadNames = []
-
-        for i in range(len(products_df)):
-            if i == max_files: # Prevents too large mosaic file
-                break
-            product_size = float(products_df['size'].values[i].split(' ')[0])
-            product_name = products_df['filename'].values[i][:-5]
-
-            product_clouds = ''
-            if platform == 's2':
-                product_clouds = ', Cloudcover: ' + str(products_df['cloudcoverpercentage'].values[i])
-            print("Name: %s, size: %s MB%s" %(product_name, product_size, product_clouds))
-
-            # if max_files == 1: # No point with ingestion date in mosaics with several images
-            #     self.returns[platform + 'c'] = products_df['ingestiondate'].values[i]
-
-            api.download(products_df['uuid'][i], self.TMPDIR)
-
-            if platform == 's1':
-                # UNZIPPING DOWNLOADED FILE
-                print("Unzipping product...")
-                zip_ref = zipfile.ZipFile(self.TMPDIR + product_name + '.zip')
-                zip_ref.extractall(self.TMPDIR)
-                zip_ref.close()
-
-                geofiles = glob.glob(self.TMPDIR + product_name + '.SAFE/measurement/*')
-                # FINDING RIGHT POLARIZATION FILE (now using HH-polarization)
-                if '-' + polarization + '-' in geofiles[0]:
-                    downloadNames.append(geofiles[0])
-                else:
-                    downloadNames.append(geofiles[1])
-
-            elif platform == 's2':
-                downloadNames.append(product_name)
-        return downloadNames
-
-    def tileImage(self, infile, outfile):
-        print('Tiling image')
-        cmd = '%sgdal_translate -of GTiff -co TILED=YES %s %s' %(self.GDALHOME, infile, outfile)
-        subprocess.call(cmd, shell=True)
-
-
-    def buildImageOverviews(self, outfile, num=5):
-        print("Building overview images")
-        opt = ['2', '4', '8', '16', '32', '64']
-        overviews = ""
-        for i in range(num):
-            overviews += opt[i] + ' '
-        cmd = '%sgdaladdo -r average %s %s' %(self.GDALHOME, outfile, overviews[:-1])
-        subprocess.call(cmd, shell=True)
-    #-------------------------- END HELP FUNCTIONS ----------------------------#
 
     # ------------------------------ S2 CLOSE-UP ----------------------------- #
     def getS2(self, outfile):
-        s2Name = self.getSentinelFiles(self.BBOX, platform='s2')[0]
+        s2Name = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, platform='s2')[0]
         if not s2Name:
             return False
         s2FileName = '/vsizip/%s%s.zip/%s.SAFE/MTD_MSIL1C.xml' %(self.TMPDIR, s2Name, s2Name)
@@ -228,8 +123,8 @@ class Download(object):
             ' -srcnodata 0 -dstalpha ' + s2FullName + ' ' + tmpfile
         subprocess.call(cmd, shell=True)
 
-        self.tileImage(tmpfile, outfile)
-        self.buildImageOverviews(outfile)
+        funcs.tileImage(self.GDALHOME, tmpfile, outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Sentinel-2 image is ready \n')
         return outfile
 
@@ -246,7 +141,11 @@ class Download(object):
         'format=image/jpeg&width=4530&height=3599'
         print("Query: " + query)
 
-        urllib.urlretrieve(query, self.TMPDIR + "terra.zip")
+        try:
+            urllib2.urlopen(query, self.TMPDIR + "terra.zip")
+        except urllib2.HTTPError, e:
+            print('Can not retrieve data. Error code: %s' %(str(e.code)))
+            return False
 
         # UNZIPPING DOWNLOADED FILE
         print("Unzipping product...")
@@ -261,14 +160,14 @@ class Download(object):
         tmpfile = glob.glob(self.TMPDIR + '**.jpg')[0]
 
         # PROCESSING FILE
-        self.tileImage(tmpfile, outfile)
-        self.buildImageOverviews(outfile)
+        funcs.tileImage(self.GDALHOME, tmpfile, outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Terra MODIS mosaic is ready \n')
         return outfile
 
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
     def getS1(self, outfile):
-        s1Name = self.getSentinelFiles(self.BBOX)[0]
+        s1Name = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX)[0]
         if not s1Name:
             return False
 
@@ -280,15 +179,15 @@ class Download(object):
             ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
         subprocess.call(cmd, shell=True)
 
-        self.tileImage(tmpfile, outfile)
-        self.buildImageOverviews(outfile)
+        funcs.tileImage(self.GDALHOME, tmpfile, outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Sentinel-1 image is ready \n')
         return outfile
     # --------------------------------- S1 MOSAIC -------------------------------- #
     def getS1Mos(self, outfile, max_num=3):
 
         tmpfiles = "" # arguments when making virtual mosaic
-        downloadNames = self.getSentinelFiles(self.BBOX, max_files=max_num)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
         if not downloadNames[0]:
             return False
         print(downloadNames)
@@ -309,8 +208,8 @@ class Download(object):
 
         print('Generating real, tiled mosaic from the virtual file')
 
-        self.tileImage(self.TMPDIR + 'tmp.vrt', outfile)
-        self.buildImageOverviews(outfile)
+        funcs.tileImage(self.GDALHOME, self.TMPDIR + 'tmp.vrt', outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Sentinel-1 mosaic is ready \n')
         return outfile
 
@@ -327,7 +226,11 @@ class Download(object):
         print("Query: " + query)
 
         rawfile = self.TMPDIR + 'seaiceraw.tif'
-        urllib.urlretrieve (query, rawfile)
+        try:
+            urllib2.urlopen(query, rawfile)
+        except urllib2.HTTPError, e:
+            print('Can not retrieve data. Error code: %s' %(str(e.code)))
+            return False
 
         tmpfile = self.TMPDIR + 'seaicetmp.tif'
         tmpfile2 = self.TMPDIR + 'seaicetmp2.tif'
@@ -345,8 +248,8 @@ class Download(object):
         cmd = '%spct2rgb.py -of GTiff -rgba %s %s' %(self.GDALHOME, tmpfile, tmpfile2)
         subprocess.call(cmd, shell=True)
 
-        self.tileImage(tmpfile2, outfile)
-        self.buildImageOverviews(outfile, num=4)
+        funcs.tileImage(self.GDALHOME, tmpfile2, outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile, num=4)
         print('Sea ice concentration image is ready \n')
         return outfile
 
@@ -367,6 +270,7 @@ class Download(object):
             urllib.urlretrieve(query, 'tmpfile.nc')
         except IOError:
             return False
+
 
         # MAKE QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
         print('Converting NETCDF bands to numpy arrays')
@@ -433,35 +337,13 @@ class Download(object):
             ' -srcnodata 255 -dstalpha ' + tmpfile2 + ' ' + tmpfile3
         subprocess.call(cmd, shell=True)
 
-        self.tileImage(tmpfile3, outfile)
-        self.buildImageOverviews(outfile, num=4)
+        funcs.tileImage(self.GDALHOME, tmpfile3, outfile)
+        funcs.buildImageOverviews(self.GDALHOME, outfile, num=4)
         print('Ice drift image is ready \n')
         return outfile
 
 # --------------------------- END CLASS DOWNLOAD  ---------------------------- #
 
-def makeGeojson(grid, outfile):
-    east = grid.split(',')[0]
-    north = grid.split(',')[1]
-
-    topRight = str( float(east) - 0.001 ) + ',' + north
-    bottomRight = str( float(east) - 0.001 ) + ',' + str( float(north) - 0.001 )
-    bottomLeft = east + ',' + str( float(north) - 0.001 )
-    json_string = '{"type":"FeatureCollection","features":[\n\
-    {"type":"Feature","properties":{},"geometry":{\n\
-        "type":"Polygon","coordinates":[[\n\
-            [' + grid + '],\n\
-            [' + topRight + '],\n\
-            [' + bottomRight + '],\n\
-            [' + bottomLeft + '],\n\
-            [' + grid + ']\n\
-        ]]\n\
-    }}\n\
-]}'
-    f = open(outfile, "w")
-    f.write(json_string)
-    f.close()
-    return outfile
 
 
 # --------------------------- GETTING DATA (MAIN) ---------------------------- #
