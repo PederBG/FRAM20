@@ -18,7 +18,7 @@ RUN wget https://sourceforge.net/projects/geoserver/files/GeoServer/2.12.5/geose
     mv geoserver-2.12.5/ /usr/share && \
     rm -f geoserver-2.12.5-bin.zip
 
-RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5/bin" >> ~/.bashrc
+RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5" >> ~/.bashrc
 
 RUN python2 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade pip setuptools wheel && \
@@ -43,4 +43,4 @@ RUN $APT_QUIET install libhdf5-serial-dev netcdf-bin libnetcdf-dev && \
 # netCDF4
 RUN python2 -m pip install netcdf4
 
-ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py populate_db && python3 manage.py runserver && tmux detach" && cd /root/fram19 && /bin/bash'
+ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver" && tmux new-session -d -s "geoserver" "cd /root/fram19 && GEOSERVER_HOME=/usr/share/geoserver-2.12.5 /usr/share/geoserver-2.12.5/bin/startup.sh" && cd /root/fram19 && /bin/bash'
