@@ -44,9 +44,9 @@ class Command(BaseCommand):
         l.save()
 
     def handle(self, *args, **options):
-        self.flush()
-        self.migrate()
-        self.make_migrations(),
+        # self.flush()
+        # self.migrate()
+        # self.make_migrations()
         self.createsu()
 
         grids = ['-40,84.85', '-33,84.8', '-28,84.4', '-23,83.9', '-21,83.5', '-19,82.9', '-18,82.4', '-17,81.8']

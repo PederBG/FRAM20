@@ -11,7 +11,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
     # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y%m%d')
-    yestdate = (DATE - timedelta(2)).strftime('%Y%m%d')
+    yestdate = (DATE - timedelta(4)).strftime('%Y%m%d') # 4 day interval in dev
 
     footprint = geojson_to_wkt(read_geojson(bbox))
     if platform == 's1':
@@ -27,7 +27,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
                         # ("20180805", "20180807"),
                         (yestdate, date),
                          platformname='Sentinel-2',
-                         cloudcoverpercentage=(0, 60) # TODO: find reasonable threshold
+                         cloudcoverpercentage=(0, 70) # TODO: find reasonable threshold
                          )
     else:
         print('Not a valid platform!')
@@ -84,7 +84,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
 
 # Tiling GeoTiff files for bether rendering performance
 def tileImage(GDALHOME, infile, outfile):
-    print('Tiling image')
+    print('Tiling image for bether rendering performance...')
     cmd = '%sgdal_translate -of GTiff -co TILED=YES %s %s' %(GDALHOME, infile, outfile)
     subprocess.call(cmd, shell=True)
 
@@ -92,13 +92,18 @@ def tileImage(GDALHOME, infile, outfile):
 # Building overview images for bether rendering performance
 # TODO difference between tileImage and buildImageOverviews ?
 def buildImageOverviews(GDALHOME, outfile, num=5):
-    print("Building overview images")
+    print("Building overview images for bether rendering performance...")
     opt = ['2', '4', '8', '16', '32', '64']
     overviews = ""
     for i in range(num):
         overviews += opt[i] + ' '
     cmd = '%sgdaladdo -r average %s %s' %(GDALHOME, outfile, overviews[:-1])
     subprocess.call(cmd, shell=True)
+
+def warpImage(GDALHOME, proj, custom_args, infile, outfile):
+        print("Warping to NSIDC Sea Ice Polar Stereographic North projection...")
+        cmd = '%sgdalwarp -of GTiff -t_srs %s %s %s %s' %(GDALHOME, proj, custom_args, infile, outfile)
+        return subprocess.call(cmd, shell=True)
 
 
 # Removing tmp files
@@ -110,6 +115,7 @@ def clean(TMPDIR):
 
 # Build geojson bounding box from input coordinates
 def makeGeojson(grid, outfile):
+    print('Making geojson bounding box...')
     east = grid.split(',')[0]
     north = grid.split(',')[1]
 
@@ -131,3 +137,9 @@ def makeGeojson(grid, outfile):
     f.write(json_string)
     f.close()
     return outfile
+
+
+def printLayerStatus(str):
+    print('--------------------------------------------------')
+    print('Generating layer: %s' %(str))
+    print('--------------------------------------------------')

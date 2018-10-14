@@ -7,7 +7,7 @@ This script will download and process up-to-date sensor data from multiple sourc
 and upload them as GeoTiff layers in a running geoserver. The geoserver will then
 handle feeding layer-tiles to the front-end on request.
 
-The script is meant to run as a cron job every day (or in a longer interval).
+The script is meant to run as a cron job.
 
 Layers:
     Sentinel-1 Optic Image Close-up (s2c)
@@ -99,7 +99,7 @@ class Download(object):
 
     # ---------------------------------------------------------
 
-
+    # Getting and processing each layer...
 
     # ------------------------------ S2 CLOSE-UP ----------------------------- #
     def getS2(self, outfile):
@@ -118,10 +118,7 @@ class Download(object):
 
         # PROCESSING FILE
         print("Processing files...")
-        print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-        cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 10 10 -order 3' + \
-            ' -srcnodata 0 -dstalpha ' + s2FullName + ' ' + tmpfile
-        subprocess.call(cmd, shell=True)
+        funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 10 10 -order 3 -srcnodata 0 -dstalpha', s2FullName, tmpfile)
 
         funcs.tileImage(self.GDALHOME, tmpfile, outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile)
@@ -141,11 +138,15 @@ class Download(object):
         'format=image/jpeg&width=4530&height=3599'
         print("Query: " + query)
 
-        try:
-            urllib2.urlopen(query, self.TMPDIR + "terra.zip")
-        except urllib2.HTTPError, e:
-            print('Can not retrieve data. Error code: %s' %(str(e.code)))
-            return False
+        with open(self.TMPDIR + "terra.zip",'wb') as f:
+            try:
+                f.write(urllib2.urlopen(query).read())
+                print(self.TMPDIR + "terra.zip")
+                f.close()
+            except urllib2.HTTPError, e:
+                print('Can not retrieve data. Error code: %s' %(str(e.code)))
+                f.close()
+                return False
 
         # UNZIPPING DOWNLOADED FILE
         print("Unzipping product...")
@@ -174,15 +175,13 @@ class Download(object):
         # PROCESSING FILE
         print("Processing files...")
         tmpfile = self.TMPDIR + 's1tmp.tif'
-        print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-        cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 40 40 -order 3' + \
-            ' -dstnodata 0 ' + s1Name + ' ' + tmpfile
-        subprocess.call(cmd, shell=True)
+        funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 40 40 -order 3 -dstnodata 0', s1Name, tmpfile)
 
         funcs.tileImage(self.GDALHOME, tmpfile, outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Sentinel-1 image is ready \n')
         return outfile
+
     # --------------------------------- S1 MOSAIC -------------------------------- #
     def getS1Mos(self, outfile, max_num=3):
 
@@ -190,17 +189,13 @@ class Download(object):
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
         if not downloadNames[0]:
             return False
-        print(downloadNames)
 
         for i in range(len(downloadNames)):
             tmpfile = self.TMPDIR + 's1mostmp' + str(i) + '.tif'
 
             # PROCESSING EACH FILE
-            print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-            cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + ' -tr 40 40 -order 3' + \
-            ' -dstnodata 0 ' + downloadNames[i] + ' ' + tmpfile
+            funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 40 40 -order 3 -dstnodata 0', downloadNames[i], tmpfile)
             tmpfiles += tmpfile + ' '
-            subprocess.call(cmd, shell=True)
 
         print('Making a virtual mosaic file')
         cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp.vrt ' + tmpfiles
@@ -226,21 +221,21 @@ class Download(object):
         print("Query: " + query)
 
         rawfile = self.TMPDIR + 'seaiceraw.tif'
-        try:
-            urllib2.urlopen(query, rawfile)
-        except urllib2.HTTPError, e:
-            print('Can not retrieve data. Error code: %s' %(str(e.code)))
-            return False
+        with open(rawfile,'wb') as f:
+            try:
+                f.write(urllib2.urlopen(query).read())
+                f.close()
+            except urllib2.HTTPError, e:
+                print('Can not retrieve data. Error code: %s' %(str(e.code)))
+                f.close()
+                return False
 
         tmpfile = self.TMPDIR + 'seaicetmp.tif'
         tmpfile2 = self.TMPDIR + 'seaicetmp2.tif'
 
         # PROCESSING FILE
         print("Processing files...")
-        print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-        cmd = self.GDALHOME + 'gdalwarp -of GTiff -t_srs ' + self.PROJ + \
-            ' -dstnodata 0 -dstalpha ' + rawfile + ' ' + tmpfile
-        code = subprocess.call(cmd, shell=True)
+        code = funcs.warpImage(self.GDALHOME, self.PROJ, '-dstnodata 0 -dstalpha', rawfile, tmpfile)
         if code != 0:
             return False
 
@@ -259,22 +254,23 @@ class Download(object):
         # DOWNLOADING NEWEST FILE WITH FTP
         enddate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
         startdate = (self.DATE - timedelta(3)).strftime('%Y%m%d')
+        m = (self.DATE - timedelta(1)).strftime('%m')
+        Y = (self.DATE - timedelta(1)).strftime('%Y')
 
-        # startdate = "20180803" #TODO: remove
-        # enddate = "20180805" #TODO: remove
-
-        query = 'ftp://osisaf.met.no/prod/ice/drift_lr/merged/ice_drift_nh_' + \
-        'polstere-625_multi-oi_%s1200-%s1200.nc' %(startdate, enddate)
+        query = 'ftp://osisaf.met.no/archive/ice/drift_lr/merged/%s/%s/ice_drift_' \
+        'nh_polstere-625_multi-oi_%s1200-%s1200.nc' %(Y, m, startdate, enddate)
         print('Query: ' + query)
+        tmpfile = self.TMPDIR + 'tmpfile.nc'
         try:
-            urllib.urlretrieve(query, 'tmpfile.nc')
+            urllib.urlretrieve(query, tmpfile)
         except IOError:
+            print("Could not download image")
             return False
 
 
         # MAKE QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
         print('Converting NETCDF bands to numpy arrays')
-        fh = nc.Dataset('tmpfile.nc', mode='r')
+        fh = nc.Dataset(tmpfile, mode='r')
         dx = (fh.variables['dX'][:][0])
         dy = (fh.variables['dY'][:][0])
 
@@ -296,7 +292,7 @@ class Download(object):
         # GETTING GEOREFERENCING INFO
         sizeX, sizeY, = Image.open(self.TMPDIR + 'quivertmp.jpg').size
 
-        file_nc = 'NETCDF:"tmpfile.nc":dX'
+        file_nc = 'NETCDF:"' + tmpfile + '":dX'
         ds = gdal.Open(file_nc)
         gt = ds.GetGeoTransform()
         cornerX = gt[0]
@@ -324,19 +320,15 @@ class Download(object):
         tmpfile2 = self.TMPDIR + 'quivertmp2.tif'
         tmpfile3 = self.TMPDIR + 'quivertmp3.tif'
 
-        print('Converting from worldfile to geotiff')
+        print('Converting from worldfile to geotiff...')
         cmd = '%sgdal_translate -of GTiff %s %s' %(self.GDALHOME, self.TMPDIR + 'quivertmp.jpg', tmpfile)
         subprocess.call(cmd, shell=True)
 
-        print('Removing noise around arrows')
+        print('Removing noise around arrows...')
         cmd = '%sgdal_calc.py -A %s --outfile=%s --calc="255*(A>220)"' %(self.GDALHOME, tmpfile, tmpfile2)
         subprocess.call(cmd, shell=True)
 
-        print("Warping to NSIDC Sea Ice Polar Stereographic North projection")
-        cmd = self.GDALHOME + 'gdalwarp -t_srs ' + self.PROJ + \
-            ' -srcnodata 255 -dstalpha ' + tmpfile2 + ' ' + tmpfile3
-        subprocess.call(cmd, shell=True)
-
+        funcs.warpImage(self.GDALHOME, self.PROJ, '-srcnodata 255 -dstalpha', tmpfile2, tmpfile3)
         funcs.tileImage(self.GDALHOME, tmpfile3, outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile, num=4)
         print('Ice drift image is ready \n')
@@ -349,7 +341,7 @@ class Download(object):
 # --------------------------- GETTING DATA (MAIN) ---------------------------- #
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,"hd:g:o:",["help", "test", "date=","grid=","target=","only=","overwrite"])
+        opts, args = getopt.getopt(argv,"hd:g:t:o:",["help", "test", "date=","grid=","target=","only=","overwrite"])
     except getopt.GetoptError:
         print('Invalid arguments. Add "-h" or "--help" for help.')
         sys.exit(1)
@@ -367,7 +359,7 @@ def main(argv):
 --overwrite      Overwrite layers in geoserver'
             )
             sys.exit()
-        elif opt in ("--test"):
+        elif opt == ("--test"):
             print("All packages and sytem variables seems to work properly.")
             sys.exit()
         elif opt in ("-d", "--date"):
@@ -403,8 +395,9 @@ def main(argv):
         outfiles.append( functions[only](d.OUTDIR + only + '.tif') )
     else:
         for k, v in functions.iteritems():
-            print('\nMaking layer: ' + k + '...')
+            funcs.printLayerStatus(str(k))
             outfiles.append( v(d.OUTDIR + k + '.tif') )
+            print("")
 
     print('Created files: ' + str(outfiles) + '\n')
     # d.clean()

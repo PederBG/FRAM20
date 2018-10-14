@@ -1,10 +1,7 @@
 FROM ubuntu:16.04
 
-ARG ssh_prv_key
-
 ENV DEBIAN_FRONTEND noninteractive
 ENV APT_QUIET "apt-get -yqq -o=Dpkg::Use-Pty=0"
-ENV FILE_SOURCE .
 
 RUN $APT_QUIET update && \
     $APT_QUIET install --no-install-recommends apt-utils && \
@@ -21,7 +18,7 @@ RUN wget https://sourceforge.net/projects/geoserver/files/GeoServer/2.12.5/geose
     mv geoserver-2.12.5/ /usr/share && \
     rm -f geoserver-2.12.5-bin.zip
 
-RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5-bin" >> ~/.bashrc
+RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5/bin" >> ~/.bashrc
 
 RUN python2 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade pip setuptools wheel && \
@@ -47,4 +44,3 @@ RUN $APT_QUIET install libhdf5-serial-dev netcdf-bin libnetcdf-dev && \
 RUN python2 -m pip install netcdf4
 
 ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py populate_db && python3 manage.py runserver && tmux detach" && cd /root/fram19 && /bin/bash'
-#ENTRYPOINT cd /root/fram19 && /bin/bash

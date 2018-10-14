@@ -8,7 +8,7 @@ python2.7.
 
 import os, sys, subprocess, glob
 from django.core.management.base import BaseCommand
-from fram.models import Position
+from fram.models import Position, Layer
 
 class Command(BaseCommand):
     args = '<foo bar ..>'
@@ -21,12 +21,17 @@ class Command(BaseCommand):
         scriptsPath = '/home/pederbg/sommer18/app/v2fram/scripts/'
         scriptName = 'getdata.py'
         targetPath = '/home/pederbg/sommer18/app/v2fram/data'
+        date = latest.date
+        grid = latest.grid
 
         # Get data
-        cmd = '%s%s -d %s -g %s %s --overwrite' %(scriptsPath, scriptName,
-            '20180728', '-18,82.4', targetPath)
+        cmd = '%s%s -d %s -g %s -t %s --overwrite' %(scriptsPath, scriptName,
+            date, grid, targetPath)
         print(cmd)
         subprocess.call(cmd, shell=True)
 
+        l = Layer()
+        l.position = latest
+        l.save()
         # Creating layer info
         # TODO
