@@ -2,17 +2,22 @@
 
 ### A GIS application for easy access to relevant sensor data from the arctic region
  
-####  Download, process and present up to date satellite imagery, and other sensor data, from a specified area.
+####  Download, process and present up to date satellite imagery, and other sensor data, following a specified location.
 
 ###### Developed as an internship assignment for Lundin Norway.
+![Github](https://preview.ibb.co/guC3D0/imageedit-1-5601177614.png "Preview")
 
 #### Note: *This is work in progress*
 
 ### Development
 
-###### Note: The project use both python2 and python3. Back end (django) is using python3.6, but the data generating scripts use modules that only supports python <= 2.7.
+#### Docker image (highly recommended)
 
-#### Docker image (recommended)
+- Fork the project and clone it in your own project folder:
+  ```sh
+  git clone https://github.com/PederBG/FRAM19.git
+  ```
+  
 - Install Docker: https://docs.docker.com/install/
 
 - Get docker image:
@@ -24,8 +29,23 @@
   ```sh
   ./docker/run_docker.sh
   ```
+The docker file will automatically start django and geoserver in two tmux sessions.
+  
+- Navigate to `http://localhost:8000/`
 
-#### Debian/Ubuntu full setup
+To display sensor data in the application the overlays needs to be generated. This is done using scripts/main.py. Type `./scripts/main.py --help` to see the options. However to see the overlays in the application a refrence have to be added in the database.
+
+###### Note that this process may take a lot of time and bandwidth depending on your download speed and available RAM. Also note that some images can take up to 5GB of disk space.
+
+- Run this command to download overlays for a given day (default is June 22, 2018) and add refrence to the database:
+   ```sh
+  python3 manage.py getsensordata
+  ```
+
+
+
+#### Debian/Ubuntu full setup (not recommended)
+###### Note: The project use both python2 and python3. Back end (django) is using python3.6, but the data generating scripts use modules that only supports python <= 2.7.
 
 - Fork the project and clone it in your own project folder:
   ```sh
