@@ -16,11 +16,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         latest = Position.objects.all().last()
+        # If no positions added
+        if not latest:
+            latest = Position()
+            latest.grid = '-17,82'
+            latest.date = '2018-06-22' # Default day (a day with clear weather)
+            latest.save()
 
         # Set paths
-        scriptsPath = '/home/pederbg/sommer18/app/v2fram/scripts/'
-        scriptName = 'getdata.py'
-        targetPath = '/home/pederbg/sommer18/app/v2fram/data'
+        scriptsPath = 'scripts/'
+        scriptName = 'main.py'
+        targetPath = 'data'
         date = latest.date
         grid = latest.grid
 
