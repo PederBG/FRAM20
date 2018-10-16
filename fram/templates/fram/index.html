@@ -20,20 +20,25 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <!-- Passing django data to external js -->
     <script>
-    var layerinfo = {'OpticClose': "{{ opticclose | safe | linebreaks }}",
-                     'OpticMos': "{{ opticmos | safe | linebreaks }}",
-                     'SARClose': "{{ sarclose | safe | linebreaks }}",
-                     'SARMos': "{{ sarmos | safe | linebreaks }}",
-                     'SeaIce': "{{ seaice | safe | linebreaks }}",
-                     'IceDrift': "{{ icedrift | safe | linebreaks }}"
-                    }
-      var positions = new Map([
-        {% for k, v in positions.items %}
-        ["{{ k }}", "{{ v }}"]
-        {% if not forloop.last %},{% endif %}
-        {% endfor %}
-      ]);
-      latestDate = "{{ last_date_str }}"
+    if ("{{ positions }}" != "None"){
+        var layerinfo = {'OpticClose': "{{ opticclose | safe | linebreaks }}",
+                         'OpticMos': "{{ opticmos | safe | linebreaks }}",
+                         'SARClose': "{{ sarclose | safe | linebreaks }}",
+                         'SARMos': "{{ sarmos | safe | linebreaks }}",
+                         'SeaIce': "{{ seaice | safe | linebreaks }}",
+                         'IceDrift': "{{ icedrift | safe | linebreaks }}"
+                        }
+          var positions = new Map([
+            {% for k, v in positions.items %}
+            ["{{ k }}", "{{ v }}"]
+            {% if not forloop.last %},{% endif %}
+            {% endfor %}
+          ]);
+          latestDate = "{{ last_date_str }}"
+    }
+    else{
+        alert("No overlay data found!")
+    }
      </script>
     <script src="{% static 'js/map.js' %}"></script>
   </head>

@@ -9,6 +9,9 @@ from django.http import HttpResponse
 
 def index(request):
     positions = {}
+    if not Position.objects.all():
+        return render(request, 'fram/index.html', {'positions': 'None'})
+
     for pos in Position.objects.all():
         positions[str(pos.date)] = pos.grid
     context = {
