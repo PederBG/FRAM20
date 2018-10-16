@@ -83,7 +83,7 @@ class DownloadManager(object):
             subprocess.call('mkdir ' + self.TMPDIR, shell=True)
         if not os.path.isdir(self.OUTDIR):
             print('Making OUTDIR...')
-            subprocess.call('mkdir ' + self.OUTDIR, shell=True)
+            subprocess.call('mkdir -p ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
             self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
