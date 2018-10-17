@@ -23,7 +23,7 @@ RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5" >> ~/.bashrc
 RUN python2 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install django && \
-    python2 -m pip install numpy scipy sentinelsat gsconfig && \
+    python2 -m pip install numpy scipy sentinelsat gsconfig pandas && \
     $APT_QUIET install python-matplotlib
 
 # GDAL

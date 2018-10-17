@@ -27,6 +27,7 @@
   
 - Run docker image:
   ```sh
+  cd FRAM19
   ./docker/run_docker.sh
   ```
 The docker file will automatically start django and geoserver in two tmux sessions.
