@@ -33,12 +33,15 @@ import zipfile
 import os, sys, subprocess, glob, getopt
 import numpy as np
 import numpy.ma as ma
-import matplotlib.pyplot as plt
 import gdal
 from gdalconst import *
 import urllib, urllib2
 import Image
 import netCDF4 as nc
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 import fram_functions as funcs
 

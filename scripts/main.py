@@ -79,7 +79,7 @@ def main(argv):
     # BUG: ws is sometime cite instead of d.date
     ws = cat.get_workspace( str(d.DATE) )
     if ws is None:
-        cat.create_workspace(str(d.DATE), str(d.DATE) + 'uri')
+        ws = cat.create_workspace(str(d.DATE), str(d.DATE) + 'uri')
 
     for layerdata in outfiles:
         if layerdata:
