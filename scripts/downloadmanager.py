@@ -1,27 +1,17 @@
 """
 Written by PederBG, 2018-08
 
-This script will download and process up-to-date sensor data from multiple sources
-and upload them as GeoTiff layers in a running geoserver. The geoserver will then
-handle feeding layer-tiles to the front-end on request.
-
-The script is meant to run as a cron job.
+This class handles downloading and processing of up-to-date sensor data from
+multiple sources.
 
 Layers:
     Sentinel-1 Optic Image Close-up (s2c)
-
     Terra MODIS Optic Mosaic (terramos)
-
     Sentinel-1 SAR High Resolution Close-up (s1c)
-
     Sentinel-1 SAR High Resolution Mosaic (s1mos)
-
     AMSR-2 Global Sea Ice Concentration (seaice)
-
     Low Resolution Sea Ice Drift (icedrift)
-
     S1 Mosaic using ESA's quicklooks (not in use)
-
 
 NOTE: This script is written for Python 2.7. This is due to some library restrictions.
 
@@ -99,7 +89,7 @@ class DownloadManager(object):
 
     # ---------------------------------------------------------
 
-    # Getting and processing each layer...
+    # Download and process each layer...
 
     # ------------------------------ S2 CLOSE-UP ----------------------------- #
     def getS2(self, outfile):
@@ -306,11 +296,12 @@ class DownloadManager(object):
         new_pxsizeX = (pxsizeX / (sizeX / float(xc)))
         new_pxsizeY = (pxsizeY / (sizeY / float(yc)))
 
-        jwg_string = "%s\n0.00000000000\n0.00000000000\n%s\n%s\n%s" \
+        # MAKING JGW FILE USED FOR GEOREFERENCING
+        jgw_string = "%s\n0.00000000000\n0.00000000000\n%s\n%s\n%s" \
          %(new_pxsizeX*1000, new_pxsizeY*1000, cornerX*1000, cornerY*1000)
 
         f = open(self.TMPDIR + "quivertmp.jgw", "w")
-        f.write(jwg_string)
+        f.write(jgw_string)
         f.close()
 
         # PROCESSING FILE

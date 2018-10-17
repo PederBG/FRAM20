@@ -1,3 +1,14 @@
+"""
+Written by PederBG, 2018-08
+
+Main method used by FRAM19 for image overlay generating.
+
+It uses a DownloadManager instance to download and process raw data and then
+uploads ready-to-use, georeferenced overlays to a locally running geoserver.
+
+The geoserver will then handle feeding layer-tiles to the front-end on request.
+"""
+
 #! /usr/bin/env python
 from datetime import datetime
 import sys, getopt
@@ -72,6 +83,7 @@ def main(argv):
     print('Created files: ' + str(outfiles) + '\n')
     # d.clean()
     #  ---------------- Getting/processing data end ---------------- #
+
 
     # --------------------- Upload to Geoserver -------------------- #
     cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")

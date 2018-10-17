@@ -1,3 +1,9 @@
+"""
+Written by PederBG, 2018-08
+
+Help function used when downloading and processing images.
+"""
+
 from datetime import date, datetime, timedelta
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
 import zipfile

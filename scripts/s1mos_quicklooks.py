@@ -1,3 +1,9 @@
+"""
+This script uses ESA's quicklook images to build a low-data mosaic GeoTIFF overlay.
+Not in use because of bad image geolocation.
+"""
+
+
 def makeProductsFile():
     api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
 
