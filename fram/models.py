@@ -19,3 +19,11 @@ class Layer(models.Model):
 
     def __str__(self):
         return "Layers from date " + str(self.position.date)
+
+class Letter(models.Model):
+    title = models.CharField(max_length=100)
+    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
+    content = models.TextField(max_length=50000)
+
+    def __str__(self):
+        return "Travel letter: {}".format(self.title)

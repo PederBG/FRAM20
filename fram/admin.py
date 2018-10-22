@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Position, Layer
+from .models import *
 
 admin.site.register(Position)
 admin.site.register(Layer)
+admin.site.register(Letter)

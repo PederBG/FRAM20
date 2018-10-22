@@ -1,10 +1,5 @@
 from django.shortcuts import render
-from django.template import loader
 from .models import Position, Layer
-
-import json
-
-from django.http import HttpResponse
 
 
 def index(request):
@@ -26,3 +21,6 @@ def index(request):
         'icedrift': Layer.objects.filter(position=Position.objects.last()).values('icedrift')[0]['icedrift'],
         }
     return render(request, 'fram/index.html', context)
+
+def letters(request):
+    return render(request, 'fram/letters.html')

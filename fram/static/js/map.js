@@ -2,9 +2,6 @@ proj4.defs('EPSG:3413', '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 ' +
     '+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 var proj3413 = ol.proj.get('EPSG:3413');
 proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
-//proj3413.setWorldExtent([-4194304, -4194304, 4194304, 4194304]);
-
-//var ext =  [-29.598609808656846, 79.41875951953834, 7.528721387689651, 84.66059789200978];
 
 
 var map;
@@ -17,7 +14,6 @@ var static_layerinfo = {
   'LandEdge': "<p><b>LandEdge</b><br>Source: NASA's EOSDIS, worldview.earthdata.nasa.gov<br>Pixel size: 255.9x255.9m / pixel<br>Raw size: 222MB</p>"
 }
 
-// setInterval(function(){ console.trace(); }, 3000);
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
   center: ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413"),
@@ -41,6 +37,7 @@ function setCustomLayerSource (workspace, name){
     })
 }
 
+// Adding bathymetry layer
 bathlayer = new ol.layer.Tile({
   source: new ol.source.TileWMS({
     url: 'https://ahocevar.com/geoserver/wms',
@@ -75,7 +72,6 @@ fetch(url).then(function(response) {
   // Waiting for http response..
 
   // The order here decides z-index for images
-  // var layernames = ["iceconc", "terra2"/*, "opticclose"*/, "s1mosv2", "s1b2",  "s2"/*, "s1_clouds", "terra_clouds"*/, "icequiverwarp", "landedge"];
   layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
   var workspace_default = latestDate
   console.log(workspace_default);
@@ -98,7 +94,6 @@ fetch(url).then(function(response) {
 // Adding markers
   allPointFeatures = [];
   activePointFeatures = [];
-
 
   Array.from(positions.keys()).forEach(function(element) {
     var grid = positions.get(element).split(',');
@@ -139,14 +134,16 @@ fetch(url).then(function(response) {
           radius: 3
       }),
   });
+
+  // Adding markers to map
   vectorLayer = new ol.layer.Vector({
       source: new ol.source.Vector({projection: 'EPSG:3413',features: allPointFeatures}),
       style: markerStyle
   });
   vectorLayer.setZIndex(3);
 
-  const scaleLineControl = new ol.control.ScaleLine();
   // Init map
+  const scaleLineControl = new ol.control.ScaleLine();
   map = new ol.Map({
     controls: ol.control.defaults({
        attributionOptions: {
@@ -160,63 +157,6 @@ fetch(url).then(function(response) {
     view: defaultView
   });
   map.addLayer(vectorLayer);
-
-  // Create the graticule component
-  // var graticule = new ol.Graticule({
-  //   strokeStyle: new ol.style.Stroke({
-  //     color: 'rgba(255,120,0,0.9)',
-  //     width: 2,
-  //     lineDash: [0.5, 4]
-  //   }),
-  //   showLabels: true,
-  //   targetSize: 300,
-  //   maxLines: 20
-  // });
-  // console.log(map);
-  // graticule.setMap(map);
-
-
-  // ------------------ LOADING LOGIC ---------------- \\
-  // map.getLayers().forEach(function (layer) {
-  //     var source = layer.getSource();
-  //     if (source instanceof ol.source.TileImage) {
-  //         source.on('tileloadstart', function () {++numInFlightTiles})
-  //         source.on('tileloadend', function () {--numInFlightTiles})
-  //     }
-  // })
-  //
-  // map.on('postrender', function (evt) {
-  //   if (!evt.frameState)
-  //       return;
-  //
-  //   var numHeldTiles = 0;
-  //   var wanted = evt.frameState.wantedTiles;
-  //   for (var layer in wanted)
-  //       if (wanted.hasOwnProperty(layer))
-  //           numHeldTiles += Object.keys(wanted[layer]).length;
-  //
-  //   var ready = numInFlightTiles === 0 && numHeldTiles === 0;
-  //   if (map.get('ready') !== ready)
-  //     map.set('ready', ready);
-  // });
-  // map.set('ready', false);
-  //
-  // function whenMapIsReady(callback) {
-  //     if (map.get('ready'))
-  //         callback();
-  //     else
-  //         map.once('change:ready', whenMapIsReady.bind(null, callback));
-  // }
-  //
-  // map.on('moveend', function (evt) {
-  //   $('.loader').css("display", "block");
-  //   $('.fadeout').css("display", "block");
-  //   whenMapIsReady(function(){
-  //     $('.loader').css("display", "none");
-  //     $('.fadeout').css("display", "none");
-  //   });
-  // });
-  // ------------------ LOADING LOGIC END ---------------- \\
 
 
 });
@@ -262,63 +202,19 @@ function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
 }
 
+// Add controls to all buttons
+// TODO: Use same names everywere and maybe set names in db
+ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'SeaIce', 'IceDrift', 'LandEdge']
 $(document).ready(function() {
 
-  $('#btOpticClose').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btOpticMos').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btSARClose').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btSARMos').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btBathymetry').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btSeaIce').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btIceDrift').click(function() {
-    ToggleLayer(this);
-  });
-  $('#btLandEdge').click(function() {
-    ToggleLayer(this);
-  });
-  /*$('#btGridLines').click(function() {
-    ToggleLayer(this);
-  });*/
+    ids.forEach(function(id) {
+        $('#bt' + id).click(function() { ToggleLayer(this) });
 
-  document.getElementById("OpticClose").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("OpticMos").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("SARClose").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("SARMos").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("Bathymetry").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("SeaIce").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("IceDrift").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  document.getElementById("LandEdge").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });
-  /*document.getElementById("GridLines").addEventListener('mouseup', function() {
-    layerdict[this.name].setOpacity(this.value / 100);
-  });*/
+        document.getElementById(id).addEventListener('mouseup', function() {
+          layerdict[this.name].setOpacity(this.value / 100);
+        });
+    });
+    
 
   function changeDate(btn){
     if (btn.id == 'forward'){
