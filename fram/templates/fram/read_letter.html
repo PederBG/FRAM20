@@ -44,28 +44,10 @@
 
       <div class="col-md-6 col-md-offset-3">
         <div class="letters-info">
-
-          <h2>Travel Letters</h2>
-          <h4>Here you can read travel letters and reports from the FRAM2019 expedition.</h4>
+          <h2>{{letter.title}}</h2>
+          <h4>{{letter.preamble}}</h4>
+          <h5>{{letter.content}}</h5>
         </div>
-
-        {% if letters %}
-          <div class="list-group">
-          {% for letter in letters %}
-              <a href="letters/{{letter.id}}" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <h4 class="mb-1">{{letter.title}}</h4>
-                  <small>{{letter.position.date}}</small>
-                </div>
-                <p class="mb-1">{{letter.preamble}}</p>
-              </a>
-              <br>
-            {% endfor %}
-          </div>
-        {% else %}
-          <br>
-          <p style="text-align: center;">No travel letters have been posted...</p>
-        {% endif %}
       </div>
 
   </body>

@@ -8,7 +8,7 @@ def index(request):
 
     context = {
         'positions': Position.objects.all().order_by('date'),
-        
+
         # all layers
         'opticclose': Layer.objects.filter(position=Position.objects.last()).values('opticclose')[0]['opticclose'],
         'opticmos': Layer.objects.filter(position=Position.objects.last()).values('opticmos')[0]['opticmos'],
@@ -22,6 +22,16 @@ def index(request):
 def letters(request):
     return render(request, 'fram/letters.html', {
         'letters': Letter.objects.all().order_by('-position__date'),
+    })
+
+def read_letter(request, letterID):
+    try:
+        letter = Letter.objects.get(id=letterID)
+    except Letter.DoesNotExist:
+        letter = None
+
+    return render(request, 'fram/read_letter.html', {
+        'letter': letter,
     })
 
 def info(request):
