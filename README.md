@@ -4,14 +4,14 @@
  
 ####  Download, process and present up to date satellite imagery, and other sensor data, following a specified location.
 
-###### Developed as an internship assignment for Lundin Norway.
-![Github](https://preview.ibb.co/guC3D0/imageedit-1-5601177614.png "Preview")
+###### Developed as an internship assignment for Lundin Norway. Published with their consent.
+![Github](https://preview.ibb.co/jC8s8A/fram.png "Preview")
 
 #### Note: *This is work in progress*
 
 ### Development
 
-#### Docker image (highly recommended)
+#### Use docker image (highly recommended)
 
 - Fork the project and clone it in your own project folder:
   ```sh
@@ -42,11 +42,11 @@ To display sensor data in the application the overlays needs to be generated. Th
    ```sh
   python3 manage.py getsensordata
   ```
-
+<br><br>
 
 
 #### Debian/Ubuntu full setup (not recommended)
-###### Note: The project use both python2 and python3. Back end (django) is using python3.6, but the data generating scripts use modules that only supports python <= 2.7.
+###### Note: The project use both python2 and python3. The django app is using python3.6, but the data generating scripts need packages that only supports python <= 2.7.
 
 - Fork the project and clone it in your own project folder:
   ```sh
