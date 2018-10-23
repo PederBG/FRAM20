@@ -6,10 +6,9 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+    <link rel="shortcut icon" href="{%  static 'img/lundin_favicon.png' %}">    <!-- Bootstrap CSS -->
 
-    <title>Raster Reprojection</title>
+    <title>Expedition Map</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
     <link href="{% static 'css/map.css' %}" rel="stylesheet">
@@ -31,12 +30,12 @@
                              'IceDrift': "{{ icedrift | safe | linebreaks }}"
                             }
               var positions = new Map([
-                {% for k, v in positions.items %}
-                ["{{ k }}", "{{ v }}"]
+                {% for pos in positions %}
+                ["{{ pos.date }}", "{{ pos.grid }}"]
                 {% if not forloop.last %},{% endif %}
                 {% endfor %}
               ]);
-              latestDate = "{{ last_date_str }}"
+              latestDate = "{{ positions.last.date }}"
         }
         else{
             alert("No overlay data found!")
@@ -60,7 +59,7 @@
             <ul class="nav navbar-nav">
               <li class="active"><a href="{% url 'index' %}">Expedition Map</a></li>
               <li><a href="{% url 'letters' %}">Travel Letters</a></li>
-              <li><a href="#">Expedition Info</a></li>
+              <li><a href="{% url 'info' %}">Expedition Info</a></li>
               <li><a href="#">Something Else</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -142,7 +141,7 @@
     </ul>
     <div id='dates-div'>
         <span class='arrow' id='back'>&#9664;</span>
-        <span id='used-date'>{{last_date_str}}</span>
+        <span id='used-date'>{{positions.last.date}}</span>
         <span class='arrow' id='forward'>&#9654;</span>
     </div>
 

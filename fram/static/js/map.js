@@ -214,16 +214,17 @@ $(document).ready(function() {
           layerdict[this.name].setOpacity(this.value / 100);
         });
     });
-    
+
 
   function changeDate(btn){
+    console.log(activePointFeatures);
     if (btn.id == 'forward'){
       if (activePointFeatures.length < allPointFeatures.length){
         activePointFeatures.push(allPointFeatures[activePointFeatures.length])
       } else return false;
     }
     else{
-      if (activePointFeatures.length > 0){
+      if (activePointFeatures.length > 1){
         activePointFeatures.pop()
       } else return false;
     }
@@ -236,7 +237,8 @@ $(document).ready(function() {
     map.addLayer(vectorLayer);
 
     layernames.forEach(function(name) {
-      layerdict[name].setSource( setCustomLayerSource( Array.from(positions.keys())[activePointFeatures.length-1], name ) );
+      let date = uglifyDate(Array.from(positions.keys())[activePointFeatures.length-1]);
+      layerdict[name].setSource( setCustomLayerSource( date, name ) );
     });
 
   }
@@ -246,5 +248,10 @@ $(document).ready(function() {
   $('#back').click(function() {
     changeDate(this)
   });
+
+  function uglifyDate(dateString){
+    let tmp = new Date(dateString);
+    return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+  }
 
 });

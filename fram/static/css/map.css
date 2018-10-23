@@ -1,6 +1,7 @@
 html, body {
   height: 100%;
   background-color: #232426;
+  color: whitesmoke;
 }
 
 /* Navbar */
@@ -168,3 +169,12 @@ div.ol-scale-line{
 div.ol-attribution{
   display: none;
 }
+
+
+/* Travel Letters Page */
+.letters-info{
+  text-align: center;
+}
+
+
+/* End Travel Letters Page */
