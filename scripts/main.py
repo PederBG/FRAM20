@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 """
 Written by PederBG, 2018-08
 
@@ -9,7 +11,6 @@ uploads ready-to-use, georeferenced overlays to a locally running geoserver.
 The geoserver will then handle feeding layer-tiles to the front-end on request.
 """
 
-#! /usr/bin/env python
 from datetime import datetime
 import sys, getopt
 from geoserver.catalog import Catalog

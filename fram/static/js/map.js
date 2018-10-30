@@ -73,7 +73,7 @@ fetch(url).then(function(response) {
 
   // The order here decides z-index for images
   layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
-  var workspace_default = latestDate
+  var workspace_default = uglifyDate(latestDate);
   console.log(workspace_default);
   layerdict = {
     "base": baselayer,
@@ -248,10 +248,10 @@ $(document).ready(function() {
   $('#back').click(function() {
     changeDate(this)
   });
-
-  function uglifyDate(dateString){
-    let tmp = new Date(dateString);
-    return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-  }
-
 });
+
+// Needed at setup
+function uglifyDate(dateString){
+  let tmp = new Date(dateString);
+  return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+}
