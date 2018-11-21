@@ -10,8 +10,8 @@ var allPointFeatures, activePointFeatures, markerStyle, layernames;
 var numInFlightTiles = 0;
 var layerdict;
 var static_layerinfo = {
-  'Bathymetry': "<p><b>Bathmetry Polar Map</b><br>Source: Ahocevar Geospatial Solutions<br>Available at: ahocevar.com/geoserver</p>",
-  'LandEdge': "<p><b>LandEdge</b><br>Source: NASA's EOSDIS, worldview.earthdata.nasa.gov<br>Pixel size: 255.9x255.9m / pixel<br>Raw size: 222MB</p>"
+  'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Source:</b> Ahocevar Geospatial Solutions<br><b>Available at:</b> ahocevar.com/geoserver</p>",
+  'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>"
 }
 
 var defaultView = new ol.View({
