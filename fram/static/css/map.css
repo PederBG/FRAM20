@@ -134,6 +134,7 @@ button:hover{
   right: 0;
   bottom: 0;
   position: absolute;
+  color: black;
   background-color: whitesmoke;
   opacity: 0.8;
   display: none;
@@ -144,13 +145,26 @@ button:hover{
 }
 #close {
     position: absolute;
-    top: 0;
+    top: -0.3em;
     right: 3px;
     color: #212326;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     transition: 0.3s;
   }
+  @media only screen and (max-width: 900px) {
+    #LayerInfoContainer{
+      font-size: small;
+      width: 50%;
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    #LayerInfoContainer{
+      font-size: small;
+      width: 75%;
+    }
+  }
+
 #close:hover,
 #close:focus {
     color: #434444;

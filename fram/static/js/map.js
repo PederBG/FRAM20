@@ -10,7 +10,7 @@ var allPointFeatures, activePointFeatures, markerStyle, layernames;
 var numInFlightTiles = 0;
 var layerdict;
 var static_layerinfo = {
-  'Bathymetry': "<p><b>Bathmetry Polar Map</b><br>Source: ahocevar, ahocevar.com/geoserver</p>",
+  'Bathymetry': "<p><b>Bathmetry Polar Map</b><br>Source: Ahocevar Geospatial Solutions<br>Available at: ahocevar.com/geoserver</p>",
   'LandEdge': "<p><b>LandEdge</b><br>Source: NASA's EOSDIS, worldview.earthdata.nasa.gov<br>Pixel size: 255.9x255.9m / pixel<br>Raw size: 222MB</p>"
 }
 
