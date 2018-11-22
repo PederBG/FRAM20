@@ -95,8 +95,8 @@ fetch(url).then(function(response) {
   allPointFeatures = [];
   activePointFeatures = [];
 
-  Array.from(positions.keys()).forEach(function(element) {
-    var grid = positions.get(element).split(',');
+  positions.forEach(function(element) {
+    var grid = element[1].split(',');
     var tmpPoint = new ol.geom.Point(
         ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
     );
@@ -190,11 +190,10 @@ function toggleInfo(bt){
   $('#LayerInfoContainer').toggle();
   $('#LayerInfo').text('');
   let layername = bt.id.split('Info')[0].split('bt')[1];
-  if ($.inArray(layername, Object.keys(layerinfo)) != -1){
-    $('#LayerInfo').html(layerinfo[layername]);
+  if ($.inArray(layername, Object.keys(positions[activePointFeatures.length-1][2])) != -1){
+    $('#LayerInfo').html(positions[activePointFeatures.length-1][2][layername]);
   }
   else{
-    console.log(layername);
     $('#LayerInfo').html(static_layerinfo[layername]);
   }
 }
@@ -217,7 +216,7 @@ $(document).ready(function() {
 
 
   function changeDate(btn){
-    console.log(activePointFeatures);
+    $('#LayerInfoContainer').hide();
     if (btn.id == 'forward'){
       if (activePointFeatures.length < allPointFeatures.length){
         activePointFeatures.push(allPointFeatures[activePointFeatures.length])
@@ -228,7 +227,7 @@ $(document).ready(function() {
         activePointFeatures.pop()
       } else return false;
     }
-    $('#used-date').html(Array.from(positions.keys())[activePointFeatures.length-1]);
+    $('#used-date').html(positions[activePointFeatures.length-1][0]);
     map.removeLayer(vectorLayer);
     vectorLayer = new ol.layer.Vector({
         source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
@@ -237,7 +236,7 @@ $(document).ready(function() {
     map.addLayer(vectorLayer);
 
     layernames.forEach(function(name) {
-      let date = uglifyDate(Array.from(positions.keys())[activePointFeatures.length-1]);
+      let date = uglifyDate(positions[activePointFeatures.length-1][0]);
       layerdict[name].setSource( setCustomLayerSource( date, name ) );
     });
 

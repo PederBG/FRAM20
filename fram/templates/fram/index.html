@@ -22,20 +22,24 @@
     <!-- Passing django data to external js -->
     <script>
         if ("{{ positions }}" != "None"){
-            var layerinfo = {'OpticClose': "{{ opticclose | safe | linebreaks }}",
-                             'OpticMos': "{{ opticmos | safe | linebreaks }}",
-                             'SARClose': "{{ sarclose | safe | linebreaks }}",
-                             'SARMos': "{{ sarmos | safe | linebreaks }}",
-                             'SeaIce': "{{ seaice | safe | linebreaks }}",
-                             'IceDrift': "{{ icedrift | safe | linebreaks }}"
-                            }
-              var positions = new Map([
-                {% for pos in positions %}
-                ["{{ pos.date }}", "{{ pos.grid }}"]
+              var positions = [];
+                {% for layer in layers %}
+                  positions.push(
+                    [
+                        "{{ layer.position.date }}", "{{ layer.position.grid }}",
+                      {
+                        'OpticClose': "{{ layer.opticclose | safe | linebreaks }}",
+                        'OpticMos': "{{ layer.opticmos | safe | linebreaks }}",
+                        'SARClose': "{{ layer.sarclose | safe | linebreaks }}",
+                        'SARMos': "{{ layer.sarmos | safe | linebreaks }}",
+                        'SeaIce': "{{ layer.seaice | safe | linebreaks }}",
+                        'IceDrift': "{{ layer.icedrift | safe | linebreaks }}"
+                      }
+                    ]
+                  )
                 {% if not forloop.last %},{% endif %}
                 {% endfor %}
-              ]);
-              latestDate = "{{ positions.last.date }}"
+              latestDate = "{{ layers.last.position.date }}"
         }
         else{
             alert("No overlay data found!")
@@ -141,7 +145,7 @@
     </ul>
     <div id='dates-div'>
         <span class='arrow' id='back'>&#9664;</span>
-        <span id='used-date'>{{positions.last.date}}</span>
+        <span id='used-date'>{{layers.last.position.date}}</span>
         <span class='arrow' id='forward'>&#9654;</span>
     </div>
 
