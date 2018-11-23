@@ -2,26 +2,54 @@ proj4.defs('EPSG:3413', '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 ' +
     '+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 var proj3413 = ol.proj.get('EPSG:3413');
 proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
+proj3413.setWorldExtent([-50, 80, 30, 87]);
 
 
-var map;
-var vectorLayer;
-var allPointFeatures, activePointFeatures, markerStyle, layernames;
-var numInFlightTiles = 0;
-var layerdict;
+var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer;
 var static_layerinfo = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Source:</b> Ahocevar Geospatial Solutions<br><b>Available at:</b> ahocevar.com/geoserver</p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>"
 }
 
+// default values
+const MIN_ZOOM = 3.5
+
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
   center: ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413"),
-  rotation: Math.PI / 7, // Quick fix instead of changing projections
+  // rotation: Math.PI / 7, // Quick fix instead of changing projections
   zoom: 5,
-  minZoom: 3.5,
+  minZoom: MIN_ZOOM,
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
+
+// Create the graticule component
+const labelStyle = new ol.style.Text({
+  font: '9px Calibri,sans-serif',
+  textBaseline: 'bottom',
+  fill: new ol.style.Fill({
+    color: 'rgba(0,0,0,1)'
+  }),
+  stroke: new ol.style.Stroke({
+    color: 'rgba(255,255,255,1)',
+    width: 3
+  })
+});
+const strokeStyle = new ol.style.Stroke({
+  color: 'rgba(255,120,0,0.9)',
+  width: 1,
+})
+
+let graticule = new ol.Graticule({
+  strokeStyle: strokeStyle,
+  showLabels: true,
+  maxLines: 200,
+  targetSize: 400,
+  // lonLabelPosition: 0.05,
+  // latLabelPosition: 0.95,
+  lonLabelStyle: labelStyle,
+  latLabelStyle: labelStyle
+});
 
 function setCustomLayerSource (workspace, name){
   return new ol.source.TileWMS({
@@ -128,7 +156,7 @@ fetch(url).then(function(response) {
               color: 'rgba(200, 50, 50, 1)'
           }),
           stroke: new ol.style.Stroke({
-              width: 1,
+              width: 3,
               color: 'rgba(200, 200, 200, 0.8)'
           }),
           radius: 3
@@ -157,6 +185,7 @@ fetch(url).then(function(response) {
     view: defaultView
   });
   map.addLayer(vectorLayer);
+  toggleGrid();
 
 
 });
@@ -199,6 +228,19 @@ function toggleInfo(bt){
 }
 function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
+}
+
+function toggleGrid(){
+  if (graticule.getMap()){
+    graticule.setMap();
+    defaultView.setMinZoom(MIN_ZOOM)
+    $('#btGridLines').css("background-color", "transparent")
+  }
+  else{
+    graticule.setMap(map);
+    defaultView.setMinZoom(1)
+    $('#btGridLines').css("background", "gray")
+  }
 }
 
 // Add controls to all buttons
