@@ -69,6 +69,8 @@ class DownloadManager(object):
         if( kwargs.get('target') ):
             self.OUTDIR = kwargs.get('target') + '/' + str(self.DATE) + '/'
 
+        # Delete old tmp dir content
+        # subprocess.call('rm ' + self.TMPDIR)
 
         # Make dirs if they don't exist
         if not os.path.isdir(self.TMPDIR):
@@ -87,6 +89,9 @@ class DownloadManager(object):
             print('GDALHOME path is not set')
             sys.exit(1)
 
+        # Make layer info file
+        self.infoFile = open(self.TMPDIR + 'layerinfo.txt', 'a+')
+
     # ---------------------------------------------------------
 
     # Download and process each layer...
@@ -100,6 +105,11 @@ class DownloadManager(object):
 
         ds = gdal.Open(s2FileName, GA_ReadOnly)
         rawEPSG = ds.GetSubDatasets()[0][0].split(':')[-1]
+
+        # Get layerInfoFile
+        self.infoFile.write('s2c_time|' + str(ds.GetMetadataItem("PRODUCT_START_TIME") + "\n"))
+        self.infoFile.write('s2c_clouds|' + str(ds.GetMetadataItem("CLOUD_COVERAGE_ASSESSMENT") + "\n"))
+        self.infoFile.close()
         ds = None
 
         s2FullName = 'SENTINEL2_L1C:"%s":TCI:%s' %(s2FileName, rawEPSG)

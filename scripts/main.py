@@ -30,7 +30,7 @@ def main(argv):
     date, grid, only, target, overwrite = None, None, None, None, False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print('Usage: ./getdata.py [OPTIONS...]\n\nHelp options:\n\
+            print('Usage: ./main.py [OPTIONS...]\n\nHelp options:\n\
 -h, --help       Show help\n\
 --test           Test that all packages and system variables work properly\n\
 -d, --date       Set date for all imagery capture (format: yyyy-mm-dd / yyyymmdd)\n\
