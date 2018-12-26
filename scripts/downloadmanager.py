@@ -52,8 +52,8 @@ class DownloadManager(object):
         self.GDALHOME = '/usr/bin/'
         self.TMPDIR = 'tmp/'
         self.RUNDIR = os.getcwd()
-        self.COLHUB_UNAME = 'PederBG'
-        self.COLHUB_PW = 'Copernicus' # Not sensitiv data
+        self.COLHUB_UNAME = os.environ["COLHUB_USERNAME"]
+        self.COLHUB_PW = os.environ["COLHUB_PASSWORD"]
         self.PROJ = 'EPSG:3413'
         self.PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -183,7 +183,7 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, outfile, max_num=3):
+    def getS1Mos(self, outfile, max_num=15):
 
         tmpfiles = "" # arguments when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
@@ -191,17 +191,23 @@ class DownloadManager(object):
             return False
 
         for i in range(len(downloadNames)):
-            tmpfile = self.TMPDIR + 's1mostmp' + str(i) + '.tif'
+            tmpfile = self.TMPDIR + 's1mostmp_' + str(i) + '.tif'
+            tmpfile2 = self.TMPDIR + 's1mostmp2_' + str(i) + '.tif'
 
             # PROCESSING EACH FILE
-            funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 40 40 -order 3 -dstnodata 0', downloadNames[i], tmpfile)
-            tmpfiles += tmpfile + ' '
+            print('Converting image to lower resolution...')
+            cmd = self.GDALHOME + 'gdal_translate -of GTiff -outsize 20% 20% ' + downloadNames[i] + ' ' + tmpfile
+            print(cmd)
+            subprocess.call(cmd, shell=True)
 
-        print('Making a virtual mosaic file')
+            funcs.warpImage(self.GDALHOME, self.PROJ, '-order 3 -dstnodata 0', tmpfile, tmpfile2)
+            tmpfiles += tmpfile2 + ' '
+
+        print('Making a virtual mosaic file...')
         cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp.vrt ' + tmpfiles
         subprocess.call(cmd, shell=True)
 
-        print('Generating real, tiled mosaic from the virtual file')
+        print('Generating real, tiled mosaic from the virtual file...')
 
         funcs.tileImage(self.GDALHOME, self.TMPDIR + 'tmp.vrt', outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile)
