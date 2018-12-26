@@ -12,7 +12,7 @@ The geoserver will then handle feeding layer-tiles to the front-end on request.
 """
 
 from datetime import datetime
-import sys, getopt
+import sys, getopt, os
 from geoserver.catalog import Catalog
 
 from downloadmanager import DownloadManager
@@ -83,6 +83,9 @@ def main(argv):
 
     print('Created files: ' + str(outfiles) + '\n')
     # d.clean()
+    if all(file == False for file in outfiles):
+        print("No images found")
+        exit(1)
     #  ---------------- Getting/processing data end ---------------- #
 
 
