@@ -45,6 +45,7 @@ class DownloadManager(object):
         self.DATE = datetime.today().date()
         self.GRID = False
         self.BBOX = 'bbox.geojson'
+        self.LARGEBBOX = 'bbox.geojson'
         self.OUTDIR = None
         self.TMPDIR = None
 
@@ -81,7 +82,8 @@ class DownloadManager(object):
             subprocess.call('mkdir -p ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
-            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson')
+            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 0.001, 0.001)
+            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 10, 1)
 
 
         # Check gdalhome path
@@ -167,26 +169,35 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
-    def getS1(self, outfile):
-        s1Name = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX)[0]
-        if not s1Name:
+    def getS1(self, outfile, max_num=4):
+
+        tmpfiles = '' # arguments when making virtual mosaic
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
+        if not downloadNames[0]:
             return False
 
-        # PROCESSING FILE
-        print("Processing files...")
-        tmpfile = self.TMPDIR + 's1tmp.tif'
-        funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 40 40 -order 3 -dstnodata 0', s1Name, tmpfile)
+        for i in range(len(downloadNames)):
+            tmpfile = self.TMPDIR + 's1tmp_' + str(i) + '.tif'
 
-        funcs.tileImage(self.GDALHOME, tmpfile, outfile)
+            funcs.warpImage(self.GDALHOME, self.PROJ, '-tr 40 40 -order 3 -dstnodata 0', downloadNames[i], tmpfile)
+            tmpfiles += tmpfile + ' '
+
+        print('Making a virtual mosaic file...')
+        cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp1.vrt ' + tmpfiles
+        subprocess.call(cmd, shell=True)
+
+        print('Generating real, tiled mosaic from the virtual file...')
+
+        funcs.tileImage(self.GDALHOME, self.TMPDIR + 'tmp1.vrt', outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile)
-        print('Sentinel-1 image is ready \n')
+        print('Sentinel-1 high resolution image is ready \n')
         return outfile
 
     # --------------------------------- S1 MOSAIC -------------------------------- #
     def getS1Mos(self, outfile, max_num=15):
 
         tmpfiles = "" # arguments when making virtual mosaic
-        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num)
         if not downloadNames[0]:
             return False
 
@@ -204,12 +215,12 @@ class DownloadManager(object):
             tmpfiles += tmpfile2 + ' '
 
         print('Making a virtual mosaic file...')
-        cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp.vrt ' + tmpfiles
+        cmd = self.GDALHOME + 'gdalbuildvrt ' + self.TMPDIR + 'tmp2.vrt ' + tmpfiles
         subprocess.call(cmd, shell=True)
 
         print('Generating real, tiled mosaic from the virtual file...')
 
-        funcs.tileImage(self.GDALHOME, self.TMPDIR + 'tmp.vrt', outfile)
+        funcs.tileImage(self.GDALHOME, self.TMPDIR + 'tmp2.vrt', outfile)
         funcs.buildImageOverviews(self.GDALHOME, outfile)
         print('Sentinel-1 mosaic is ready \n')
         return outfile

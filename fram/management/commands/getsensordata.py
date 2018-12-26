@@ -15,9 +15,11 @@ class Command(BaseCommand):
     help = "No options needed"
 
     def handle(self, *args, **options):
-        latest = Position.objects.all().order_by('-date')[0]
+        latest = Position.objects.all().order_by('-date')
         # If no positions added
-        if not latest:
+        if latest:
+            latest = latest[0]
+        else:
             latest = Position()
             latest.grid = '-17,82'
             latest.date = '2018-06-22' # Default day (a day with clear weather)

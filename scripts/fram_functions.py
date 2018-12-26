@@ -11,13 +11,13 @@ import subprocess, glob
 
 
 # Help function for downloading satellite products
-def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1'):
+def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1', time_window=1):
     print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
         %(bbox, max_files, polarization, platform))
     api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
     # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y%m%d')
-    yestdate = (DATE - timedelta(4)).strftime('%Y%m%d') # 4 day interval in dev
+    yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d') # 4 day interval in dev
 
     footprint = geojson_to_wkt(read_geojson(bbox))
     if platform == 's1':
@@ -65,7 +65,6 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
 
         # if max_files == 1: # No point with ingestion date in mosaics with several images
         #     self.returns[platform + 'c'] = products_df['ingestiondate'].values[i]
-
         api.download(products_df['uuid'][i], TMPDIR)
 
         if platform == 's1':
@@ -120,14 +119,14 @@ def clean(TMPDIR):
 
 
 # Build geojson bounding box from input coordinates
-def makeGeojson(grid, outfile):
+def makeGeojson(grid, outfile, xstep, ystep):
     print('Making geojson bounding box...')
     east = grid.split(',')[0]
     north = grid.split(',')[1]
 
-    topRight = str( float(east) - 0.001 ) + ',' + north
-    bottomRight = str( float(east) - 0.001 ) + ',' + str( float(north) - 0.001 )
-    bottomLeft = east + ',' + str( float(north) - 0.001 )
+    topRight = str( float(east) - xstep ) + ',' + north
+    bottomRight = str( float(east) - xstep ) + ',' + str( float(north) - ystep )
+    bottomLeft = east + ',' + str( float(north) - ystep )
     json_string = '{"type":"FeatureCollection","features":[\n\
     {"type":"Feature","properties":{},"geometry":{\n\
         "type":"Polygon","coordinates":[[\n\
