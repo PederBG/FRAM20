@@ -6,6 +6,8 @@ proj3413.setWorldExtent([-50, 80, 30, 87]);
 
 
 var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer;
+var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
+// var HOST_IP = 'http://localhost:8080/geoserver/wms'
 var static_layerinfo = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Source:</b> Ahocevar Geospatial Solutions<br><b>Available at:</b> ahocevar.com/geoserver</p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>"
@@ -53,8 +55,7 @@ let graticule = new ol.Graticule({
 
 function setCustomLayerSource (workspace, name){
   return new ol.source.TileWMS({
-      url: 'http://localhost:8080/geoserver/wms',
-      //url: 'http://192.168.38.113:8080/geoserver/wms',
+      url: HOST_IP,
       params: {
         'LAYERS': workspace + ':' + name,
         'TILED': true,

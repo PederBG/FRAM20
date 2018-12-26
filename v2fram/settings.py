@@ -19,13 +19,49 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*gegjh0b1@bo3&5x*w%r1k9el^*#r^*^ubs47ozpu)5y84pg#1'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+if DEBUG:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = '*gegjh0b1@bo3&5x*w%r1k9el^*#r^*^ubs47ozpu)5y84pg#1'
+
+    ALLOWED_HOSTS = ['*']
+
+else:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'http://185.35.187.19:8000/']
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'debugfile': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/root/logs/debug.log',
+            },
+            'infofile': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': '/root/logs/info.log',
+            },
+            'warningfile': {
+                'level': 'WARNING',
+                'class': 'logging.FileHandler',
+                'filename': '/root/logs/warning.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['debugfile', 'infofile', 'warningfile'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
 
 
 # Application definition

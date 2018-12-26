@@ -1,7 +1,7 @@
 # FRAM19
 
 ### A GIS application for easy access to relevant sensor data from the arctic region
- 
+
 ####  Download, process and present up to date satellite imagery, and other sensor data, following a specified location.
 
 ###### Developed as an internship assignment for Lundin Norway. Published with their consent.
@@ -17,21 +17,21 @@
   ```sh
   git clone https://github.com/PederBG/FRAM19.git
   ```
-  
+
 - Install Docker: https://docs.docker.com/install/
 
 - Get docker image:
   ```sh
   docker pull pederbg/fram19
   ```
-  
+
 - Run docker image:
   ```sh
-  cd FRAM19
-  ./docker/run_docker.sh
+  cd FRAM19/docker
+  ./run_docker.sh
   ```
 The docker file will automatically start django and geoserver in two tmux sessions.
-  
+
 - Navigate to `http://localhost:8000/`
 
 To display sensor data in the application the overlays needs to be generated. This is done using scripts/main.py. Type `./scripts/main.py --help` to see the options. However to see the overlays in the application a refrence have to be added in the database.
@@ -89,11 +89,11 @@ To display sensor data in the application the overlays needs to be generated. Th
   - SciPy: `pip2 install scipy`
   - sentinelsat: `pip2 install sentinelsat`
   - matplotlib: `apt-get install python-matplotlib`
-  
+
 - Install Geospatial Data Abstraction Library (GDAL):
     ```sh
   add-apt-repository -y ppa:ubuntugis/ppa
-  apt update 
+  apt update
   apt upgrade
   apt install gdal-bin python-gdal
   ```
@@ -108,7 +108,7 @@ To display sensor data in the application the overlays needs to be generated. Th
   pip2 install h5py
   ```
     - Install netCDF4: `pip2 install netcdf4`
-    
+
 
 #### Test project
 
@@ -118,4 +118,3 @@ To display sensor data in the application the overlays needs to be generated. Th
   scripts/getdata.py --test
   python3 manage.py runserver
   ```
-
