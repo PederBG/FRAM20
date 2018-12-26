@@ -124,17 +124,18 @@ def makeGeojson(grid, outfile, xstep, ystep):
     east = grid.split(',')[0]
     north = grid.split(',')[1]
 
-    topRight = str( float(east) - xstep ) + ',' + north
-    bottomRight = str( float(east) - xstep ) + ',' + str( float(north) - ystep )
-    bottomLeft = east + ',' + str( float(north) - ystep )
+    topLeft = str( float(east) - xstep ) + ',' + str( float(north) + ystep )
+    topRight = str( float(east) + xstep ) + ',' + str( float(north) + ystep )
+    bottomRight = str( float(east) + xstep ) + ',' + str( float(north) - ystep )
+    bottomLeft = str( float(east) - xstep ) + ',' + str( float(north) - ystep )
     json_string = '{"type":"FeatureCollection","features":[\n\
     {"type":"Feature","properties":{},"geometry":{\n\
         "type":"Polygon","coordinates":[[\n\
-            [' + grid + '],\n\
+            [' + topLeft + '],\n\
             [' + topRight + '],\n\
             [' + bottomRight + '],\n\
             [' + bottomLeft + '],\n\
-            [' + grid + ']\n\
+            [' + topLeft + ']\n\
         ]]\n\
     }}\n\
 ]}'

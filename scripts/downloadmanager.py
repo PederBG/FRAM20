@@ -83,7 +83,7 @@ class DownloadManager(object):
 
         if (self.GRID):
             self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 0.001, 0.001)
-            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 10, 1)
+            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 25, 2.5)
 
 
         # Check gdalhome path
@@ -197,7 +197,7 @@ class DownloadManager(object):
     def getS1Mos(self, outfile, max_num=15):
 
         tmpfiles = "" # arguments when making virtual mosaic
-        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=2)
         if not downloadNames[0]:
             return False
 
