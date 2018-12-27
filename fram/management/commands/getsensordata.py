@@ -68,7 +68,7 @@ class Command(BaseCommand):
         except KeyError:
             l.sarclose = "<p>No data</p>"
         try:
-            l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 40.0 x 40.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['s1mos_size'])
+            l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['s1mos_size'])
         except KeyError:
             l.sarmos = "<p>No data</p>"
         try:

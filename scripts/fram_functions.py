@@ -119,15 +119,15 @@ def clean(TMPDIR):
 
 
 # Build geojson bounding box from input coordinates
-def makeGeojson(grid, outfile, xstep, ystep):
+def makeGeojson(grid, outfile, e_step, w_step, n_step, s_step):
     print('Making geojson bounding box...')
     east = grid.split(',')[0]
     north = grid.split(',')[1]
 
-    topLeft = str( float(east) - xstep ) + ',' + str( float(north) + ystep )
-    topRight = str( float(east) + xstep ) + ',' + str( float(north) + ystep )
-    bottomRight = str( float(east) + xstep ) + ',' + str( float(north) - ystep )
-    bottomLeft = str( float(east) - xstep ) + ',' + str( float(north) - ystep )
+    topLeft = str( float(east) - e_step ) + ',' + str( float(north) + n_step )
+    topRight = str( float(east) + w_step ) + ',' + str( float(north) + n_step )
+    bottomRight = str( float(east) + w_step ) + ',' + str( float(north) - s_step )
+    bottomLeft = str( float(east) - e_step ) + ',' + str( float(north) - s_step )
     json_string = '{"type":"FeatureCollection","features":[\n\
     {"type":"Feature","properties":{},"geometry":{\n\
         "type":"Polygon","coordinates":[[\n\

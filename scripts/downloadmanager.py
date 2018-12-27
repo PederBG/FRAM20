@@ -82,8 +82,8 @@ class DownloadManager(object):
             subprocess.call('mkdir -p ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
-            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 0.001, 0.001)
-            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 25, 2.5)
+            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 1, 1, 0.01, 0.01)
+            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 10, 30, 1.5, 2.5)
 
 
         # Check gdalhome path
