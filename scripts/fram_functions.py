@@ -14,8 +14,8 @@ import subprocess, glob
 def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1', time_window=1):
     print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
         %(bbox, max_files, polarization, platform))
-    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
-    # api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
+    # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
+    api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y%m%d')
     yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d') # 4 day interval in dev
 
