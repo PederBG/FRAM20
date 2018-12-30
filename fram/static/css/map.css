@@ -37,7 +37,7 @@ html, body {
 }
 
 .center-view {
-  top: 3.8em;
+  top: 5em;
   left: .5em;
   z-index: 5;
 }
@@ -97,6 +97,47 @@ button:hover{
   justify-content: center;
   margin-left: -3em; /* Quickfix */
   margin-top: -0.8em;
+}
+
+#btGridLines{
+  margin-left: 0.3em;
+}
+#btCrosshair{
+  margin-left: 1em;
+}
+
+/* ------------- Crosshair ------------ */
+#cross-x, #cross-y{
+  border: 0.5px solid red;
+  z-index: 10000;
+  position: absolute;
+  display: none;
+}
+
+#cross-x {
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    margin-top: -1px;
+}
+
+#cross-y {
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    margin-left: -1px;
+}
+
+#grid-display{
+  right: 1em;
+  margin-top: 0.5em;
+  color: white;
+  display: none;
+  position: absolute;
+  background-color: gray;
+  z-index: 100;
+  padding: 0.2em;
+  border-radius: 4%;
 }
 
 

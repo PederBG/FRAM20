@@ -21,8 +21,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- Passing django data to external js -->
     <script>
+        var positions = [];
         if ("{{ positions }}" != "None"){
-              var positions = [];
                 {% for layer in layers %}
                   positions.push(
                     [
@@ -43,6 +43,7 @@
         }
         else{
             alert("No overlay data found!")
+            latestDate = "No data"
         }
     </script>
     <script src="{% static 'js/map.js' %}"></script>
@@ -77,6 +78,10 @@
 
     <!-- MAP LOGIC -->
     <div id="map" class="map">
+
+      <div id="cross-x"></div>
+      <div id="cross-y"></div>
+      <div id="grid-display"></div>
       <div class="ol-control center-view">
         <button onclick="setDefaultView()">&#9974;</button>
       </div>
@@ -146,6 +151,9 @@
       <!-- Not a geoserver layer -->
       <li class="layercontrol">
         <button class='btn btn-primary' id="btGridLines" type="button" onclick='toggleGrid()'>Grid-Lines</button>
+      </li>
+      <li class="layercontrol">
+        <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>
       </li>
     </ul>
     <div id='dates-div'>

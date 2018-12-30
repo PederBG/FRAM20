@@ -38,7 +38,7 @@ const labelStyle = new ol.style.Text({
   })
 });
 const strokeStyle = new ol.style.Stroke({
-  color: 'rgba(255,120,0,0.9)',
+  color: 'rgba(255,0,0,0.9)',
   width: 1,
 })
 
@@ -120,56 +120,6 @@ fetch(url).then(function(response) {
   layerdict['landedge'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'landedge') });
   layerdict['landedge'].setVisible(false);
 
-// Adding markers
-  allPointFeatures = [];
-  activePointFeatures = [];
-
-  positions.forEach(function(element) {
-    var grid = element[1].split(',');
-    var tmpPoint = new ol.geom.Point(
-        ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
-    );
-    var marker2 = new ol.Feature({
-    geometry: tmpPoint
-  });
-    tmp = new ol.Feature({ geometry: tmpPoint})
-    allPointFeatures.push(tmp);
-    activePointFeatures.push(tmp);
-  });
-
-
-  // Changing last point to an arrow (station location)
-  allPointFeatures[allPointFeatures.length - 1].setStyle(
-      new ol.style.Style({
-          image: new ol.style.RegularShape({
-            fill: new ol.style.Fill({color: 'red'}),
-            stroke:  new ol.style.Stroke({color: 'black', width: 1}),
-            points: 3,
-            radius: 6,
-            rotation: Math.PI / 4,
-            angle: 0
-          })
-        })
-    );
-  markerStyle = new ol.style.Style({
-      image: new ol.style.Circle({
-          fill: new ol.style.Fill({
-              color: 'rgba(200, 50, 50, 1)'
-          }),
-          stroke: new ol.style.Stroke({
-              width: 3,
-              color: 'rgba(200, 200, 200, 0.8)'
-          }),
-          radius: 3
-      }),
-  });
-
-  // Adding markers to map
-  vectorLayer = new ol.layer.Vector({
-      source: new ol.source.Vector({projection: 'EPSG:3413',features: allPointFeatures}),
-      style: markerStyle
-  });
-  vectorLayer.setZIndex(3);
 
   // Init map
   const scaleLineControl = new ol.control.ScaleLine();
@@ -185,10 +135,61 @@ fetch(url).then(function(response) {
     target: 'map',
     view: defaultView
   });
-  map.addLayer(vectorLayer);
-  toggleGrid();
+
+  // Adding markers
+  if (positions.length != 0){
+    allPointFeatures = [];
+    activePointFeatures = [];
+
+    positions.forEach(function(element) {
+      var grid = element[1].split(',');
+      var tmpPoint = new ol.geom.Point(
+          ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
+      );
+      var marker2 = new ol.Feature({
+      geometry: tmpPoint
+    });
+      tmp = new ol.Feature({ geometry: tmpPoint})
+      allPointFeatures.push(tmp);
+      activePointFeatures.push(tmp);
+    });
 
 
+    // Changing last point to an arrow (station location)
+    allPointFeatures[allPointFeatures.length - 1].setStyle(
+        new ol.style.Style({
+            image: new ol.style.RegularShape({
+              fill: new ol.style.Fill({color: 'red'}),
+              stroke:  new ol.style.Stroke({color: 'black', width: 1}),
+              points: 3,
+              radius: 6,
+              rotation: Math.PI / 4,
+              angle: 0
+            })
+          })
+      );
+    markerStyle = new ol.style.Style({
+        image: new ol.style.Circle({
+            fill: new ol.style.Fill({
+                color: 'rgba(200, 50, 50, 1)'
+            }),
+            stroke: new ol.style.Stroke({
+                width: 3,
+                color: 'rgba(200, 200, 200, 0.8)'
+            }),
+            radius: 3
+        }),
+    });
+
+    // Adding markers to map
+    vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({projection: 'EPSG:3413',features: allPointFeatures}),
+        style: markerStyle
+    });
+    vectorLayer.setZIndex(3);
+
+    map.addLayer(vectorLayer);
+  }
 });
 
 
@@ -242,6 +243,30 @@ function toggleGrid(){
     defaultView.setMinZoom(1)
     $('#btGridLines').css("background", "gray")
   }
+}
+
+function displayGridCallback(){
+  raw_grid = map.getView().getCenter();
+  conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' )
+
+  output = conv_grid[1].toFixed(4) + ' N, '
+  if (conv_grid[0] < 0) output += conv_grid[0].toFixed(4) *-1 + ' W'
+  else output += conv_grid[0].toFixed(4) + ' E'
+
+  $('#grid-display').html(output);
+}
+function toggleCrosshair(){
+  if($('#cross-x').css('display')=='none'){
+    $('#btCrosshair').css('background-color', 'gray');
+    map.on("moveend", displayGridCallback);
+    displayGridCallback();
+  }
+  else{
+    $('#btCrosshair').css('background-color', 'transparent');
+    map.un("moveend", displayGridCallback);
+
+  }
+  $('#cross-x, #cross-y, #grid-display').toggle();
 }
 
 // Add controls to all buttons
