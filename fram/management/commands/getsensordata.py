@@ -16,14 +16,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         latest = Position.objects.all().order_by('-date')
+
         # If no positions added
         if latest:
             latest = latest[0]
         else:
-            latest = Position()
-            latest.grid = '-17,82'
-            latest.date = '2018-06-22' # Default day (a day with clear weather)
-            latest.save()
+            # latest = Position()
+            # latest.grid = '-17,82'
+            # latest.date = '2018-06-22' # Default day (a day with clear weather)
+            # latest.save()
+            print("No positions found")
+            sys.exit(1)
+        if Layer.objects.filter(position=latest):
+            print("Latest position already have a layer")
+            sys.exit(1)
 
         # Set paths
         scriptsPath = 'scripts/'
@@ -31,6 +37,7 @@ class Command(BaseCommand):
         targetPath = 'data'
         date = latest.date
         grid = latest.grid
+
 
         # Get data
         cmd = '%s%s -d %s -g %s -t %s --overwrite' %(scriptsPath, scriptName,
@@ -80,3 +87,7 @@ class Command(BaseCommand):
         except KeyError:
             l.icedrift = "<p>No data</p>"
         l.save()
+
+        print("Deleting tmp folder...")
+        subprocess.call('rm -r ' + scriptsPath + 'tmp', shell=True)
+        print("Process finished")
