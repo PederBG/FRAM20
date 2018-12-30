@@ -15,7 +15,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
         %(bbox, max_files, polarization, platform))
     # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
-    api = SentinelAPI(self.COLHUB_UNAME, self.COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
+    api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y%m%d')
     yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d') # 4 day interval in dev
 
@@ -33,7 +33,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
                         # ("20180805", "20180807"),
                         (yestdate, date),
                          platformname='Sentinel-2',
-                         cloudcoverpercentage=(0, 70) # TODO: find reasonable threshold
+                         cloudcoverpercentage=(0, 80) # TODO: find reasonable threshold
                          )
     else:
         print('Not a valid platform!')
