@@ -160,7 +160,7 @@ class DownloadManager(object):
             return False
 
         # FINDING FILE NAME
-        tmpfile = glob.glob(self.TMPDIR + '**.jpg')[0]
+        tmpfile = glob.glob(self.TMPDIR + 'nasa-worldview-**.jpg')[0]
 
         # PROCESSING FILE
         funcs.tileImage(self.GDALHOME, tmpfile, outfile)
