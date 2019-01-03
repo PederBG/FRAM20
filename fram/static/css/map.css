@@ -37,7 +37,7 @@ html, body {
 }
 
 .center-view {
-  top: 4.5em;
+  top: 4em;
   left: .5em;
   z-index: 5;
 }
@@ -66,7 +66,7 @@ button:hover{
     border: 1px white solid;
     background: transparent;
     min-width: 8em;
-    margin-top: 1.5em;
+    margin-top: 0.5em;
 }
 .btn-primary:hover{
     background-color: gray;
@@ -76,7 +76,7 @@ button:hover{
 
 
 .layercontrol-container input{
-  width: 60%;
+  width: 55%;
 }
 .layer-info{
   width:40%;
@@ -86,7 +86,7 @@ button:hover{
   margin-top: 5px;
   display: flex;
   visibility: hidden;
-  width: 9em;
+  width: 8.2em;
 }
 
 .layercontrol-container{
@@ -100,10 +100,10 @@ button:hover{
 }
 
 #btGridLines{
-  margin-left: 0.3em;
+  margin-left: 0.115em;
 }
 #btCrosshair{
-  margin-left: 1em;
+  margin-left: 0.215em;
 }
 
 /* ------------- Crosshair ------------ */
@@ -131,21 +131,21 @@ button:hover{
 #grid-display{
   right: 1em;
   margin-top: 0.5em;
-  color: white;
+  color: whitesmoke;
   display: none;
   position: absolute;
-  background-color: gray;
+  background-color: #292929;
   z-index: 100;
   padding: 0.2em;
   border-radius: 4%;
+  font-size: large;
 }
 
 
 /* ------------- Picking Dates ------------ */
 #dates-div{
     text-align: center;
-    margin-top: -0.8em;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 }
 
 #used-date{
@@ -156,17 +156,23 @@ button:hover{
 
 }
 
-.arrow{
+.arrow, #scroll-up{
     color: darkgray;
     font-size: 2.2em;
     cursor: pointer;
 }
 
-.arrow:hover{
+.arrow:hover, #scroll-up:hover{
     color: whitesmoke;
     font-size: 2.3em;
 }
 
+#scroll-up{
+  text-align: center;
+  margin: auto;
+  width: 20%;
+  display: none;
+}
 
 /* ------------- Layer Info Box ------------ */
 #LayerInfoContainer{
@@ -192,18 +198,6 @@ button:hover{
     font-size: 25px;
     font-weight: bold;
     transition: 0.3s;
-  }
-  @media only screen and (max-width: 900px) {
-    #LayerInfoContainer{
-      font-size: small;
-      width: 50%;
-    }
-  }
-  @media only screen and (max-width: 600px) {
-    #LayerInfoContainer{
-      font-size: small;
-      width: 75%;
-    }
   }
 
 #close:hover,
@@ -237,3 +231,25 @@ div.ol-attribution{
 
 
 /* End Travel Letters Page */
+
+/* Media queries */
+
+@media only screen and (max-width: 900px) {
+  #LayerInfoContainer{
+    width: 50%;
+  }
+  #scroll-up{
+    display: block;
+  }
+}
+@media only screen and (max-width: 600px) {
+  #LayerInfoContainer{
+    width: 75%;
+  }
+
+  .center-view {
+    top: 4.2em;
+    left: .4em;
+    font-size: large;
+  }
+}

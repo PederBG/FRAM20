@@ -5,9 +5,9 @@ proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
 proj3413.setWorldExtent([-50, 80, 30, 87]);
 
 
-var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer;
-var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
-// var HOST_IP = 'http://localhost:8080/geoserver/wms'
+var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
+// var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
+var HOST_IP = 'http://localhost:8080/geoserver/wms'
 var static_layerinfo = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Source:</b> Ahocevar Geospatial Solutions<br><b>Available at:</b> ahocevar.com/geoserver</p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>"
@@ -16,10 +16,15 @@ var static_layerinfo = {
 // default values
 const MIN_ZOOM = 3.5
 
+if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
+else{
+  let grid = positions[positions.length-1][1].split(',');
+  centerGrid = ol.proj.transform([parseFloat(grid[0]), parseFloat(grid[1])],"WGS84", "EPSG:3413");
+}
+
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
-  center: ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413"),
-  // rotation: Math.PI / 7, // Quick fix instead of changing projections
+  center: centerGrid,
   zoom: 5,
   minZoom: MIN_ZOOM,
   extent: ol.proj.get("EPSG:3413").getExtent()
@@ -173,11 +178,7 @@ fetch(url).then(function(response) {
             fill: new ol.style.Fill({
                 color: 'rgba(200, 50, 50, 1)'
             }),
-            stroke: new ol.style.Stroke({
-                width: 3,
-                color: 'rgba(200, 200, 200, 0.8)'
-            }),
-            radius: 3
+            radius: 4
         }),
     });
 
@@ -211,8 +212,10 @@ function ToggleLayer(bt){
 }
 
 function setDefaultView(){
+  if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
+  else centerGrid = activePointFeatures[activePointFeatures.length-1].getProperties().geometry.A;
   defaultView.animate({
-    center: ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413"),
+    center: centerGrid,
     zoom: 5
   });
 }
@@ -267,6 +270,10 @@ function toggleCrosshair(){
 
   }
   $('#cross-x, #cross-y, #grid-display').toggle();
+}
+
+function scrollUp(){
+  $('html').animate({ scrollTop: 0 }, 'fast');
 }
 
 // Add controls to all buttons

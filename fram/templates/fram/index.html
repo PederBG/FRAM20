@@ -90,6 +90,13 @@
         <span id="close" onclick="closeLayerInfo()">&times;</span>
       </div>
     </div>
+
+    <div id='dates-div'>
+        <span class='arrow' id='back'>&#9664;</span>
+        <span id='used-date'>{{layers.last.position.date}}</span>
+        <span class='arrow' id='forward'>&#9654;</span>
+    </div>
+
     <ul class="layercontrol-container">
       <li class="layercontrol">
         <button name="s2c" class='btn btn-primary' id="btOpticClose" type="button">Optic-Close</button>
@@ -156,10 +163,9 @@
         <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>
       </li>
     </ul>
-    <div id='dates-div'>
-        <span class='arrow' id='back'>&#9664;</span>
-        <span id='used-date'>{{layers.last.position.date}}</span>
-        <span class='arrow' id='forward'>&#9654;</span>
+
+    <div id="scroll-up" onclick="scrollUp()">
+      &#9650;
     </div>
 
     <!-- _____ -->
