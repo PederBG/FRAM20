@@ -48,7 +48,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
         products_df = api.to_dataframe(products).sort_values(['cloudcoverpercentage', 'size'], ascending=[True, True])
         products_df = products_df.head(1)
     else:
-        products_df = api.to_dataframe(products).sort_values('size', ascending=True)
+        products_df = api.to_dataframe(products).sort_values('beginposition', ascending=True)
 
     downloadNames = []
 
@@ -57,6 +57,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
             break
         product_size = float(products_df['size'].values[i].split(' ')[0])
         product_name = products_df['filename'].values[i][:-5]
+        product_date = products_df['beginposition'].values[i]
 
         product_clouds = ''
         if platform == 's2':
@@ -90,7 +91,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
 # Tiling GeoTiff files for bether rendering performance
 def tileImage(GDALHOME, infile, outfile):
     print('Tiling image for bether rendering performance...')
-    cmd = '%sgdal_translate -of GTiff -co TILED=YES %s %s' %(GDALHOME, infile, outfile)
+    cmd = '%sgdal_translate -of GTiff -co TILED=YES %s %s' %(GDALHOME, infile, outfile) # -scale ?
     subprocess.call(cmd, shell=True)
 
 
@@ -102,7 +103,7 @@ def buildImageOverviews(GDALHOME, outfile, num=5):
     overviews = ""
     for i in range(num):
         overviews += opt[i] + ' '
-    cmd = '%sgdaladdo -r average %s %s' %(GDALHOME, outfile, overviews[:-1])
+    cmd = '%sgdaladdo -r gauss %s %s' %(GDALHOME, outfile, overviews[:-1]) # is Gaussian kernel better?
     subprocess.call(cmd, shell=True)
 
 def warpImage(GDALHOME, proj, custom_args, infile, outfile):
