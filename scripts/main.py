@@ -90,8 +90,8 @@ def main(argv):
 
 
     # --------------------- Upload to Geoserver -------------------- #
-    # cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", os.environ["GEOSERVER_SECRET_KEY"])
-    cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
+    cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", os.environ["GEOSERVER_SECRET_KEY"])
+    # cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
 
     # BUG: ws is sometime cite instead of d.date
     ws = cat.get_workspace( str(d.DATE) )
