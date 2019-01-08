@@ -86,7 +86,7 @@ fetch(url).then(function(response) {
 
   layerdict['landedge'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'landedge') });
   layerdict['landedge'].setVisible(false);
-  layerdict['graticule'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'grid') });
+  layerdict['graticule'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'graticule') });
   layerdict['graticule'].setVisible(false);
 
 

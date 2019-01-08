@@ -298,7 +298,7 @@ class DownloadManager(object):
         y = np.linspace(yc, 0, yc)
 
         print('Making quiverplot from dX and dY ice drift estimates')
-        fig = plt.figure(figsize=(11.9*5, 17.7*5), frameon=False) #TODO: fix hardcode
+        fig = plt.figure(figsize=(11.9*5, 17.7*3), frameon=False) #TODO: fix hardcode
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
