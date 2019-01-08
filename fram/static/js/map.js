@@ -6,8 +6,8 @@ proj3413.setWorldExtent([-50, 80, 30, 87]);
 
 
 var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
-// var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
-var HOST_IP = 'http://localhost:8080/geoserver/wms'
+var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
+// var HOST_IP = 'http://localhost:8080/geoserver/wms'
 var static_layerinfo = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>",
