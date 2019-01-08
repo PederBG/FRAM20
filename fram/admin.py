@@ -4,4 +4,4 @@ from .models import *
 
 admin.site.register(Position)
 admin.site.register(Layer)
-admin.site.register(Letter)
+admin.site.register(Daily)

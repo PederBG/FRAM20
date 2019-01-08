@@ -20,11 +20,11 @@ class Layer(models.Model):
     def __str__(self):
         return "Layers from date " + str(self.position.date)
 
-class Letter(models.Model):
+class Daily(models.Model):
     title = models.CharField(max_length=100, default='No title')
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
     preamble = models.TextField(max_length=1000, default='No preamble')
     content = models.TextField(max_length=50000, default='No content')
 
     def __str__(self):
-        return "Travel letter: {}".format(self.title)
+        return "Daily report: {}".format(self.title)

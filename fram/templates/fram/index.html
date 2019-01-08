@@ -63,13 +63,12 @@
           <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
               <li class="active"><a href="{% url 'index' %}">Expedition Map</a></li>
-              <li><a href="{% url 'letters' %}">Travel Letters</a></li>
               <li><a href="{% url 'info' %}">Expedition Info</a></li>
-              <li><a href="#">Something Else</a></li>
+              <li><a href="{% url 'daily' %}">Daily Reports</a></li>
+              <li><a href="{% url 'weekly' %}">Weekly Letters</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-              <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+              <li><a href="{% url 'contact' %}"><span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
             </ul>
           </div>
         </div>

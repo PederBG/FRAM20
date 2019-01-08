@@ -11,20 +11,26 @@ def index(request):
         }
     return render(request, 'fram/index.html', context)
 
-def letters(request):
-    return render(request, 'fram/letters.html', {
-        'letters': Letter.objects.all().order_by('-position__date'),
+def daily(request):
+    return render(request, 'fram/daily.html', {
+        'daily_reports': Daily.objects.all().order_by('-position__date'),
     })
 
-def read_letter(request, letterID):
+def read_daily(request, dailyID):
     try:
-        letter = Letter.objects.get(id=letterID)
-    except Letter.DoesNotExist:
-        letter = None
+        daily = Daily.objects.get(id=dailyID)
+    except Daily.DoesNotExist:
+        daily = None
 
-    return render(request, 'fram/read_letter.html', {
-        'letter': letter,
+    return render(request, 'fram/read_daily.html', {
+        'daily': daily,
     })
 
 def info(request):
     return render(request, 'fram/info.html')
+
+def weekly(request):
+    return render(request, 'fram/weekly.html')
+
+def contact(request):
+    return render(request, 'fram/contact.html')
