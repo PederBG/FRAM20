@@ -154,11 +154,15 @@
           <button class='layer-info' id="btLandEdgeInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
+      <li class="layercontrol">
+        <button name="graticule" class='btn btn-primary' id="btGraticule" type="button">Graticule</button>
+        <div class='layer-options-container'>
+          <input name="graticule" type="range" min="1" max="100" value="100" class="slider" id="Graticule">
+          <button class='layer-info' id="btGraticule" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
 
       <!-- Not a geoserver layer -->
-      <li class="layercontrol">
-        <button class='btn btn-primary' id="btGridLines" type="button" onclick='toggleGrid()'>Grid-Lines</button>
-      </li>
       <li class="layercontrol">
         <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>
       </li>

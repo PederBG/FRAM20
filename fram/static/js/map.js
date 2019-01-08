@@ -9,8 +9,9 @@ var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdi
 // var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
 var HOST_IP = 'http://localhost:8080/geoserver/wms'
 var static_layerinfo = {
-  'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Source:</b> Ahocevar Geospatial Solutions<br><b>Available at:</b> ahocevar.com/geoserver</p>",
-  'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>"
+  'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
+  'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>",
+  'Graticule': "<p><h5>Graticule Overlay</h5></p>"
 }
 
 // default values
@@ -30,34 +31,6 @@ var defaultView = new ol.View({
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
 
-// Create the graticule component
-const labelStyle = new ol.style.Text({
-  font: '9px Calibri,sans-serif',
-  textBaseline: 'bottom',
-  fill: new ol.style.Fill({
-    color: 'rgba(0,0,0,1)'
-  }),
-  stroke: new ol.style.Stroke({
-    color: 'rgba(255,255,255,1)',
-    width: 3
-  })
-});
-const strokeStyle = new ol.style.Stroke({
-  color: 'rgba(255,0,0,0.9)',
-  width: 1,
-})
-
-let graticule = new ol.Graticule({
-  strokeStyle: strokeStyle,
-  showLabels: true,
-  maxLines: 200,
-  targetSize: 400,
-  // lonLabelPosition: 0.05,
-  // latLabelPosition: 0.95,
-  lonLabelStyle: labelStyle,
-  latLabelStyle: labelStyle
-});
-
 function setCustomLayerSource (workspace, name){
   return new ol.source.TileWMS({
       url: HOST_IP,
@@ -70,21 +43,6 @@ function setCustomLayerSource (workspace, name){
       projection: 'EPSG:3413'
     })
 }
-
-// Adding bathymetry layer
-bathlayer = new ol.layer.Tile({
-  source: new ol.source.TileWMS({
-    url: 'https://ahocevar.com/geoserver/wms',
-    crossOrigin: '',
-    params: {
-      'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
-      'TILED': true/*,
-      'crossOrigin': 'anonymous'*/
-    },
-    projection: 'EPSG:3413'
-  })
-});
-bathlayer.setVisible(false);
 
 var parser = new ol.format.WMTSCapabilities();
 var url = 'https://map1.vis.earthdata.nasa.gov/wmts-arctic/' +
@@ -111,9 +69,13 @@ fetch(url).then(function(response) {
   console.log(workspace_default);
   layerdict = {
     "base": baselayer,
-    "bathymetry": bathlayer,
   };
   //Creating and adding all custom layers
+
+  // This is added first to set lowest z-index
+  layerdict['bathymetry'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'bathymetry') });
+  layerdict['bathymetry'].setVisible(false);
+
   function addCustomLayers(workspace){
       for (var i = 0; i < layernames.length; i++) {
         layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(workspace, layernames[i]) });
@@ -121,9 +83,11 @@ fetch(url).then(function(response) {
       }
   }
   addCustomLayers(workspace_default);
-  console.log(positions);
+
   layerdict['landedge'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'landedge') });
   layerdict['landedge'].setVisible(false);
+  layerdict['graticule'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'grid') });
+  layerdict['graticule'].setVisible(false);
 
 
   // Init map
@@ -235,19 +199,6 @@ function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
 }
 
-function toggleGrid(){
-  if (graticule.getMap()){
-    graticule.setMap();
-    defaultView.setMinZoom(MIN_ZOOM)
-    $('#btGridLines').css("background-color", "transparent")
-  }
-  else{
-    graticule.setMap(map);
-    defaultView.setMinZoom(1)
-    $('#btGridLines').css("background", "gray")
-  }
-}
-
 function displayGridCallback(){
   raw_grid = map.getView().getCenter();
   conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' )
@@ -278,7 +229,7 @@ function scrollUp(){
 
 // Add controls to all buttons
 // TODO: Use same names everywere and maybe set names in db
-ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'SeaIce', 'IceDrift', 'LandEdge']
+ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
 $(document).ready(function() {
 
     ids.forEach(function(id) {
