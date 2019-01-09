@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import *
+from django.http import FileResponse, Http404
 
 
 def index(request):
@@ -27,6 +28,16 @@ def read_daily(request, dailyID):
     })
 
 def info(request):
+    if(request.GET.get('outline')):
+        try:
+            return FileResponse(open('data/Outline_UiO.pdf', 'rb'), content_type='application/pdf')
+        except FileNotFoundError:
+            raise Http404()
+    if(request.GET.get('project')):
+        try:
+            return FileResponse(open('data/Prosjektskisse_2019.pdf', 'rb'), content_type='application/pdf')
+        except FileNotFoundError:
+            raise Http404()
     return render(request, 'fram/info.html')
 
 def weekly(request):

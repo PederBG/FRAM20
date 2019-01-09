@@ -229,6 +229,14 @@ div.ol-attribution{
   text-align: center;
 }
 
+.info-files{
+  width: 100%;
+  height: 5em;
+}
+.info-files-div{
+  text-align: center;
+}
+
 
 /* End Daily Reports Page */
 
