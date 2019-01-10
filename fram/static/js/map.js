@@ -32,6 +32,9 @@ var defaultView = new ol.View({
 })
 
 function setCustomLayerSource (workspace, name){
+  let SLD_style; // S1-images use different geoserver styling
+  SLD_style = name.includes('s1') ? 'cite:raster2' : 'raster';
+
   return new ol.source.TileWMS({
       url: HOST_IP,
       params: {
@@ -39,6 +42,7 @@ function setCustomLayerSource (workspace, name){
         'TILED': true,
         transparent: true,
         format: 'image/png',
+        styles: SLD_style
       },
       projection: 'EPSG:3413'
     })

@@ -69,27 +69,32 @@ class Command(BaseCommand):
         try:
             l.opticclose = "<p><h5>Sentinel-2 Optical Image</h5><b>Sensing time:</b> %s<br><b>Cloud coverage assessment:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 10.0 x 10.0 meters<br><b>Raw size:</b> %s</p>" %(layerinfo['s2c_time'], layerinfo['s2c_clouds'], layerinfo['s2c_size'])
         except KeyError:
-            l.opticclose = "<p>No data</p>"
+            l.opticclose = "<p><h5>Sentinel-2 Optical Image</h5><b>Sensing time:</b> No data<br><b>Cloud coverage assessment:</b> No data<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 10.0 x 10.0 meters<br><b>Raw size:</b> No data</p>"
+
         try:
             l.opticmos = "<p><h5>Terra MODIS Optical Mosaic</h5><b>Sensing time:</b> %s<br><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> https://worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 250.0 x 250.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['terramos_size'])
         except KeyError:
-            l.opticmos = "<p>No data</p>"
+            l.opticmos = "<p><h5>Terra MODIS Optical Mosaic</h5><b>Sensing time:</b> No data<br><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> https://worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 250.0 x 250.0 meters<br><b>Raw size:</b> No data</p>"
+
         try:
             l.sarclose = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Image</h5><b>Sensing time:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 40.0 x 40.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['s1c_size'])
         except KeyError:
-            l.sarclose = "<p>No data</p>"
+            l.sarclose = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Image</h5><b>Sensing time:</b> No data<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 40.0 x 40.0 meters<br><b>Raw size:</b> No data</p>"
+
         try:
             l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['s1mos_size'])
         except KeyError:
-            l.sarmos = "<p>No data</p>"
+            l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> No data<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> No data</p>"
+
         try:
-            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['seaice_size'])
+            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span>to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['seaice_size'])
         except KeyError:
-            l.seaice = "<p>No data</p>"
+            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span> to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> No data<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> No data</p>"
+
         try:
             l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['icedrift_size'])
         except KeyError:
-            l.icedrift = "<p>No data</p>"
+            l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> No data<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> No data</p>"
         l.save()
 
         print("Deleting tmp folder...")
