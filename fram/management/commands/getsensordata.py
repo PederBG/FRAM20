@@ -9,6 +9,7 @@ python2.7.
 import os, sys, subprocess, glob
 from django.core.management.base import BaseCommand
 from fram.models import Position, Layer
+from datetime import datetime
 
 class Command(BaseCommand):
     args = '<foo bar ..>'
@@ -17,19 +18,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         latest = Position.objects.all().order_by('-date')
 
-        # If no positions added
         if latest:
             latest = latest[0]
+        # If no positions added
         else:
-            # latest = Position()
-            # latest.grid = '-17,82'
-            # latest.date = '2018-06-22' # Default day (a day with clear weather)
-            # latest.save()
             print("No positions found")
             sys.exit(1)
+
+        # If latest grid already have a layer
         if Layer.objects.filter(position=latest):
-            print("Latest position already have a layer")
-            sys.exit(1)
+            print("No new position found, using last added grid.")
+            p = Position()
+            p.grid = latest.grid
+            p.date = datetime.now().date()
+            p.save()
+            latest = p
+
 
         # Set paths
         scriptsPath = 'scripts/'
