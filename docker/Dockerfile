@@ -18,11 +18,10 @@ RUN wget https://sourceforge.net/projects/geoserver/files/GeoServer/2.12.5/geose
     mv geoserver-2.12.5/ /usr/share && \
     rm -f geoserver-2.12.5-bin.zip
 
-RUN echo "export GEOSERVER_HOME=/usr/share/geoserver-2.12.5" >> ~/.bashrc
 
 RUN python2 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install django && \
+    python3 -m pip install django whitenoise gunicorn && \
     python2 -m pip install numpy scipy sentinelsat gsconfig pandas && \
     $APT_QUIET install python-matplotlib
 
@@ -43,4 +42,11 @@ RUN $APT_QUIET install libhdf5-serial-dev netcdf-bin libnetcdf-dev && \
 # netCDF4
 RUN python2 -m pip install netcdf4
 
-ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver" && tmux new-session -d -s "geoserver" "cd /root/fram19 && GEOSERVER_HOME=/usr/share/geoserver-2.12.5 /usr/share/geoserver-2.12.5/bin/startup.sh" && mkdir /root/logs && cd /root/fram19 && /bin/bash'
+# Extra setup
+RUN mkdir /root/logs && touch /root/logs/cron.log /root/logs/access.log /root/logs/info.log
+
+RUN rm /etc/localtime && ln -s /usr/share/zoneinfo/Europe/Oslo /etc/localtime
+
+RUN service cron start
+
+ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver" && tmux new-session -d -s "geoserver" "cd /root/fram19 && GEOSERVER_HOME=/usr/share/geoserver-2.12.5 /usr/share/geoserver-2.12.5/bin/startup.sh" && cd /root/fram19 && /bin/bash'
