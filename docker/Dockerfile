@@ -21,7 +21,7 @@ RUN wget https://sourceforge.net/projects/geoserver/files/GeoServer/2.12.5/geose
 
 RUN python2 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install django whitenoise gunicorn && \
+    python3 -m pip install django whitenoise gunicorn django-mailbox && \
     python2 -m pip install numpy scipy sentinelsat gsconfig pandas && \
     $APT_QUIET install python-matplotlib
 
