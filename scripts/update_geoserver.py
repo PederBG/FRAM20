@@ -10,6 +10,8 @@ print(cat)
 
 for layer in layers:
     date = layer.split('/')[-2]
+    if date == 'data':
+        date = 'cite'
 
     ws = cat.get_workspace(date)
     if ws is None:
