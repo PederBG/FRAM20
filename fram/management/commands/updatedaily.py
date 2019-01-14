@@ -38,28 +38,27 @@ class Command(BaseCommand):
                         p.date = date
                         p.save()
 
+                        if len(mes) > 3:
+                            print("Adding daily report..")
+                            d = Daily()
+                            d.title = mes[1]
+                            d.position = p
+                            d.preamble = mes[2]
+
+                            cont = ""
+                            for line in mes[3:]:
+                                if line == '':
+                                    cont += '\n\n'
+                                else:
+                                    cont += line + ' '
+                            d.content = cont
+                            d.save()
+                            print("Done!")
+                            break # Only getting first mail with daily subject
+
                     else:
                         print("Position already exist")
-                        p = Position.objects.filter(date=date).last()
-
-                    if len(mes) > 3:
-                        print("Adding daily report..")
-                        d = Daily()
-                        d.title = mes[1]
-                        d.position = p
-                        d.preamble = mes[2]
-
-                        cont = ""
-                        for line in mes[3:]:
-                            if line == '':
-                                cont += '\n\n'
-                            else:
-                                cont += line + ' '
-                        d.content = cont
-                        d.save()
-                        print("Done!")
-                        break # Only getting first mail with daily subject
-
+                        exit(0)
 
                 except Exception:
                     print('Syntax wrong')
