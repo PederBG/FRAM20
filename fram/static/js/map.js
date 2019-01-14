@@ -239,7 +239,7 @@ $(document).ready(function() {
     ids.forEach(function(id) {
         $('#bt' + id).click(function() { ToggleLayer(this) });
 
-        document.getElementById(id).addEventListener('mouseup', function() {
+        $('#' + id).bind('mouseup touchend', function() {
           layerdict[this.name].setOpacity(this.value / 100);
         });
     });
