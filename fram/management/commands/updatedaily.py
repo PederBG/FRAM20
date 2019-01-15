@@ -8,6 +8,9 @@ class Command(BaseCommand):
     help = "No options needed"
 
     def handle(self, *args, **options):
+        allowed_addresses = ['pedergrbr@gmail.com']
+
+
         print("Getting new mails...")
         Mailbox.objects.first().get_new_mail()
 
@@ -17,6 +20,13 @@ class Command(BaseCommand):
             exit(0)
 
         for mail in reversed(mails):
+
+            # Check sender address
+            sender = mail.from_header.split('<')[1].split('>')[0]
+            if sender not in allowed_addresses:
+                print("Address " + sender + " is not in allowed_addresses, going to next mail..")
+                continue
+
             if mail.subject=='daily':
 
                 try:
