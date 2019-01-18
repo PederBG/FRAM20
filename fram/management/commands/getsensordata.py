@@ -9,7 +9,7 @@ python2.7.
 import os, sys, subprocess, glob
 from django.core.management.base import BaseCommand
 from fram.models import Position, Layer
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Command(BaseCommand):
     args = '<foo bar ..>'
@@ -82,19 +82,19 @@ class Command(BaseCommand):
             l.sarclose = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Image</h5><b>Sensing time:</b> No data<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 40.0 x 40.0 meters<br><b>Raw size:</b> No data</p>"
 
         try:
-            l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> %s</p>" %(date, layerinfo['s1mos_size'])
+            l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> %s - %s<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> %s</p>" %(date - timedelta(days=1), date, layerinfo['s1mos_size'])
         except KeyError:
             l.sarmos = "<p><h5>Sentinel-1 Synthetic-Aperture Radar (SAR) Mosaic</h5><b>Sensing time:</b> No data<br><b>Source:</b> ESA, Copernicus Programme<br><b>Available at:</b> https://colhub.met.no/#/home<br><b>Pixel size:</b> 200.0 x 200.0 meters<br><b>Raw size:</b> No data</p>"
 
         try:
-            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span>to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['seaice_size'])
+            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span>to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> %s<br><b>Source:</b> University of Bremen, Sea Ice Remote Sensing<br><b>Available at:</b> https://seaice.uni-bremen.de<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['seaice_size'])
         except KeyError:
-            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span> to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> No data<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> No data</p>"
+            l.seaice = "<p><h5>AMSR-2 Global Sea Ice Concentration</h5><p>This layer show sea ice concentration in percentage from <span style='color: #6b023f'><b>100% " + "</b></span> to <span style='color: #013384'><b>1% " + "</b></span></p><b>Sensing time:</b> No data<br><b>Source:</b> University of Bremen, Sea Ice Remote Sensing<br><b>Available at:</b> https://seaice.uni-bremen.de<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> No data</p>"
 
         try:
-            l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['icedrift_size'])
+            l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> %s<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size (original product):</b> 62.5 x 62.5 kilometers<br><b>Raw size:</b> %s</p>" %(date, layerinfo['icedrift_size'])
         except KeyError:
-            l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> No data<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size:</b> 6.250 x 6.250 kilometers<br><b>Raw size:</b> No data</p>"
+            l.icedrift = "<p><h5>Low Resolution Sea Ice Drift</h5><b>Sensing time:</b> No data<br><b>Source:</b> EUMETSAT, Ocean and Sea Ice SAF<br><b>Available at:</b> http://osisaf.met.no/<br><b>Pixel size (original product):</b> 62.5 x 62.5 kilometers<br><b>Raw size:</b> No data</p>"
         l.save()
 
         print("Deleting tmp folder...")

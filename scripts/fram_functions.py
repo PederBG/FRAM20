@@ -45,7 +45,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     print("Found", len(products), "Sentinel images.")
 
     if platform == 's2':
-        products_df = api.to_dataframe(products).sort_values(['cloudcoverpercentage', 'size'], ascending=[True, True])
+        products_df = api.to_dataframe(products).sort_values(['cloudcoverpercentage', 'beginposition'], ascending=[True, True])
         products_df = products_df.head(1)
     else:
         products_df = api.to_dataframe(products).sort_values('beginposition', ascending=True)

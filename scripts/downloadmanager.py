@@ -169,7 +169,7 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
-    def getS1(self, outfile, max_num=4):
+    def getS1(self, outfile, max_num=3):
 
         tmpfiles = '' # arguments when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
@@ -197,7 +197,7 @@ class DownloadManager(object):
     def getS1Mos(self, outfile, max_num=40):
 
         tmpfiles = "" # arguments when making virtual mosaic
-        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=2)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=1)
         if not downloadNames[0]:
             return False
 
