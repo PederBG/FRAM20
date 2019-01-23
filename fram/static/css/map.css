@@ -261,3 +261,18 @@ div.ol-attribution{
     font-size: large;
   }
 }
+
+
+/* Info Page */
+.text-body{
+  text-align: left;
+}
+
+.text-body img{
+  width: 100%;
+}
+
+.text-body h2, .text-body h3{
+  text-align: center;
+}
+/* End Info Page */
