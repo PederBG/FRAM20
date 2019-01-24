@@ -230,12 +230,15 @@ div.ol-attribution{
   text-align: center;
 }
 
-.info-files{
-  width: 100%;
-  height: 5em;
-}
-.info-files-div{
+.info-div, .read-daily-div{
   text-align: center;
+  background-color: whitesmoke;
+  color: #040404;
+}
+
+.read-daily-div{
+  height: 100%;
+  position: fixed;
 }
 
 
