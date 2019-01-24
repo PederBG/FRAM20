@@ -1,0 +1,177 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="{%  static 'img/lundin_favicon.png' %}">    <!-- Bootstrap CSS -->
+
+    <title>Expedition Map</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <link href="{% static 'css/map.css' %}" rel="stylesheet">
+
+    <!-- The next line is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Passing django data to external js -->
+    <script>
+        var positions = [];
+        if ("{{ positions }}" != "None"){
+                {% for layer in layers %}
+                  positions.push(
+                    [
+                        "{{ layer.position.date }}", "{{ layer.position.grid }}",
+                      {
+                        'OpticClose': "{{ layer.opticclose | safe | linebreaks }}",
+                        'OpticMos': "{{ layer.opticmos | safe | linebreaks }}",
+                        'SARClose': "{{ layer.sarclose | safe | linebreaks }}",
+                        'SARMos': "{{ layer.sarmos | safe | linebreaks }}",
+                        'SeaIce': "{{ layer.seaice | safe | linebreaks }}",
+                        'IceDrift': "{{ layer.icedrift | safe | linebreaks }}"
+                      }
+                    ]
+                  )
+                {% if not forloop.last %},{% endif %}
+                {% endfor %}
+              latestDate = "{{ layers.last.position.date }}"
+        }
+        else{
+            alert("No overlay data found!")
+            latestDate = "No data"
+        }
+    </script>
+    <script src="{% static 'js/map.js' %}"></script>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" id="nav-title" href="{% url 'index' %}">FRAM-2019</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{% url 'map' %}"><span class="glyphicon glyphicon-globe"></span> Expedition Map</a></li>
+            <li><a href="{% url 'info' %}"><span class="glyphicon glyphicon-info-sign"></span> Expedition Info</a></li>
+            <li><a href="{% url 'daily' %}"><span class="glyphicon glyphicon-comment"></span> Daily Reports</a></li>
+            <li><a href="{% url 'weekly' %}"><span class="glyphicon glyphicon-envelope"></span> Weekly Letters</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'links' %}"><span class="glyphicon glyphicon-link"></span> Links</a></li>
+            <li><a href="{% url 'contact' %}"><span class="glyphicon glyphicon-earphone"></span> Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+    <!-- MAP LOGIC -->
+    <div id="map" class="map">
+
+      <div id="cross-x"></div>
+      <div id="cross-y"></div>
+      <div id="grid-display"></div>
+      <div class="ol-control center-view">
+        <button onclick="setDefaultView()">&#9974;</button>
+      </div>
+      <div id='LayerInfoContainer'>
+        <div id='LayerInfo'></div>
+        <span id="close" onclick="closeLayerInfo()">&times;</span>
+      </div>
+    </div>
+
+    <div id='dates-div'>
+        <span class='arrow' id='back'>&#9664;</span>
+        <span id='used-date'>{{layers.last.position.date}}</span>
+        <span class='arrow' id='forward'>&#9654;</span>
+    </div>
+
+    <ul class="layercontrol-container">
+      <li class="layercontrol">
+        <button name="s2c" class='btn btn-primary' id="btOpticClose" type="button">Optic-Close</button>
+        <div class='layer-options-container'>
+          <input name="s2c" type="range" min="1" max="100" value="100" class="slider" id="OpticClose">
+          <button class='layer-info' id="btOpticCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="terramos" class='btn btn-primary' id="btOpticMos" type="button">Optic-Mosaic</button>
+        <div class='layer-options-container'>
+          <input name="terramos" type="range" min="1" max="100" value="100" class="slider" id="OpticMos">
+          <button class='layer-info' id="btOpticMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="s1c" class='btn btn-primary' id="btSARClose" type="button">SAR-Close</button>
+        <div class='layer-options-container'>
+          <input name="s1c" type="range" min="1" max="100" value="100" class="slider" id="SARClose">
+          <button class='layer-info' id="btSARCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="s1mos" class='btn btn-primary' id="btSARMos" type="button">SAR-Mosaic</button>
+        <div class='layer-options-container'>
+          <input name="s1mos" type="range" min="1" max="100" value="100" class="slider" id="SARMos">
+          <button class='layer-info' id="btSARMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="bathymetry" class='btn btn-primary' id="btBathymetry" type="button">Bathymetry</button>
+        <div class='layer-options-container'>
+          <input name="bathymetry" type="range" min="1" max="100" value="100" class="slider" id="Bathymetry">
+          <button class='layer-info' id="btBathymetryInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="seaice" class='btn btn-primary' id="btSeaIce" type="button">Sea-ice</button>
+        <div class='layer-options-container'>
+          <input name="seaice" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">
+          <button class='layer-info' id="btSeaIceInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="icedrift" class='btn btn-primary' id="btIceDrift" type="button">Ice-Drift</button>
+        <div class='layer-options-container'>
+          <input name="icedrift" type="range" min="1" max="100" value="100" class="slider" id="IceDrift">
+          <button class='layer-info' id="btIceDriftInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="landedge" class='btn btn-primary' id="btLandEdge" type="button">Land-Edge</button>
+        <div class='layer-options-container'>
+          <input name="landedge" type="range" min="1" max="100" value="100" class="slider" id="LandEdge">
+          <button class='layer-info' id="btLandEdgeInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="graticule" class='btn btn-primary' id="btGraticule" type="button">Graticule</button>
+        <div class='layer-options-container'>
+          <input name="graticule" type="range" min="1" max="100" value="100" class="slider" id="Graticule">
+          <button class='layer-info' id="btGraticule" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+
+      <!-- Not a geoserver layer -->
+      <li class="layercontrol">
+        <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>
+      </li>
+    </ul>
+
+    <div id="scroll-up" onclick="scrollUp()">
+      &#9650;
+    </div>
+
+    <!-- _____ -->
+  </body>
+</html>

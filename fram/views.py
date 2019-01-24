@@ -4,13 +4,16 @@ from django.http import FileResponse, Http404
 
 
 def index(request):
+    return render(request, 'fram/index.html')
+
+def map(request):
     if not Position.objects.all():
-        return render(request, 'fram/index.html', {'positions': 'None'})
+        return render(request, 'fram/map.html', {'positions': 'None'})
 
     context = {
         'layers': Layer.objects.all().order_by('position__date'),
         }
-    return render(request, 'fram/index.html', context)
+    return render(request, 'fram/map.html', context)
 
 def daily(request):
     return render(request, 'fram/daily.html', {
@@ -42,6 +45,9 @@ def info(request):
 
 def weekly(request):
     return render(request, 'fram/weekly.html')
+
+def links(request):
+    return render(request, 'fram/links.html')
 
 def contact(request):
     return render(request, 'fram/contact.html')

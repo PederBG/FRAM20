@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" href="{%  static 'img/lundin_favicon.png' %}">    <!-- Bootstrap CSS -->
 
-    <title>Weekly Letters</title>
+    <title>Links</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="{% static 'css/map.css' %}" rel="stylesheet">
 
@@ -32,10 +32,10 @@
             <li><a href="{% url 'map' %}"><span class="glyphicon glyphicon-globe"></span> Expedition Map</a></li>
             <li><a href="{% url 'info' %}"><span class="glyphicon glyphicon-info-sign"></span> Expedition Info</a></li>
             <li><a href="{% url 'daily' %}"><span class="glyphicon glyphicon-comment"></span> Daily Reports</a></li>
-            <li class="active"><a href="{% url 'weekly' %}"><span class="glyphicon glyphicon-envelope"></span> Weekly Letters</a></li>
+            <li><a href="{% url 'weekly' %}"><span class="glyphicon glyphicon-envelope"></span> Weekly Letters</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'links' %}"><span class="glyphicon glyphicon-link"></span> Links</a></li>
+            <li class="active"><a href="{% url 'links' %}"><span class="glyphicon glyphicon-link"></span> Links</a></li>
             <li><a href="{% url 'contact' %}"><span class="glyphicon glyphicon-earphone"></span> Contact</a></li>
           </ul>
         </div>
@@ -43,13 +43,20 @@
     </nav>
 
       <div class="col-md-6 col-md-offset-3">
-        <div class="daily-info">
-
-          <h2>Weekly Letters</h2>
-          <h4>Here you can download weekly letters from the FRAM2019 expedition.</h4>
+        <div class="links-page">
+          <h1>Links</h1>
+          <br><br>
+          <h3>FRAM 2014/15 Expedition</h3>
+          <h4><a href="https://sabvabaa.nersc.no/" target="_blank">Expedition Page</a></h4>
+          <h4><a href="https://www.youtube.com/watch?v=PYxmPijXDYo" target="_blank">Talk by Prof. emeritus Yngve Kristoffersen</a></h4>
+          <h3>Other Satellite Resources</h3>
+          <h4><a href="https://worldview.earthdata.nasa.gov/" target="_blank">Worldview, by NASA</a></h4>
+          <h4><a href="https://www.polarview.aq/arctic" target="_blank">Polar View</a></h4>
+          <h4><a href="" target="_blank"></a></h4>
+          <h4><a href="" target="_blank"></a></h4>
+          <h4><a href="" target="_blank"></a></h4>
         </div>
       </div>
-
 
   </body>
 </html>

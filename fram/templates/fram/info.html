@@ -18,29 +18,30 @@
   </head>
   <body>
 
-      <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" id="nav-title">FRAM-2019</a>
-          </div>
-          <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-              <li><a href="{% url 'index' %}">Expedition Map</a></li>
-              <li class="active"><a href="{% url 'info' %}">Expedition Info</a></li>
-              <li><a href="{% url 'daily' %}">Daily Reports</a></li>
-              <li><a href="{% url 'weekly' %}">Weekly Letters</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="{% url 'contact' %}"><span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
-            </ul>
-          </div>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" id="nav-title" href="{% url 'index' %}">FRAM-2019</a>
         </div>
-      </nav>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li><a href="{% url 'map' %}"><span class="glyphicon glyphicon-globe"></span> Expedition Map</a></li>
+            <li class="active"><a href="{% url 'info' %}"><span class="glyphicon glyphicon-info-sign"></span> Expedition Info</a></li>
+            <li><a href="{% url 'daily' %}"><span class="glyphicon glyphicon-comment"></span> Daily Reports</a></li>
+            <li><a href="{% url 'weekly' %}"><span class="glyphicon glyphicon-envelope"></span> Weekly Letters</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'links' %}"><span class="glyphicon glyphicon-link"></span> Links</a></li>
+            <li><a href="{% url 'contact' %}"><span class="glyphicon glyphicon-earphone"></span> Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
       <div class="col-md-8 col-md-offset-2 info-files-div">
         <div class="text-body">
