@@ -328,4 +328,10 @@ div.ol-attribution{
   border-spacing: 0 1em;
 }
 
+.top-text{
+  text-align: left;
+  font-size: 1.3em;
+  margin-left: 2em;
+}
+
 /* End Index Page */
