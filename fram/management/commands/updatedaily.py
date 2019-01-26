@@ -3,12 +3,13 @@ from django.core.management.base import BaseCommand
 from fram.models import Position, Layer, Daily
 from django_mailbox.models import Message, Mailbox
 from datetime import datetime
+
 class Command(BaseCommand):
     args = '<foo bar ..>'
     help = "No options needed"
 
     def handle(self, *args, **options):
-        allowed_addresses = ['pedergrbr@gmail.com']
+        allowed_addresses = ['pedergrbr@gmail.com', 'jan-erik.lie@lundin-norway.no', 'Yngve.Kristoffersen@uib.no']
 
 
         print("Getting new mails...")
