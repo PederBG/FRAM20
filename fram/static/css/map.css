@@ -226,7 +226,7 @@ div.ol-attribution{
 
 
 /* Daily Reports Page */
-.daily-info{
+.daily-info, .weekly-info{
   text-align: center;
 }
 
@@ -243,6 +243,22 @@ div.ol-attribution{
 
 
 /* End Daily Reports Page */
+
+/* Info Page, Links Page */
+.text-body{
+  text-align: left;
+}
+
+.text-body img{
+  width: 100%;
+}
+
+.text-body h2, .text-body h3, .links-page h1{
+  text-align: center;
+}
+/* End Info Page, Links Page */
+
+
 
 /* Media queries */
 
@@ -264,74 +280,14 @@ div.ol-attribution{
     left: .4em;
     font-size: large;
   }
+
+  .cover-image h3{
+    font-size: medium;
+  }
+  .top-text{
+    font-size: small;
+  }
+  .cover-text{
+    font-size: small;
+  }
 }
-
-
-/* Info Page, Links Page */
-.text-body{
-  text-align: left;
-}
-
-.text-body img{
-  width: 100%;
-}
-
-.text-body h2, .text-body h3, .links-page h1{
-  text-align: center;
-}
-/* End Info Page, Links Page */
-
-
-/* Index Page */
-.cover-image{
-  background: url('../../static/img/terramodis.jpeg') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-  width: 100%;
-  height: auto;
-  top: 0px;
-  position: absolute;
-  z-index: 0;
-  color: black;
-  text-align: center;
-
-}
-
-.cover-image img{
-  width: 100%;
-}
-
-#index-dropdown{
-  width: 5%;
-  opacity: 0.9;
-  bottom: 0;
-
-}
-
-#index-route{
-  border: 2px solid black;
-}
-
-.cover-text{
-  text-align: left;
-  color: black;
-  background-color: rgba(245, 245, 245, 0.8);
-  font-size: 1.2em;
-  padding: 0.5em;
-  border: solid 0.1em gray;
-}
-
-.cover-text table{
-  border-collapse: separate;
-  border-spacing: 0 1em;
-}
-
-.top-text{
-  text-align: left;
-  font-size: 1.3em;
-  margin-left: 2em;
-}
-
-/* End Index Page */

@@ -1,0 +1,169 @@
+/* Index Page */
+.navbar{
+  z-index: 10;
+}
+
+.cover-image{
+  background: url('../../static/img/terramodis.jpeg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  width: 100%;
+  height: auto;
+  top: 0px;
+  position: absolute;
+  z-index: 0;
+  color: black;
+  text-align: center;
+}
+
+.first-page{
+  height:91vh;
+}
+
+#logo-full{
+  width: 40%;
+  margin-left: 30%;
+  margin-top: 8vh;
+}
+
+#index-dropdown{
+  opacity: 0.8;
+  top: 70vh;
+  position: absolute;
+  width: 10vw;
+  margin-left: -5vw;
+}
+#index-dropdown:hover{
+  width: 11vw;
+  margin-left: -5.5vw;
+  opacity: 1;
+}
+
+/* For large screens */
+#logo-title, #logo-flag{
+  display: none;
+}
+#logo-full{
+  display: block;
+}
+
+.second-page h3{
+  width: 80vw;
+  margin-left: 10vw;
+}
+
+.top-text{
+  text-align: left;
+  font-size: 1.3em;
+  margin-left: 20vw;
+  width: 60vw;
+
+}
+
+#index-route{
+  border: 2px solid black;
+  width: 40vw;
+}
+
+.cover-text{
+  text-align: left;
+  color: black;
+  background-color: rgba(245, 245, 245, 0.8);
+  font-size: 1.2em;
+  padding: 0.5em;
+  border: solid 0.1em gray;
+  width: 80vw;
+  margin-left: 10vw;
+}
+
+.cover-text table{
+  border-collapse: separate;
+  border-spacing: 0 1em;
+}
+
+
+/* For smaller screens */
+@media(max-width:1400px){
+  #logo-full{
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 8vh;
+  }
+
+  #index-dropdown{
+    top: 78vh;
+    width: 14vw;
+    margin-left: -7vw;
+  }
+  #index-dropdown:hover{
+    width: 15vw;
+    margin-left: -7.5vw;
+    opacity: 1;
+  }
+
+  #index-route{
+    width: 60vw;
+  }
+  .cover-text{
+    width: 60vw;
+    margin-left: 19vw;
+  }
+}
+
+
+/* For phones/tablets */
+@media(max-width:992px){
+  #logo-full{
+    display: none;
+  }
+  #logo-title, #logo-flag{
+    display: block;
+  }
+
+  #logo-title{
+    margin-top: 9vh;
+    width: 80vw;
+    margin-left: 10vw;
+  }
+  #logo-flag{
+    width: 40vw;
+    margin-left: 30vw;
+  }
+
+  #index-dropdown{
+    top: 75vh;
+    width: 20vw;
+    margin-left: -10vw;
+  }
+  #index-dropdown:hover{
+    width: 21vw;
+    margin-left: -10.5vw;
+    opacity: 1;
+  }
+
+  .second-page h3{
+    width: 98vw;
+    margin-left: 1vw;
+    font-size: large;
+  }
+
+  .top-text{
+    width: 98vw;
+    margin-left: 1vw;
+    font-size: medium;
+  }
+
+  #index-route{
+    width: 98vw;
+  }
+  .cover-text{
+    width: 98vw;
+    margin-left: 1vw;
+    font-size: small;
+  }
+
+}
+
+/* End Index Page */
