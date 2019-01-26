@@ -134,6 +134,20 @@
         </div>
       </li>
       <li class="layercontrol">
+        <button name="magnetic" class='btn btn-primary' id="btMagnetic" type="button">Magnetic</button>
+        <div class='layer-options-container'>
+          <input name="magnetic" type="range" min="1" max="100" value="100" class="slider" id="Magnetic">
+          <button class='layer-info' id="btMagneticInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
+        <button name="gravity" class='btn btn-primary' id="btGravity" type="button">Gravity</button>
+        <div class='layer-options-container'>
+          <input name="gravity" type="range" min="1" max="100" value="100" class="slider" id="Gravity">
+          <button class='layer-info' id="btGravityInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
+      </li>
+      <li class="layercontrol">
         <button name="seaice" class='btn btn-primary' id="btSeaIce" type="button">Sea-ice</button>
         <div class='layer-options-container'>
           <input name="seaice" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">

@@ -10,6 +10,8 @@ var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
 // var HOST_IP = 'http://localhost:8080/geoserver/wms'
 var static_layerinfo = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
+  'Magnetic': "<p><h5>Magnetic Anomali Overlay</h5></p>",
+  'Gravity': "<p><h5>Freeair Gravity Overlay</h5></p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>",
   'Graticule': "<p><h5>Graticule Overlay</h5></p>"
 }
@@ -79,6 +81,10 @@ fetch(url).then(function(response) {
   // This is added first to set lowest z-index
   layerdict['bathymetry'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'bathymetry') });
   layerdict['bathymetry'].setVisible(false);
+  layerdict['magnetic'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'magnetic') });
+  layerdict['magnetic'].setVisible(false);
+  layerdict['gravity'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'gravity') });
+  layerdict['gravity'].setVisible(false);
 
   function addCustomLayers(workspace){
       for (var i = 0; i < layernames.length; i++) {
@@ -233,7 +239,7 @@ function scrollUp(){
 
 // Add controls to all buttons
 // TODO: Use same names everywere and maybe set names in db
-ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
+ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'Magnetic', 'Gravity', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
 $(document).ready(function() {
 
     ids.forEach(function(id) {
