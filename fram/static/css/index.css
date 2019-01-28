@@ -18,6 +18,13 @@
   text-align: center;
 }
 
+/* To fix zoomed in background on phones/tablets */
+@media screen and (max-width:768px){
+  .cover-image {
+    background-size: 900px 100%;
+  }
+}
+
 .first-page{
   height:91vh;
 }
@@ -28,16 +35,21 @@
   margin-top: 8vh;
 }
 
-#index-dropdown{
+.index-dropdown{
   opacity: 0.8;
-  top: 70vh;
+  top: 72vh;
   position: absolute;
-  width: 10vw;
-  margin-left: -5vw;
+  width: 80vw;
+  margin-left: 10vw;
 }
+
+#index-dropdown{
+  align-items: center;
+  opacity: 0.9;
+  width: 10vw;
+}
+
 #index-dropdown:hover{
-  width: 11vw;
-  margin-left: -5.5vw;
   opacity: 1;
 }
 
@@ -48,6 +60,7 @@
 #logo-full{
   display: block;
 }
+
 
 .second-page h3{
   width: 80vw;
@@ -92,7 +105,7 @@
     margin-top: 8vh;
   }
 
-  #index-dropdown{
+  /* #index-dropdown{
     top: 78vh;
     width: 14vw;
     margin-left: -7vw;
@@ -101,7 +114,7 @@
     width: 15vw;
     margin-left: -7.5vw;
     opacity: 1;
-  }
+  } */
 
   #index-route{
     width: 60vw;
@@ -133,14 +146,7 @@
   }
 
   #index-dropdown{
-    top: 75vh;
     width: 20vw;
-    margin-left: -10vw;
-  }
-  #index-dropdown:hover{
-    width: 21vw;
-    margin-left: -10.5vw;
-    opacity: 1;
   }
 
   .second-page h3{
