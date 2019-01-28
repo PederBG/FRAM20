@@ -1,6 +1,27 @@
 /* Index Page */
 .navbar{
-  z-index: 10;
+    margin-bottom: 0;
+    z-index: 1;
+    font-size: 1.1em;
+}
+
+.nav.navbar-nav li a:hover{
+    background-color: #707070;
+}
+
+.nav.navbar-nav li.active a{
+   background-color: #506070;
+}
+.nav.navbar-nav li.active a:hover{
+    background-color: #707070;
+}
+
+#nav-title{
+  color: whitesmoke;
+  font-size: 1.4em;
+}
+#nav-title:hover{
+  color: #ffffff;
 }
 
 .cover-image{
@@ -42,7 +63,7 @@
   width: max-content;
   display: table;
   margin: 0 auto;
-  padding-bottom: 5px;
+  padding: 0 5px 5px 5px;
   text-align: center;
 }
 

@@ -9,6 +9,7 @@ html, body {
     margin-bottom: 0;
     background-color: inherit;
     z-index: 1;
+    font-size: 1.1em;
 }
 
 .nav.navbar-nav li a:hover{
@@ -24,6 +25,10 @@ html, body {
 
 #nav-title{
   color: whitesmoke;
+  font-size: 1.4em;
+}
+#nav-title:hover{
+  color: #ffffff;
 }
 
 /* Navbar end */
@@ -237,8 +242,23 @@ div.ol-attribution{
 }
 
 .read-daily-div{
-  height: 100%;
-  position: fixed;
+  padding-bottom: 20vh;
+}
+.read-daily-div h1{
+  bottom: 0;
+  position: absolute;
+  font-size: 4em;
+  cursor: pointer;
+  color: #1C2833;
+}
+.read-daily-div h1:hover{
+  color: black;
+}
+
+.daily-date{
+  text-align: left;
+  margin-bottom: -1em;
+  padding-top: 0.3em;
 }
 
 
