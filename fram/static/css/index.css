@@ -62,22 +62,21 @@
 #logo-title, #logo-flag{
   display: none;
 }
+
 #logo-full{
   display: block;
 }
 
-
-.second-page h3{
-  width: 80vw;
-  margin-left: 10vw;
+.second-page{
+  width: 95vw;
+  margin-left: 2.5vw;
+  background-color: rgba(245, 245, 245, 0.4);
+  border-radius: 1%;
 }
 
 .top-text{
   text-align: left;
   font-size: 1.3em;
-  margin-left: 20vw;
-  width: 60vw;
-
 }
 
 #index-route{
@@ -92,8 +91,6 @@
   font-size: 1.2em;
   padding: 0.5em;
   border: solid 0.1em gray;
-  width: 80vw;
-  margin-left: 10vw;
 }
 
 .cover-text table{
@@ -110,23 +107,8 @@
     margin-top: 8vh;
   }
 
-  /* #index-dropdown{
-    top: 78vh;
-    width: 14vw;
-    margin-left: -7vw;
-  }
-  #index-dropdown:hover{
-    width: 15vw;
-    margin-left: -7.5vw;
-    opacity: 1;
-  } */
-
   #index-route{
     width: 60vw;
-  }
-  .cover-text{
-    width: 60vw;
-    margin-left: 19vw;
   }
 }
 
@@ -155,23 +137,17 @@
   }
 
   .second-page h3{
-    width: 98vw;
-    margin-left: 1vw;
-    font-size: large;
+   font-size: large;
   }
 
   .top-text{
-    width: 98vw;
-    margin-left: 1vw;
     font-size: medium;
   }
 
   #index-route{
-    width: 98vw;
+    width: 100%;
   }
   .cover-text{
-    width: 98vw;
-    margin-left: 1vw;
     font-size: small;
   }
 
