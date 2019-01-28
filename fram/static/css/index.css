@@ -4,7 +4,7 @@
 }
 
 .cover-image{
-  background: url('../../static/img/terramodis.jpeg') no-repeat center center fixed;
+  background: url('../../static/img/bg1.jpeg') no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -16,13 +16,6 @@
   z-index: 0;
   color: black;
   text-align: center;
-}
-
-/* To fix zoomed in background on phones/tablets */
-@media screen and (max-width:768px){
-  .cover-image {
-    background-size: 900px 100%;
-  }
 }
 
 .first-page{
@@ -43,15 +36,27 @@
   margin-left: 10vw;
 }
 
+#dropdown-text{
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 20%;
+  width: max-content;
+  display: table;
+  margin: 0 auto;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
 #index-dropdown{
   align-items: center;
-  opacity: 0.9;
+  opacity: 0.95;
   width: 10vw;
+  cursor: pointer;
 }
 
 #index-dropdown:hover{
   opacity: 1;
-}
+  margin-top: 1vh;
+  }
 
 /* For large screens */
 #logo-title, #logo-flag{
@@ -170,6 +175,19 @@
     font-size: small;
   }
 
+}
+
+
+@media screen and (max-width:768px){
+
+  /* To fix zoomed in background on phones/tablets */
+  .cover-image {
+    background-size: 800px 100%;
+  }
+
+  .index-dropdown{
+    top: 65vh;
+  }
 }
 
 /* End Index Page */
