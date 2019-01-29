@@ -1,14 +1,12 @@
-proj4.defs('EPSG:3413', '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 ' +
-    '+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
-var proj3413 = ol.proj.get('EPSG:3413');
-proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
-proj3413.setWorldExtent([-50, 80, 30, 87]);
+// ------ LOGIC FOR OPENLAYERS AND GEOSERVER ------ \\
 
+// Init variables
+const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
+// const HOST_IP = 'http://localhost:8080/geoserver/wms'
+const MIN_ZOOM = 3.5
 
 var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
-var HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
-// var HOST_IP = 'http://localhost:8080/geoserver/wms'
-var static_layerinfo = {
+const STATIC_LAYERINFO = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
   'Magnetic': "<p><h5>Magnetic Anomali Overlay</h5></p>",
   'Gravity': "<p><h5>Freeair Gravity Overlay</h5></p>",
@@ -16,9 +14,18 @@ var static_layerinfo = {
   'Graticule': "<p><h5>Graticule Overlay</h5></p>"
 }
 
-// default values
-const MIN_ZOOM = 3.5
 
+
+// Setting projection for openlayers map
+proj4.defs('EPSG:3413', '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 ' +
+    '+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+var proj3413 = ol.proj.get('EPSG:3413');
+proj3413.setExtent([-4194304, -4194304, 4194304, 4194304]);
+proj3413.setWorldExtent([-50, 80, 30, 87]);
+
+
+
+// Set default view
 if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
 else{
   let grid = positions[positions.length-1][1].split(',');
@@ -33,9 +40,10 @@ var defaultView = new ol.View({
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
 
+// Define function to get raster data from geoserver
 function setCustomLayerSource (workspace, name){
   let SLD_style; // S1-images use different geoserver styling
-  SLD_style = name.includes('s1') ? 'cite:raster2' : 'raster';
+  SLD_style = name.indexOf('s1') != -1 ? 'cite:raster2' : 'raster';
 
   return new ol.source.TileWMS({
       url: HOST_IP,
@@ -50,13 +58,13 @@ function setCustomLayerSource (workspace, name){
     })
 }
 
+// Getting base map using jquery get-syntax
 var parser = new ol.format.WMTSCapabilities();
 var url = 'https://map1.vis.earthdata.nasa.gov/wmts-arctic/' +
     'wmts.cgi?SERVICE=WMTS&request=GetCapabilities';
-fetch(url).then(function(response) {
-  return response.text();
-}).then(function(text) {
-  var result = parser.read(text);
+
+$.get( url, function(response) {
+  var result = parser.read(response);
   var options = ol.source.WMTS.optionsFromCapabilities(result, {
     layer: 'OSM_Land_Mask',
     matrixSet: 'EPSG3413_250m'
@@ -67,16 +75,14 @@ fetch(url).then(function(response) {
   baselayer = new ol.layer.Tile({
     source: new ol.source.WMTS(/** @type {!olx.source.WMTSOptions} */ (options))
   });
-  // Waiting for http response..
+
 
   // The order here decides z-index for images
   layernames = ['seaice', 'terramos', 's1mos', 's1c', 's2c', 'icedrift']
   var workspace_default = uglifyDate(latestDate);
-  console.log(workspace_default);
   layerdict = {
     "base": baselayer,
   };
-  //Creating and adding all custom layers
 
   // This is added first to set lowest z-index
   layerdict['bathymetry'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'bathymetry') });
@@ -86,6 +92,7 @@ fetch(url).then(function(response) {
   layerdict['gravity'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'gravity') });
   layerdict['gravity'].setVisible(false);
 
+  // Creating and adding all custom layers
   function addCustomLayers(workspace){
       for (var i = 0; i < layernames.length; i++) {
         layerdict[layernames[i]] = new ol.layer.Tile({ source: setCustomLayerSource(workspace, layernames[i]) });
@@ -100,7 +107,7 @@ fetch(url).then(function(response) {
   layerdict['graticule'].setVisible(false);
 
 
-  // Init map
+  // Init actual map
   const scaleLineControl = new ol.control.ScaleLine();
   map = new ol.Map({
     controls: ol.control.defaults({
@@ -110,12 +117,12 @@ fetch(url).then(function(response) {
      }).extend([
        scaleLineControl
      ]),
-    layers: Object.values(layerdict),
+    layers: Object.keys(layerdict).map(function(e) {return layerdict[e]}), // Object.values() is not supported by IE..
     target: 'map',
     view: defaultView
   });
 
-  // Adding markers
+  // Adding markers from positions in db
   if (positions.length != 0){
     allPointFeatures = [];
     activePointFeatures = [];
@@ -134,7 +141,7 @@ fetch(url).then(function(response) {
     });
 
 
-    // Changing last point to an arrow (station location)
+    // Changing last point to an arrow (current station location)
     allPointFeatures[allPointFeatures.length - 1].setStyle(
         new ol.style.Style({
             image: new ol.style.RegularShape({
@@ -170,74 +177,8 @@ fetch(url).then(function(response) {
 
 
 
+// ------------------- INIT LAYER BUTTONS ----------------- \\
 
-// ------------------- CONTROLS ----------------- \\
-function ToggleLayer(bt){
-  var active = layerdict[bt.name].getVisible();
-  layerdict[bt.name].setVisible(!active);
-  if (!active){
-    $('#'+bt.id).css("background-color", "gray")
-    $('#'+bt.id).next().css('visibility', 'visible')
-  }
-  else{
-    $('#'+bt.id).css("background", "transparent")
-    $('#'+bt.id).next().css('visibility', 'hidden')
-  }
-}
-
-function setDefaultView(){
-  if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
-  else centerGrid = activePointFeatures[activePointFeatures.length-1].getProperties().geometry.A;
-  defaultView.animate({
-    center: centerGrid,
-    zoom: 5
-  });
-}
-
-function toggleInfo(bt){
-  $('#LayerInfoContainer').toggle();
-  $('#LayerInfo').text('');
-  let layername = bt.id.split('Info')[0].split('bt')[1];
-  if ($.inArray(layername, Object.keys(positions[activePointFeatures.length-1][2])) != -1){
-    $('#LayerInfo').html(positions[activePointFeatures.length-1][2][layername]);
-  }
-  else{
-    $('#LayerInfo').html(static_layerinfo[layername]);
-  }
-}
-function closeLayerInfo(){
-  $('#LayerInfoContainer').toggle();
-}
-
-function displayGridCallback(){
-  raw_grid = map.getView().getCenter();
-  conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' )
-
-  output = conv_grid[1].toFixed(4) + ' N, '
-  if (conv_grid[0] < 0) output += conv_grid[0].toFixed(4) *-1 + ' W'
-  else output += conv_grid[0].toFixed(4) + ' E'
-
-  $('#grid-display').html(output);
-}
-function toggleCrosshair(){
-  if($('#cross-x').css('display')=='none'){
-    $('#btCrosshair').css('background-color', 'gray');
-    map.on("moveend", displayGridCallback);
-    displayGridCallback();
-  }
-  else{
-    $('#btCrosshair').css('background-color', 'transparent');
-    map.un("moveend", displayGridCallback);
-
-  }
-  $('#cross-x, #cross-y, #grid-display').toggle();
-}
-
-function scrollUp(){
-  $('html').animate({ scrollTop: 0 }, 'fast');
-}
-
-// Add controls to all buttons
 // TODO: Use same names everywere and maybe set names in db
 ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'Magnetic', 'Gravity', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
 $(document).ready(function() {
@@ -250,43 +191,10 @@ $(document).ready(function() {
         });
     });
 
-
-  function changeDate(btn){
-    $('#LayerInfoContainer').hide();
-    if (btn.id == 'forward'){
-      if (activePointFeatures.length < allPointFeatures.length){
-        activePointFeatures.push(allPointFeatures[activePointFeatures.length])
-      } else return false;
-    }
-    else{
-      if (activePointFeatures.length > 1){
-        activePointFeatures.pop()
-      } else return false;
-    }
-    $('#used-date').html(positions[activePointFeatures.length-1][0]);
-    map.removeLayer(vectorLayer);
-    vectorLayer = new ol.layer.Vector({
-        source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
-        style: markerStyle
+    $('#forward').click(function() {
+      changeDate(this)
     });
-    map.addLayer(vectorLayer);
-
-    layernames.forEach(function(name) {
-      let date = uglifyDate(positions[activePointFeatures.length-1][0]);
-      layerdict[name].setSource( setCustomLayerSource( date, name ) );
+    $('#back').click(function() {
+      changeDate(this)
     });
-
-  }
-  $('#forward').click(function() {
-    changeDate(this)
-  });
-  $('#back').click(function() {
-    changeDate(this)
-  });
 });
-
-// Needed at setup
-function uglifyDate(dateString){
-  let tmp = new Date(dateString);
-  return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-}
