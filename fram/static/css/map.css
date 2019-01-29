@@ -278,6 +278,27 @@ div.ol-attribution{
 }
 /* End Info Page, Links Page */
 
+/* Contact Page */
+.contact-div h2{
+  text-align: center;
+}
+
+.contact-info{
+  margin-left: 20%;
+  width: 60%;
+  font-size: medium;
+}
+
+
+@media(max-width:768px){
+  .contact-info{
+    margin-left: 3%;
+    width: 94%;
+  }
+}
+
+/* End Contact Page */
+
 
 
 /* Media queries */
