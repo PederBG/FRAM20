@@ -40,7 +40,7 @@
 }
 
 .first-page{
-  height:91vh;
+  height:90vh;
 }
 
 #logo-full{
@@ -90,19 +90,22 @@
 
 .second-page{
   width: 95vw;
-  margin-left: 2.5vw;
-  background-color: rgba(245, 245, 245, 0.4);
+  margin-left: 2vw;
+  background-color: rgba(245, 245, 245, 0.6);
   border-radius: 1%;
 }
 
 .top-text{
   text-align: left;
   font-size: 1.3em;
+  margin-left: 25%;
+  width: 50%;
 }
 
 #index-route{
   border: 2px solid black;
   width: 40vw;
+  margin-bottom: 0.2em;
 }
 
 .cover-text{
@@ -130,6 +133,11 @@
 
   #index-route{
     width: 60vw;
+  }
+
+  .top-text{
+    margin-left: 5vw;
+    width: 90%;
   }
 }
 
@@ -163,6 +171,7 @@
 
   .top-text{
     font-size: medium;
+    margin-left: 0.1em;
   }
 
   #index-route{
@@ -176,14 +185,31 @@
 
 
 @media screen and (max-width:768px){
-
   /* To fix zoomed in background on phones/tablets */
   .cover-image {
-    background-size: 800px 100%;
+    background-size: 770px 100%;
   }
+}
 
+@media(max-width:768px){
   .index-dropdown{
     top: 65vh;
+  }
+  .first-page{
+    height:89vh;
+  }
+}
+
+@media screen and (max-width:600px){
+  /* To fix zoomed in background on phones/tablets */
+  .cover-image {
+    background-size: 602px 100%;
+  }
+}
+
+@media(max-width:450px){
+  .first-page{
+    height:88vh;
   }
 }
 
