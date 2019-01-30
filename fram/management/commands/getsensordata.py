@@ -39,13 +39,17 @@ class Command(BaseCommand):
         scriptsPath = 'scripts/'
         scriptName = 'main.py'
         targetPath = 'data'
+        only = ''
         date = latest.date
         grid = latest.grid
 
+        if datetime.now() < datetime.now().replace(hour=13):
+            print("Early running: only generating s1 image.")
+            only = '-o s1c'
 
         # Get data
-        cmd = '%s%s -d %s -g %s -t %s --overwrite' %(scriptsPath, scriptName,
-            date, grid, targetPath)
+        cmd = '%s%s -d %s -g %s -t %s %s --overwrite' %(scriptsPath, scriptName,
+            date, grid, targetPath, only)
         print(cmd)
         subprocess.call(cmd, shell=True)
 

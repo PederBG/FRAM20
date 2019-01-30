@@ -8,7 +8,7 @@ Layers:
     Sentinel-1 Optic Image Close-up (s2c)
     Terra MODIS Optic Mosaic (terramos)
     Sentinel-1 SAR High Resolution Close-up (s1c)
-    Sentinel-1 SAR High Resolution Mosaic (s1mos)
+    Sentinel-1 SAR Lower Resolution Mosaic (s1mos)
     AMSR-2 Global Sea Ice Concentration (seaice)
     Low Resolution Sea Ice Drift (icedrift)
     S1 Mosaic using ESA's quicklooks (not in use)
@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 
 import fram_functions as funcs
 
-np.set_printoptions(threshold=np.nan) # for ice-drift quiverplot
+np.set_printoptions(threshold=sys.maxsize) # for ice-drift quiverplot
 
 class DownloadManager(object):
 
@@ -70,8 +70,9 @@ class DownloadManager(object):
         if( kwargs.get('target') ):
             self.OUTDIR = kwargs.get('target') + '/' + str(self.DATE) + '/'
 
-        # Delete old tmp dir content
-        # subprocess.call('rm ' + self.TMPDIR)
+        # Delete old tmp dir and data content
+        print(('rm ' + self.TMPDIR + ' ' + self.OUTDIR))
+        subprocess.call('rm -r ' + self.TMPDIR + ' ' + self.OUTDIR, shell=True)
 
         # Make dirs if they don't exist
         if not os.path.isdir(self.TMPDIR):
@@ -83,7 +84,7 @@ class DownloadManager(object):
 
         if (self.GRID):
             self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 1, 1, 0.01, 0.01)
-            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 20, 50, 1.5, 5)
+            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 20, 70, 1.5, 6)
 
 
         # Check gdalhome path
@@ -194,7 +195,7 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, outfile, max_num=40):
+    def getS1Mos(self, outfile, max_num=50):
 
         tmpfiles = "" # arguments when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=1)
