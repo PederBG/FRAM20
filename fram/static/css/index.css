@@ -251,7 +251,7 @@
 }
 
 /* Flipped media screen */
-@media all and (orientation:landscape) {
+@media only screen and (orientation:landscape) and (max-width:900px){
   #logo-title, #logo-flag{
     display: none;
   }
@@ -271,7 +271,7 @@
     width: 15vw;
   }
   .first-page{
-    height:85vh;
+    height:88vh;
   }
 }
 
