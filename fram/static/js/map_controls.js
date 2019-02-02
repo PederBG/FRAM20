@@ -64,7 +64,10 @@ function toggleCrosshair(){
   $('#cross-x, #cross-y, #grid-display').toggle();
 }
 
-
+function scrollDown(){
+  console.log("yo");
+  $('html').animate({ scrollTop: $(document).height()}, 'fast');
+}
 function scrollUp(){
   $('html').animate({ scrollTop: 0 }, 'fast');
 }

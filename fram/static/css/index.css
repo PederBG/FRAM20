@@ -2,7 +2,7 @@
 .navbar{
     margin-bottom: 0;
     z-index: 1;
-    font-size: 1.1em;
+    font-size: 1.2em;
 }
 
 .nav.navbar-nav li a:hover{
@@ -120,6 +120,7 @@
   font-size: 1.2em;
   padding: 0.5em;
   border: solid 0.1em gray;
+  padding-left: 1em;
 }
 
 .cover-text table{
@@ -127,7 +128,7 @@
   border-spacing: 0 1em;
 }
 
-.cover-text td{
+.cover-text td:nth-child(2){
   padding-left: 3em;
 }
 
@@ -198,7 +199,7 @@
 }
 
 /* Force navbar collapse earlier than native bootstrap */
-@media (max-width: 968px) {
+@media (max-width: 1040px) {
     .navbar-header {
         float: none;
     }

@@ -9,7 +9,7 @@ html, body {
     margin-bottom: 0;
     background-color: inherit;
     z-index: 1;
-    font-size: 1.1em;
+    font-size: 1.2em;
 }
 
 .nav.navbar-nav li a:hover{
@@ -147,6 +147,20 @@ button:hover{
   font-size: large;
 }
 
+#scroll-down{
+  right: 0.8em;
+  bottom: 0.8em;
+  position: absolute;
+  z-index: 2;
+  width: 4em;
+  display: none;
+}
+
+#scroll-down:hover{
+  opacity: 0.85;
+  bottom: 0.6em;
+}
+
 
 /* ------------- Picking Dates ------------ */
 #dates-div{
@@ -276,6 +290,11 @@ div.ol-attribution{
 .text-body h2, .text-body h3, .links-page h1{
   text-align: center;
 }
+
+.text-body td:nth-child(2){
+  padding-left: 3em;
+  padding-bottom: 1em;
+}
 /* End Info Page, Links Page */
 
 /* Contact Page */
@@ -307,7 +326,7 @@ div.ol-attribution{
   #LayerInfoContainer{
     width: 50%;
   }
-  #scroll-up{
+  #scroll-up, #scroll-down{
     display: block;
   }
 }
@@ -334,7 +353,7 @@ div.ol-attribution{
 }
 
 /* Force navbar collapse earlier than native bootstrap */
-@media (max-width: 968px) {
+@media (max-width: 1040px) {
     .navbar-header {
         float: none;
     }
