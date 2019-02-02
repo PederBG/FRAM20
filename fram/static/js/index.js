@@ -1,7 +1,7 @@
 // Static variables
 const NUMB_IMAGES = 7;
 const FADE_TIME = 300;
-const SLIDE_TIME = 5000
+const SLIDE_TIME = 4000
 const background = $('.cover-image');
 
 // Get background images
@@ -19,20 +19,41 @@ function preload(){
 }
 preload();
 
-// Run image slideshow
-let i = 0;
-setInterval(function() {
-  // background.fadeTo(FADE_TIME, 0.9);
-  background.css('background-image', 'url(' + images[i] + ')');
-  // setTimeout(function() { background.fadeTo(FADE_TIME, 1); }, FADE_TIME);
-  i = i + 1;
-  if (i == NUMB_IMAGES) {
-    i =  0;
-  }
-}, SLIDE_TIME);
-
-
 // Dropdown handler
 $("#index-dropdown").click(function() {
-  $("html, body").animate({ scrollTop: window.innerHeight }, 600);
+  let secondPagePos = $(".second-page").offset().top;
+  $("html, body").animate({ scrollTop: secondPagePos }, 600);
+});
+
+// Init variables
+let i = 0;
+let pause = false;
+let win = $(window);
+
+//
+win.scroll(function() {
+  if ( ( win.scrollTop() + 0.4 * win.innerHeight() ) > window.innerHeight ) {
+    pause = true;
+    $('.second-page').css('background-color', 'rgba(245, 245, 245, 0.7)');
+  }
+  else{
+    pause = false;
+    $('.second-page').css('background-color', 'rgba(245, 245, 245, 0.5)');
+  }
+});
+
+$('document').ready(function(){
+
+  // Run image slideshow
+  setInterval(function() {
+    // background.fadeTo(FADE_TIME, 0.9);
+    if (!pause){
+      background.css('background-image', 'url(' + images[i] + ')');
+      // setTimeout(function() { background.fadeTo(FADE_TIME, 1); }, FADE_TIME);
+      i = i + 1;
+      if (i == NUMB_IMAGES) {
+        i =  0;
+      }
+    }
+  }, SLIDE_TIME);
 });

@@ -91,20 +91,25 @@
 .second-page{
   width: 95vw;
   margin-left: 2vw;
-  background-color: rgba(245, 245, 245, 0.6);
+  background-color: rgba(245, 245, 245, 0.5);
   border-radius: 1%;
+}
+
+.second-page h3{
+  padding-top: 0.5em;
 }
 
 .top-text{
   text-align: left;
   font-size: 1.3em;
   margin-left: 25%;
-  width: 50%;
+  width: 60%;
+  margin-bottom: 1em;
 }
 
 #index-route{
   border: 2px solid black;
-  width: 40vw;
+  width: 45vw;
   margin-bottom: 0.2em;
 }
 
@@ -122,8 +127,18 @@
   border-spacing: 0 1em;
 }
 
+.cover-text td{
+  padding-left: 3em;
+}
 
 /* For smaller screens */
+@media(max-width:1600px){
+
+  #index-route{
+    width: 50vw;
+  }
+}
+
 @media(max-width:1400px){
   #logo-full{
     width: 60%;
@@ -136,8 +151,8 @@
   }
 
   .top-text{
-    margin-left: 5vw;
-    width: 90%;
+    margin-left: 10vw;
+    width: 85vw;
   }
 }
 
@@ -234,6 +249,10 @@
   }
   .first-page{
     height:89vh;
+  }
+
+  .second-page{
+   padding-bottom: 10em;
   }
 }
 
