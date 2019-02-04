@@ -1,15 +1,15 @@
-# FRAM19
+# FRAM-2019
 
-### A GIS application for easy access to relevant sensor data from the arctic region
+### Website / GIS application used for the FRAM-2019 expedition, due to start spring 2019.
+#### Visit at: www.fram2019.com (still in dev)
 
-####  Download, process and present up to date satellite imagery, and other sensor data, following a specified location.
+####  Using python to download and process up to date satellite imagery, and other sensor data, following specified locations in the Artic Ocean. Presenting this in a full-stack Django application with GeoServer and OpenLayers. All configurations and dependencies are handled by Docker.
 
 ###### Developed as an internship assignment for Lundin Norway. Published with their consent.
 ![Github](https://preview.ibb.co/jC8s8A/fram.png "Preview")
 
-#### Note: *This is work in progress*
-
 ### Development
+##### Note: *not updated to newest changes*
 
 #### Use docker image (highly recommended)
 
@@ -28,7 +28,7 @@
 - Run docker image:
   ```sh
   cd FRAM19/docker
-  ./run_docker.sh
+   sudo ./run_docker.sh
   ```
 The docker file will automatically start django and geoserver in two tmux sessions.
 
