@@ -25,9 +25,9 @@ class Command(BaseCommand):
             print("No positions found")
             sys.exit(1)
 
-        # If latest grid already have a layer
-        if Layer.objects.filter(position=latest):
-            print("No new position found, using last added grid.")
+        # If latest position not from today
+        if latest.date =! datetime.now().date():
+            print("No new position added today, using last added grid.")
             p = Position()
             p.grid = latest.grid
             p.date = datetime.now().date()
