@@ -133,6 +133,41 @@
   padding-left: 3em;
 }
 
+.btn{
+  font-size: large;
+  padding: 0.5em 2em 0.5em 2em;
+  background-color: #09a3c1;
+  color: whitesmoke;
+}
+
+.btn:hover{
+  margin-top: 0.2em;
+  margin-bottom: -0.2em;
+  color: whitesmoke;
+  background-color: #06b4d6;
+}
+
+.btn:focus{
+  color: whitesmoke;
+}
+
+
+.logos-div img{
+  width: 20vh;
+}
+
+.logos-div img:hover{
+  opacity: 0.85;
+}
+
+.logos-div a{
+  margin-left: 3vh;
+}
+
+.logos-div a:first-child{
+  margin-left: -3vh;
+}
+
 /* For smaller screens */
 @media(max-width:1600px){
 
@@ -254,10 +289,6 @@
 @media(max-width:768px){
   .first-page{
     height:89vh;
-  }
-
-  .second-page{
-   padding-bottom: 3em;
   }
 
   .index-dropdown{
