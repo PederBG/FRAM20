@@ -1,5 +1,9 @@
 // ------ CONTROLS FOR MAP-PAGE ------ \\
 
+// Init variables
+let win = $(window);
+let arrowDown = true;
+
 function ToggleLayer(bt){
   var active = layerdict[bt.name].getVisible();
   layerdict[bt.name].setVisible(!active);
@@ -64,13 +68,23 @@ function toggleCrosshair(){
   $('#cross-x, #cross-y, #grid-display').toggle();
 }
 
+// Scrolling up/down
 function scrollDown(){
-  console.log("yo");
-  $('html').animate({ scrollTop: $(document).height()}, 'fast');
+  if (arrowDown) $('html').animate({ scrollTop: $(document).height()}, 'fast');
+  else $('html').animate({ scrollTop: 0 }, 'fast');
 }
-function scrollUp(){
-  $('html').animate({ scrollTop: 0 }, 'fast');
-}
+
+// Control button for scrolling up/down
+win.scroll(function() {
+  if ( ( win.scrollTop() + 0.7 * win.innerHeight() ) > window.innerHeight ) {
+    arrowDown = false;
+    $('#scroll-down').css('transform','rotate(' + 180 + 'deg)');
+  }
+  else{
+    arrowDown = true;
+    $('#scroll-down').css('transform','rotate(' + 0 + 'deg)');
+  }
+});
 
 
 function changeDate(btn){

@@ -1,7 +1,7 @@
 // Static variables
 const NUMB_IMAGES = 7;
 const FADE_TIME = 300;
-const SLIDE_TIME = 4000
+const SLIDE_TIME = 3000
 const background = $('.inner-div');
 
 // Get background images
@@ -30,7 +30,21 @@ let i = 0;
 let pause = false;
 let win = $(window);
 
-//
+// TODO Stop slideshow when page-tab is not active
+// win.blur(function() {
+//   if (!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )){
+//     console.log("blur");
+//     pause = true;
+//   }
+// });
+// win.focus(function() {
+//   if (!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )){
+//     console.log("focus");
+//     pause = false;
+//   }
+// });
+
+// Stop slideshow on scroll-down
 win.scroll(function() {
   if ( ( win.scrollTop() + 0.4 * win.innerHeight() ) > window.innerHeight ) {
     pause = true;
@@ -39,6 +53,13 @@ win.scroll(function() {
   else{
     pause = false;
     $('.second-page').css('background-color', 'rgba(245, 245, 245, 0.5)');
+  }
+
+  if ( ( win.scrollTop() + 0.5 * win.innerHeight() ) > window.innerHeight ) {
+    console.log("UP");
+  }
+  else{
+    console.log("DOWN");
   }
 });
 

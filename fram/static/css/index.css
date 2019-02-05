@@ -55,8 +55,7 @@
 
 .index-dropdown{
   opacity: 0.9;
-  top: 75vh;
-  position: absolute;
+  margin-top: 36vh;
   width: 80vw;
   margin-left: 10vw;
 }
@@ -140,6 +139,9 @@
   #index-route{
     width: 50vw;
   }
+  .index-dropdown{
+    margin-top: 45vh;
+  }
 }
 
 @media(max-width:1400px){
@@ -161,6 +163,9 @@
   #index-dropdown{
     width: 12vw;
   }
+  .index-dropdown{
+    margin-top: 40vh;
+  }
 }
 
 /* For phones/tablets */
@@ -181,6 +186,10 @@
   #logo-flag{
     width: 40vw;
     margin-left: 30vw;
+  }
+
+  .index-dropdown{
+    margin-top: 3vh;
   }
 
   #index-dropdown{
@@ -242,14 +251,6 @@
     }
 }
 
-
-@media screen and (max-width:768px){
-  /* To fix zoomed in background on phones/tablets */
-  .cover-image {
-    background-size: 770px 100%;
-  }
-}
-
 @media(max-width:768px){
   .first-page{
     height:89vh;
@@ -258,12 +259,20 @@
   .second-page{
    padding-bottom: 3em;
   }
+
+  .index-dropdown{
+    margin-top: 20vh;
+  }
 }
 
 @media screen and (max-width:600px){
   /* To fix zoomed in background on phones/tablets */
   .cover-image {
     background-size: 602px 100%;
+  }
+
+  .index-dropdown{
+    margin-top: 30vh;
   }
 
   #index-dropdown{
@@ -288,11 +297,11 @@
   }
 
   #logo-full{
-    margin-top: 12vh;
+    margin-top: 8vh;
   }
 
   .index-dropdown{
-    top: 60vh;
+    margin-top: 2vh;
   }
   #index-dropdown{
     width: 15vw;
