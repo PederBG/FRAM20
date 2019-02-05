@@ -26,7 +26,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
         # If latest position not from today
-        if latest.date =! datetime.now().date():
+        if latest.date != datetime.now().date():
             print("No new position added today, using last added grid.")
             p = Position()
             p.grid = latest.grid
