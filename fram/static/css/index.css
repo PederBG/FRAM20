@@ -92,7 +92,7 @@
 
 .second-page{
   width: 95vw;
-  margin-left: 2vw;
+  margin-left: 2.3vw;
   background-color: rgba(245, 245, 245, 0.5);
   border-radius: 1%;
 }
@@ -156,10 +156,6 @@
   .top-text{
     margin-left: 10vw;
     width: 85vw;
-  }
-
-  .index-dropdown{
-    top: 78vh;
   }
 
   #index-dropdown{
@@ -255,9 +251,6 @@
 }
 
 @media(max-width:768px){
-  .index-dropdown{
-    top: 80vh;
-  }
   .first-page{
     height:89vh;
   }
@@ -271,10 +264,6 @@
   /* To fix zoomed in background on phones/tablets */
   .cover-image {
     background-size: 602px 100%;
-  }
-
-  .index-dropdown{
-    top: 80vh;
   }
 
   #index-dropdown{
