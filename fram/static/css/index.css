@@ -25,18 +25,22 @@
 }
 
 .cover-image{
-  background: url('../../static/img/bg1.jpeg') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-  width: 100%;
-  height: auto;
-  top: 0px;
-  position: absolute;
-  z-index: 0;
   color: black;
   text-align: center;
+}
+
+/* Fix background-attachment blocked by phone/tablet browsers */
+.inner-div{
+  z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-image: url('../../static/img/bg1.jpeg');
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
 .first-page{
@@ -50,8 +54,8 @@
 }
 
 .index-dropdown{
-  opacity: 0.8;
-  top: 72vh;
+  opacity: 0.9;
+  top: 75vh;
   position: absolute;
   width: 80vw;
   margin-left: 10vw;
@@ -69,13 +73,11 @@
 
 #index-dropdown{
   align-items: center;
-  opacity: 0.95;
   width: 10vw;
   cursor: pointer;
 }
 
 #index-dropdown:hover{
-  opacity: 1;
   margin-top: 1vh;
   }
 
@@ -155,6 +157,14 @@
     margin-left: 10vw;
     width: 85vw;
   }
+
+  .index-dropdown{
+    top: 78vh;
+  }
+
+  #index-dropdown{
+    width: 12vw;
+  }
 }
 
 /* For phones/tablets */
@@ -168,7 +178,7 @@
   }
 
   #logo-title{
-    margin-top: 9vh;
+    margin-top: 4vh;
     width: 80vw;
     margin-left: 10vw;
   }
@@ -246,14 +256,14 @@
 
 @media(max-width:768px){
   .index-dropdown{
-    top: 65vh;
+    top: 80vh;
   }
   .first-page{
     height:89vh;
   }
 
   .second-page{
-   padding-bottom: 10em;
+   padding-bottom: 3em;
   }
 }
 
@@ -261,6 +271,14 @@
   /* To fix zoomed in background on phones/tablets */
   .cover-image {
     background-size: 602px 100%;
+  }
+
+  .index-dropdown{
+    top: 80vh;
+  }
+
+  #index-dropdown{
+    width: 25vw;
   }
 }
 
@@ -285,7 +303,7 @@
   }
 
   .index-dropdown{
-    top: 50vh;
+    top: 60vh;
   }
   #index-dropdown{
     width: 15vw;

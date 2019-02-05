@@ -2,7 +2,7 @@
 const NUMB_IMAGES = 7;
 const FADE_TIME = 300;
 const SLIDE_TIME = 4000
-const background = $('.cover-image');
+const background = $('.inner-div');
 
 // Get background images
 let images = [];
