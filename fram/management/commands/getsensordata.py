@@ -16,6 +16,7 @@ class Command(BaseCommand):
     help = "No options needed"
 
     def handle(self, *args, **options):
+
         latest = Position.objects.all().order_by('-date')
 
         if latest:
@@ -67,6 +68,10 @@ class Command(BaseCommand):
             layerinfo[file.split(' ')[0][:-4] + '_size'] = file.split(' ')[1] + 'B'
 
         print(layerinfo)
+
+        # Remove old layer from same day
+        if Layer.objects.all().order_by('-position__date').first().position.date == datetime.now().date():
+            Layer.objects.all().order_by('-position__date').first().delete()
 
         l = Layer()
         l.position = latest
