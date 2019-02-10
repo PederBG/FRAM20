@@ -28,3 +28,11 @@ class Daily(models.Model):
 
     def __str__(self):
         return "Daily report: {}".format(self.title)
+
+
+class Weekly(models.Model):
+    title = models.CharField(max_length=250, default='No title')
+    filename = models.CharField(max_length=250, default='No data')
+
+    def __str__(self):
+        return "Weekly letter: {}".format(self.title)

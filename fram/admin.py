@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(Position)
 admin.site.register(Layer)
 admin.site.register(Daily)
+admin.site.register(Weekly)

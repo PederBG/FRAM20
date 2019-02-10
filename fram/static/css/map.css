@@ -248,6 +248,11 @@ div.ol-attribution{
 .daily-info, .weekly-info{
   text-align: center;
 }
+.info-files{
+  width: 100%;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+}
 
 .info-div, .read-daily-div{
   text-align: center;

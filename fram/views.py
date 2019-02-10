@@ -31,20 +31,20 @@ def read_daily(request, dailyID):
     })
 
 def info(request):
-    if(request.GET.get('outline')):
-        try:
-            return FileResponse(open('data/Outline_UiO.pdf', 'rb'), content_type='application/pdf')
-        except FileNotFoundError:
-            raise Http404()
-    if(request.GET.get('project')):
-        try:
-            return FileResponse(open('data/Prosjektskisse_2019.pdf', 'rb'), content_type='application/pdf')
-        except FileNotFoundError:
-            raise Http404()
     return render(request, 'fram/info.html')
 
 def weekly(request):
-    return render(request, 'fram/weekly.html')
+    if request.GET:
+        try: # Using as_attachment because phones/tablets get errors reading pdf in browser. TODO: fix this
+            return FileResponse(open('data/weekly/' + request.GET.get('name'), 'rb'), content_type='application/pdf', as_attachment=True)
+        except FileNotFoundError:
+            raise Http404()
+
+    context = {
+        'weeklys': Weekly.objects.all().order_by('-id')
+    }
+
+    return render(request, 'fram/weekly.html', context)
 
 def links(request):
     return render(request, 'fram/links.html')
