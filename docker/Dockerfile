@@ -32,6 +32,9 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && \
     $APT_QUIET upgrade && \
     $APT_QUIET install gdal-bin python-gdal
 
+# NGINX
+RUN $APT_QUIET install nginx
+
 # Cython
 RUN python2 -m pip install Cython
 
@@ -49,4 +52,4 @@ RUN rm /etc/localtime && ln -s /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 
 RUN service cron start
 
-ENTRYPOINT  /bin/bash -c 'tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver" && tmux new-session -d -s "geoserver" "cd /root/fram19 && GEOSERVER_HOME=/usr/share/geoserver-2.12.5 /usr/share/geoserver-2.12.5/bin/startup.sh" && cd /root/fram19 && /bin/bash'
+ENTRYPOINT  /bin/bash -c 'cp /root/fram19/nginx.conf.copy /etc/nginx/sites-enabled/nginx.conf && rm /etc/nginx/sites-enabled/default && /etc/init.d/nginx restart && tmux new-session -d -s "django" "cd /root/fram19 && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput &&  gunicorn --access-logfile /root/logs/access.log --workers 3 -b :8000 v2fram.wsgi:application" && tmux new-session -d -s "geoserver" "cd /root/fram19 && GEOSERVER_HOME=/usr/share/geoserver-2.12.5 /usr/share/geoserver-2.12.5/bin/startup.sh" && cd /root/fram19 && /bin/bash'
