@@ -35,6 +35,14 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && \
 # NGINX
 RUN $APT_QUIET install nginx
 
+# CERTBOT (FOR SSL CERTIFICATE)
+RUN $APT_QUIET update && \
+    $APT_QUIET install software-properties-common
+RUN add-apt-repository -y universe && \
+    add-apt-repository ppa:certbot/certbot
+RUN $APT_QUIET update && \
+    $APT_QUIET install certbot python-certbot-nginx
+
 # Cython
 RUN python2 -m pip install Cython
 
