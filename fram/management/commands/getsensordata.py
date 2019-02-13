@@ -17,6 +17,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        # Set datetime when script starts
+        DATETIME = datetime.now()
+
         latest = Position.objects.all().order_by('-date')
 
         if latest:
@@ -27,14 +30,13 @@ class Command(BaseCommand):
             sys.exit(1)
 
         # If latest position not from today
-        if latest.date != datetime.now().date():
+        if latest.date != DATETIME.date():
             print("No new position added today, using last added grid.")
             p = Position()
             p.grid = latest.grid
-            p.date = datetime.now().date()
+            p.date = DATETIME.date()
             p.save()
             latest = p
-
 
         # Set paths
         scriptsPath = 'scripts/'
@@ -44,7 +46,7 @@ class Command(BaseCommand):
         date = latest.date
         grid = latest.grid
 
-        if datetime.now() < datetime.now().replace(hour=13):
+        if DATETIME < DATETIME.replace(hour=13):
             print("Early running: only generating s1 image.")
             only = '-o s1c'
 
@@ -70,8 +72,9 @@ class Command(BaseCommand):
         print(layerinfo)
 
         # Remove old layer from same day
-        if Layer.objects.all().order_by('-position__date').first().position.date == datetime.now().date():
+        if Layer.objects.all().order_by('-position__date').first().position.date == DATETIME.date():
             Layer.objects.all().order_by('-position__date').first().delete()
+
 
         l = Layer()
         l.position = latest

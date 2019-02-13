@@ -1,7 +1,7 @@
 // Static variables
 const NUMB_IMAGES = 7;
 const FADE_TIME = 300;
-const SLIDE_TIME = 3000
+const SLIDE_TIME = 5000
 const background = $('.inner-div');
 
 // Get background images
