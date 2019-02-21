@@ -35,7 +35,7 @@ else{
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
   center: centerGrid,
-  zoom: 5,
+  zoom: 4,
   minZoom: MIN_ZOOM,
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
@@ -127,6 +127,8 @@ $.get( url, function(response) {
     allPointFeatures = [];
     activePointFeatures = [];
 
+    let stopCondition = true;
+
     positions.forEach(function(element) {
       var grid = element[1].split(',');
       var tmpPoint = new ol.geom.Point(
@@ -137,7 +139,10 @@ $.get( url, function(response) {
     });
       tmp = new ol.Feature({ geometry: tmpPoint})
       allPointFeatures.push(tmp);
-      activePointFeatures.push(tmp);
+      if (stopCondition) activePointFeatures.push(tmp);
+
+      // If second-to-last layer is set to default
+      if (element[0] == latestDate) stopCondition = false;
     });
 
 

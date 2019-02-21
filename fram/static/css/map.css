@@ -147,7 +147,7 @@ button:hover{
   font-size: large;
 }
 
-#scroll-down{
+#scroll-window{
   right: 0.8em;
   bottom: 0.8em;
   position: absolute;
@@ -156,7 +156,7 @@ button:hover{
   display: none;
 }
 
-#scroll-down:hover{
+#scroll-window:hover{
   opacity: 0.85;
   bottom: 0.6em;
 }
@@ -331,7 +331,7 @@ div.ol-attribution{
   #LayerInfoContainer{
     width: 50%;
   }
-  #scroll-up, #scroll-down{
+  #scroll-up, #scroll-window{
     display: block;
   }
 }

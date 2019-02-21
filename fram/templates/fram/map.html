@@ -39,7 +39,8 @@
                   )
                 {% if not forloop.last %},{% endif %}
                 {% endfor %}
-              latestDate = "{{ layers.last.position.date }}"
+              latestDate = "{{ default_date }}"
+              console.log(positions);
         }
         else{
             alert("No overlay data found!")
@@ -90,12 +91,12 @@
         <div id='LayerInfo'></div>
         <span id="close" onclick="closeLayerInfo()">&times;</span>
       </div>
-      <img src="{% static 'img/arrowdown.png' %}" alt="Fram Logo" id="scroll-down" onclick="scrollDown()">
+      <img src="{% static 'img/arrowdown.png' %}" alt="Fram Logo" id="scroll-window" onclick="scrollWindow()">
     </div>
 
     <div id='dates-div'>
         <span class='arrow' id='back'>&#9664;</span>
-        <span id='used-date'>{{layers.last.position.date}}</span>
+        <span id='used-date'>{{default_date}}</span>
         <span class='arrow' id='forward'>&#9654;</span>
     </div>
 

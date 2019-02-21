@@ -4,6 +4,7 @@
 let win = $(window);
 let arrowDown = true;
 
+// Show/hide geoserver map layers
 function ToggleLayer(bt){
   var active = layerdict[bt.name].getVisible();
   layerdict[bt.name].setVisible(!active);
@@ -17,17 +18,17 @@ function ToggleLayer(bt){
   }
 }
 
-
+// Move map view to default view area
 function setDefaultView(){
   if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
   else centerGrid = activePointFeatures[activePointFeatures.length-1].getProperties().geometry.A;
   defaultView.animate({
     center: centerGrid,
-    zoom: 5
+    zoom: 4
   });
 }
 
-
+// Show/hide info box for a geoserver layer
 function toggleInfo(bt){
   $('#LayerInfoContainer').toggle();
   $('#LayerInfo').text('');
@@ -43,7 +44,7 @@ function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
 }
 
-
+// Help function for toggleCrosshair
 function displayGridCallback(){
   raw_grid = map.getView().getCenter();
   conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' )
@@ -54,6 +55,7 @@ function displayGridCallback(){
 
   $('#grid-display').html(output);
 }
+// Display grid for a spesific location on the map
 function toggleCrosshair(){
   if($('#cross-x').css('display')=='none'){
     $('#btCrosshair').css('background-color', 'gray');
@@ -68,8 +70,8 @@ function toggleCrosshair(){
   $('#cross-x, #cross-y, #grid-display').toggle();
 }
 
-// Scrolling up/down
-function scrollDown(){
+// Scrolling window up/down
+function scrollWindow(){
   if (arrowDown) $('html').animate({ scrollTop: $(document).height()}, 'fast');
   else $('html').animate({ scrollTop: 0 }, 'fast');
 }
@@ -86,7 +88,7 @@ win.scroll(function() {
   }
 });
 
-
+// Changing date for the geoserver layers
 function changeDate(btn){
   $('#LayerInfoContainer').hide();
   if (btn.id == 'forward'){
@@ -114,7 +116,7 @@ function changeDate(btn){
 
 }
 
-
+// Help function to convert easy-to-read date into database date
 function uglifyDate(dateString){
   let tmp = new Date(dateString);
   return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
