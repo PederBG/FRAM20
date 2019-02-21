@@ -3,6 +3,7 @@
 // Init variables
 let win = $(window);
 let arrowDown = true;
+let activeHistoricals = {};
 
 // Show/hide geoserver map layers
 function ToggleLayer(bt){
@@ -68,6 +69,7 @@ function toggleCrosshair(){
 
   }
   $('#cross-x, #cross-y, #grid-display').toggle();
+  checkMenus();
 }
 
 // Scrolling window up/down
@@ -80,11 +82,11 @@ function scrollWindow(){
 win.scroll(function() {
   if ( ( win.scrollTop() + 0.7 * win.innerHeight() ) > window.innerHeight ) {
     arrowDown = false;
-    $('#scroll-down').css('transform','rotate(' + 180 + 'deg)');
+    $('#scroll-window').css('transform','rotate(' + 180 + 'deg)');
   }
   else{
     arrowDown = true;
-    $('#scroll-down').css('transform','rotate(' + 0 + 'deg)');
+    $('#scroll-window').css('transform','rotate(' + 0 + 'deg)');
   }
 });
 
@@ -113,11 +115,106 @@ function changeDate(btn){
     let date = uglifyDate(positions[activePointFeatures.length-1][0]);
     layerdict[name].setSource( setCustomLayerSource( date, name ) );
   });
-
 }
+
+function toggleHistorical(){
+  if($('#historical-div').css('display')=='none'){
+    $('#btHistorical').css('background-color', 'gray');
+    $('#btHistoricalInfo').css('visibility', 'visible')
+
+  }
+  else{
+    $('#btHistorical').css('background-color', 'transparent');
+    $('#btHistoricalInfo').css('visibility', 'hidden')
+
+
+  }
+  $('#historical-div').toggle();
+  checkMenus();
+}
+
+
+// Make historical ice drift trajectory (shitty solution..)
+function showHistorical(btn){
+
+  // Remove a  plot
+  if ($(btn).html() in activeHistoricals) {
+    $(btn).css({"border-color":"transparent", "opacity": "0.8"});
+    map.removeLayer(activeHistoricals[$(btn).html()])
+    delete activeHistoricals[$(btn).html()];
+  }
+
+  // Add a new plot
+  else{
+    $(btn).css({"border-color": "black", "border-width":"0.15em", "border-style":"solid", "opacity": "1"});
+    // Get data
+    let lons = $(btn)[0].value.split('|')[0].split(', ');
+    let lats = $(btn)[0].value.split('|')[1].split(', ');
+
+    // Make grids in right projection
+    let points = [];
+    for (var i = 0; i < lons.length; i++) {
+      points.push(
+          ol.proj.transform( [parseFloat( lons[i] ), parseFloat( lats[i] )] , 'EPSG:4326', 'EPSG:3413' )
+      );
+    }
+
+    var vectorStyle = new ol.style.Style({
+       stroke : new ol.style.Stroke({color : $(btn).css("background-color"), width: 2
+    })
+  });
+
+    // Make OpenLayers vector
+
+    vectorFeature = new ol.Feature({ geometry: new ol.geom.LineString(points) });
+    vectorFeature.setStyle(vectorStyle)
+
+    var vectorLine = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [ vectorFeature ]
+        })
+      });
+
+    map.addLayer(vectorLine);
+    activeHistoricals[$(btn).html()] = vectorLine;
+  }
+}
+
+// Fixing flow of different menus on the map
+// Hard coding ftw..
+function checkMenus(){
+  if($(window).width() < 600){
+    if($('#historical-div').css('display')=='block' && $('#grid-display').css('display') =='block'){
+      $('#grid-display').css('margin-top', '0.5em');
+      $('#historical-div').css('margin-top', '3.5em');
+    }
+    else{
+      $('#grid-display').css('margin-top', '0.5em');
+      $('#historical-div').css('margin-top', '0.5em');
+    }
+  }
+  else{
+    if($('#historical-div').css('display')=='block'){
+      $('#grid-display').css('margin-top', '3.5em');
+      $('#historical-div').css('margin-top', '0.5em');
+    }
+    else{
+      $('#grid-display').css('margin-top', '0.5em');
+    }
+  }
+}
+
+// Check the flow of menus when window is resized
+$( window ).resize(function() {
+  checkMenus();
+});
 
 // Help function to convert easy-to-read date into database date
 function uglifyDate(dateString){
   let tmp = new Date(dateString);
   return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 }
+
+window.onload = function() {
+  checkMenus();
+};

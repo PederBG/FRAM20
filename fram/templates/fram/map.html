@@ -87,6 +87,15 @@
       <div class="ol-control center-view">
         <button onclick="setDefaultView()">&#9974;</button>
       </div>
+
+      <div id="historical-div">
+        {% for elem in historical %}
+          <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
+        {% endfor %}
+        <span class="glyphicon glyphicon-remove" onclick="toggleHistorical()"></span>
+
+      </div>
+
       <div id='LayerInfoContainer'>
         <div id='LayerInfo'></div>
         <span id="close" onclick="closeLayerInfo()">&times;</span>
@@ -175,13 +184,19 @@
         <button name="graticule" class='btn btn-primary' id="btGraticule" type="button">Graticule</button>
         <div class='layer-options-container'>
           <input name="graticule" type="range" min="1" max="100" value="100" class="slider" id="Graticule">
-          <button class='layer-info' id="btGraticule" type="button" onclick='toggleInfo(this)'>Info</button>
+          <button class='layer-info' id="btGraticuleInfo" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
 
-      <!-- Not a geoserver layer -->
+      <!-- Not geoserver layers -->
       <li class="layercontrol">
         <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>
+      </li>
+      <li class="layercontrol">
+        <button class='btn btn-primary' id="btHistorical" type="button" onclick='toggleHistorical()'>Historical Drift</button>
+        <div class='layer-options-container'>
+          <button class='layer-info' id="btHistoricalInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+        </div>
       </li>
     </ul>
 

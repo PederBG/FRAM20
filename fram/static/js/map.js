@@ -11,7 +11,8 @@ const STATIC_LAYERINFO = {
   'Magnetic': "<p><h5>Magnetic Anomali Overlay</h5></p>",
   'Gravity': "<p><h5>Freeair Gravity Overlay</h5></p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>",
-  'Graticule': "<p><h5>Graticule Overlay</h5></p>"
+  'Graticule': "<p><h5>Graticule Overlay</h5></p>",
+  'Historical': "<p><h5>Historical Ice Drift</h5></p>Info comming.."
 }
 
 

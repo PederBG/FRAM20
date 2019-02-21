@@ -23,6 +23,7 @@ def map(request):
     context = {
         'layers': Layer.objects.all().order_by('position__date'),
         'default_date': default_date.position.date,
+        'historical': HistoricalDrift.objects.all().order_by('year'),
         }
     return render(request, 'fram/map.html', context)
 

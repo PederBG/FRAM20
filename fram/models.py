@@ -36,3 +36,11 @@ class Weekly(models.Model):
 
     def __str__(self):
         return "Weekly letter: {}".format(self.title)
+
+class HistoricalDrift(models.Model):
+    year = models.CharField(max_length=30, default='No data')
+    lons = models.CharField(max_length=20000, default='No data')
+    lats = models.CharField(max_length=20000, default='No data')
+
+    def __str__(self):
+        return "Historical drfit from: {}".format(self.year)

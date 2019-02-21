@@ -67,6 +67,7 @@ button:hover{
     background-color: #707070;
 }
 
+
 .btn-primary{
     color: whitesmoke;
     border: 1px white solid;
@@ -78,7 +79,6 @@ button:hover{
     background-color: gray;
     border: 1px white solid;
 }
-
 
 
 .layercontrol-container input{
@@ -109,7 +109,14 @@ button:hover{
   margin-left: 0.115em;
 }
 #btCrosshair{
-  margin-left: 0.215em;
+  margin-left: 0.115em;
+}
+#btHistorical{
+  margin-left: 0.18em;
+}
+
+#btHistoricalInfo{
+  margin-left: 30%;
 }
 
 /* ------------- Crosshair ------------ */
@@ -145,6 +152,59 @@ button:hover{
   padding: 0.2em;
   border-radius: 4%;
   font-size: large;
+}
+
+#historical-div{
+  right: 1em;
+  margin-top: 0.5em;
+  background-color: gray;
+  display: none;
+  position: absolute;
+  z-index: 102;
+  padding: 0.5em;
+  border-radius: 4%;
+}
+
+#historical-div button{
+  border: transparent 0.15em solid;
+  opacity: 0.8;
+}
+
+#historical-div button:hover{
+  opacity: 1;
+}
+
+#btn-2012{
+  background-color: DodgerBlue;
+}
+#btn-2013{
+  background-color: Orange;
+}
+#btn-2014{
+  background-color: MediumSeaGreen;
+}
+#btn-2015{
+  background-color: SlateBlue;
+}
+#btn-2016{
+  background-color: Violet;
+}
+#btn-2017{
+  background-color: Olive;
+}
+#btn-2018{
+  background-color: Sienna;
+}
+
+#historical-div span{
+  font-size: x-large;
+  color: black;
+  vertical-align: middle;
+  cursor: pointer;
+  opacity: 0.9;
+}
+#historical-div span:hover{
+  opacity: 1;
 }
 
 #scroll-window{
@@ -355,6 +415,17 @@ div.ol-attribution{
   .cover-text{
     font-size: small;
   }
+
+  #historical-div button{
+    display: block;
+    margin-bottom: 0.3em;
+  }
+  #historical-div span{
+    text-align: center;
+    width: 60%;
+    margin-left: 19%;
+  }
+
 }
 
 /* Force navbar collapse earlier than native bootstrap */
