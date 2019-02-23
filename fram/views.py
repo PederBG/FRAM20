@@ -3,8 +3,6 @@ from .models import *
 from django.http import FileResponse, Http404
 from datetime import datetime
 
-DATETIME = datetime.now()
-
 def index(request):
     return render(request, 'fram/index.html')
 
@@ -15,7 +13,7 @@ def map(request):
 
     # If time is over 11:00 + 10 minutes a new layer will be published.
     # Since this layer only have partial information, default is set to the day before.
-    if DATETIME > DATETIME.replace(hour=11, minute=10):
+    if datetime.now() > datetime.now().replace(hour=11, minute=10):
         default_date = Layer.objects.all().order_by('-position__date')[1]
     else:
         default_date = Layer.objects.all().order_by('-position__date')[0]

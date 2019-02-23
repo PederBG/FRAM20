@@ -1,9 +1,9 @@
 // ------ LOGIC FOR OPENLAYERS AND GEOSERVER ------ \\
 
 // Init variables
-const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms'
-// const HOST_IP = 'http://localhost:8080/geoserver/wms'
-const MIN_ZOOM = 3.5
+const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms';
+// const HOST_IP = 'http://localhost:8080/geoserver/wms';
+const MIN_ZOOM = 3.5;
 
 var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
 const STATIC_LAYERINFO = {
