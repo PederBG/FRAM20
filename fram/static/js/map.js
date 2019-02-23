@@ -12,7 +12,7 @@ const STATIC_LAYERINFO = {
   'Gravity': "<p><h5>Freeair Gravity Overlay</h5></p>",
   'LandEdge': "<p><h5>Land Edges</h5><b>Source:</b> NASA, Earth Observing System Data and Information System (EOSDIS)<br><b>Available at:</b> worldview.earthdata.nasa.gov<br><b>Pixel size:</b> 255.9x255.9 meters<br><b>Raw size:</b> 222MB</p>",
   'Graticule': "<p><h5>Graticule Overlay</h5></p>",
-  'Historical': "<p><h5>Historical Ice Drift</h5></p>Info comming.."
+  'Historical': "<p><h5>Ice drift 1. April - 1. August for the years 2012-2018</h5></p>Ice velocity fields from TOPAZ reanalysis.<br><b>Source:</b> E.U. Copernicus Marine Service Information - drift trajectories from MET Norway, OpenDrift  model."
 }
 
 

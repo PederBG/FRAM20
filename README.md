@@ -3,9 +3,9 @@
 ### Website / GIS application used for the FRAM-2019 expedition, due to start spring 2019.
 #### Visit at: www.fram2019.com (still in dev)
 
-####  Using python to download and process up to date satellite imagery, and other sensor data, following specified locations in the Artic Ocean. Presenting this in a full-stack Django application with GeoServer and OpenLayers. All configurations and dependencies are handled by Docker.
+####  Using python to download and process up to date satellite imagery, and other sensor data, following specified locations in the Artic Ocean. Presenting this in a full-stack Django application with GeoServer and OpenLayers. Application deployed using NGINX and Gunicorn. All configurations and dependencies are handled by Docker.
 
-###### Developed as an internship assignment for Lundin Norway. Published with their consent.
+###### Developed as an internship assignment for Lundin Norway. Source code published with their consent.
 ![Github](https://preview.ibb.co/jC8s8A/fram.png "Preview")
 
 ### Development
