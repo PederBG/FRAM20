@@ -161,13 +161,17 @@ function showHistorical(btn){
 
     var vectorStyle = new ol.style.Style({
        stroke : new ol.style.Stroke({color : $(btn).css("background-color"), width: 2
-    })
-  });
+     })
+    });
+    var vectorStyleA = new ol.style.Style({
+       stroke : new ol.style.Stroke({color : $(btn).css("background-color"), width: 2, lineDash: [.1, 3]
+     })
+    });
 
     // Make OpenLayers vector
 
     vectorFeature = new ol.Feature({ geometry: new ol.geom.LineString(points) });
-    vectorFeature.setStyle(vectorStyle)
+    ($(btn).html()[4] == 'a') ? vectorFeature.setStyle(vectorStyleA) : vectorFeature.setStyle(vectorStyle)
 
     var vectorLine = new ol.layer.Vector({
         source: new ol.source.Vector({

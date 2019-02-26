@@ -174,25 +174,22 @@ button:hover{
   opacity: 1;
 }
 
-#btn-2012{
-  background-color: DodgerBlue;
-}
-#btn-2013{
+#btn-2013a, #btn-2013b{
   background-color: Orange;
 }
-#btn-2014{
+#btn-2014a, #btn-2014b{
   background-color: MediumSeaGreen;
 }
-#btn-2015{
+#btn-2015a, #btn-2015b{
   background-color: SlateBlue;
 }
-#btn-2016{
+#btn-2016a, #btn-2016b{
   background-color: Violet;
 }
-#btn-2017{
+#btn-2017a, #btn-2017b{
   background-color: Olive;
 }
-#btn-2018{
+#btn-2018a, #btn-2018b{
   background-color: Sienna;
 }
 
@@ -418,7 +415,8 @@ div.ol-attribution{
 
   #historical-div button{
     display: block;
-    margin-bottom: 0.3em;
+    margin-bottom: 0.1em;
+    font-size: x-small;
   }
   #historical-div span{
     text-align: center;
