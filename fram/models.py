@@ -45,7 +45,7 @@ class HistoricalDrift(models.Model):
     def __str__(self):
         return "Historical drift from: {}".format(self.year)
 
-class DailyAccessLog(models.Model):
+class AccessLog(models.Model):
     date = models.DateField('date')
     ip = models.CharField(max_length=50)
 

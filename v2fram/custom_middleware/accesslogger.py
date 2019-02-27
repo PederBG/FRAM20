@@ -1,4 +1,4 @@
-from fram.models import DailyAccessLog
+from fram.models import AccessLog
 from datetime import datetime
 
 class AccessLoggerMiddleware:
@@ -8,32 +8,31 @@ class AccessLoggerMiddleware:
     def __call__(self, request):
         #print("Called", flush=True) # How to print to gunicorn
         response = self.get_response(request)
-        user_ip = request.META['REMOTE_ADDR']
+        user_ip = request.META['HTTP_X_REAL_IP'] # Need real ip, not the one proxied by nginx
 
-        last_record = DailyAccessLog.objects.order_by('date').last()
-        today = datetime.today()
+        last_record = AccessLog.objects.order_by('date').last()
+        today = datetime.now().date()
 
         # If none exist at all
         if not last_record:
-            daylog = DailyAccessLog()
+            daylog = AccessLog()
             daylog.date = today
             daylog.ip = user_ip
             daylog.save()
 
         # If none exist for today
         elif last_record.date != today:
-            daylog = DailyAccessLog()
+            daylog = AccessLog()
             daylog.date = today
             daylog.ip = user_ip
             daylog.save()
 
         else:
             # Log new ips
-            if not DailyAccessLog.objects.filter(date = today, ip = user_ip):
-                daylog = DailyAccessLog()
+            if not AccessLog.objects.filter(date = today, ip = user_ip):
+                daylog = AccessLog()
                 daylog.date = today
                 daylog.ip = user_ip
                 daylog.save()
-                print("New ip logged!")
 
         return response
