@@ -57,6 +57,8 @@ else:
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+        'v2fram.custom_middleware.accesslogger.AccessLoggerMiddleware',
     ]
 
     LOGGING = {
