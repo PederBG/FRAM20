@@ -4,6 +4,12 @@ html, body {
   color: whitesmoke;
 }
 
+h1, h2{
+  color: #1696af;
+  text-align: center;
+}
+
+
 /* Navbar */
 .navbar{
     margin-bottom: 0;
@@ -344,6 +350,9 @@ div.ol-attribution{
 .text-body{
   text-align: left;
 }
+.links-page{
+  text-align: center;
+}
 
 .text-body img{
   width: 100%;
@@ -368,6 +377,20 @@ div.ol-attribution{
   margin-left: 20%;
   width: 60%;
   font-size: medium;
+}
+
+.contact-info b{
+  margin-left: -1em;
+  color: #1696af;
+}
+
+.page-stat{
+  text-align: center;
+}
+
+.counter-numb{
+  font-size: 4em;
+  color: #93081b;
 }
 
 

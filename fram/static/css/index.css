@@ -1,4 +1,11 @@
 /* Index Page */
+
+h3{
+  color: #93081b;
+  font-style: oblique;
+  font-weight: bold;
+}
+
 .navbar{
     margin-bottom: 0;
     z-index: 1;

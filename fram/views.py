@@ -66,4 +66,10 @@ def links(request):
 
 
 def contact(request):
-    return render(request, 'fram/contact.html')
+    context = {
+        'date': datetime.now(),
+        'daily_users': len(AccessLog.objects.filter(date = datetime.now().date())),
+        'monthly_users': len(AccessLog.objects.filter(date__month = datetime.now().date().month).values_list('ip', flat=True).distinct()),
+        'alltime_users': len(AccessLog.objects.all().values_list('ip', flat=True).distinct()),
+        }
+    return render(request, 'fram/contact.html', context)
