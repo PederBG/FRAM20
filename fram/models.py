@@ -43,4 +43,11 @@ class HistoricalDrift(models.Model):
     lats = models.CharField(max_length=20000, default='No data')
 
     def __str__(self):
-        return "Historical drfit from: {}".format(self.year)
+        return "Historical drift from: {}".format(self.year)
+
+class DailyAccessLog(models.Model):
+    date = models.DateField('date')
+    ip = models.CharField(max_length=50)
+
+    def __str__(self):
+        return "{}: {}".format(self.date.strftime('%d/%m-%Y'), self.ip)
