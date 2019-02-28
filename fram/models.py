@@ -51,4 +51,4 @@ class AccessLog(models.Model):
     location = models.CharField(max_length=100, default="No data")
 
     def __str__(self):
-        return "{}: {}".format(self.date.strftime('%d/%m-%Y'), self.ip)
+        return "{}: {} - {}".format(self.date.strftime('%d/%m-%Y'), self.ip, self.location)
