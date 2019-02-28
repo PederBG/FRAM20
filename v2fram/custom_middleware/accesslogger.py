@@ -48,7 +48,16 @@ class AccessLoggerMiddleware:
         response = urlopen('https://extreme-ip-lookup.com/json/' + ip).read().decode('UTF-8')
         data = json.loads(response)
 
-        if data['status'] == 'success' and data['city'] != '':
-            return data['city'] + ", " + data['country']
-        else:
-            return "No data"
+        ret = ""
+
+        if data['status'] == 'success':
+            if data['country'] != '':
+                ret += data['country']
+            if data['city'] != '':
+                ret += ", " + data['city']
+            if data['isp'] != '':
+                ret += "; " + data['isp']
+        if ret == "":
+            ret = "No data"
+
+        return ret
