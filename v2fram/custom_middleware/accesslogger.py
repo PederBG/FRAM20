@@ -1,9 +1,12 @@
 from fram.models import AccessLog
 from datetime import datetime
+from urllib.request import urlopen
+import json
 
 class AccessLoggerMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+
 
     def __call__(self, request):
         #print("Called", flush=True) # How to print to gunicorn
@@ -18,6 +21,7 @@ class AccessLoggerMiddleware:
             daylog = AccessLog()
             daylog.date = today
             daylog.ip = user_ip
+            daylog.location = self.getIPInfo(user_ip)
             daylog.save()
 
         # If none exist for today
@@ -25,6 +29,7 @@ class AccessLoggerMiddleware:
             daylog = AccessLog()
             daylog.date = today
             daylog.ip = user_ip
+            daylog.location = self.getIPInfo(user_ip)
             daylog.save()
 
         else:
@@ -33,6 +38,17 @@ class AccessLoggerMiddleware:
                 daylog = AccessLog()
                 daylog.date = today
                 daylog.ip = user_ip
+                daylog.location = self.getIPInfo(user_ip)
                 daylog.save()
 
         return response
+
+    @staticmethod
+    def getIPInfo(ip):
+        response = urlopen('https://extreme-ip-lookup.com/json/' + ip).read().decode('UTF-8')
+        data = json.loads(response)
+
+        if data['status'] == 'success' and data['city'] != '':
+            return data['city'] + ", " + data['country']
+        else:
+            return "No data"
