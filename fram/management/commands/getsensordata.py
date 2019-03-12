@@ -41,7 +41,7 @@ class Command(BaseCommand):
         # Set paths
         scriptsPath = 'scripts/'
         scriptName = 'main.py'
-        targetPath = 'data'
+        targetPath = '/root/fram19/data'
         only = ''
         date = latest.date
         grid = latest.grid

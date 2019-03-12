@@ -61,16 +61,18 @@ class DownloadManager(object):
         if( kwargs.get('date') ):
             self.DATE = kwargs.get('date')
 
+        # defaults
         self.OUTDIR = self.PATH + str(self.DATE) + '/'
         self.TMPDIR = self.PATH + 'tmp/'
 
+        # change defaults
         if( kwargs.get('grid') ):
             self.GRID = kwargs.get('grid')
 
         if( kwargs.get('target') ):
             self.OUTDIR = kwargs.get('target') + '/' + str(self.DATE) + '/'
 
-        # Delete old tmp dir and data content
+        # Delete old tmp dir and data content if exist
         print(('rm ' + self.TMPDIR + ' ' + self.OUTDIR))
         subprocess.call('rm -r ' + self.TMPDIR + ' ' + self.OUTDIR, shell=True)
 
@@ -80,7 +82,7 @@ class DownloadManager(object):
             subprocess.call('mkdir ' + self.TMPDIR, shell=True)
         if not os.path.isdir(self.OUTDIR):
             print('Making OUTDIR...')
-            subprocess.call('mkdir -p ' + self.OUTDIR, shell=True)
+            subprocess.call('mkdir ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
             self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 1, 1, 0.01, 0.01)

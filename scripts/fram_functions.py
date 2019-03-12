@@ -17,7 +17,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
     api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://scihub.copernicus.eu/dhus/#/home')
     date = DATE.strftime('%Y%m%d')
-    yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d') # 4 day interval in dev
+    yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d')
 
     footprint = geojson_to_wkt(read_geojson(bbox))
     if platform == 's1':
@@ -124,6 +124,10 @@ def makeGeojson(grid, outfile, e_step, w_step, n_step, s_step):
     print('Making geojson bounding box...')
     east = grid.split(',')[0]
     north = grid.split(',')[1]
+
+    # Quick fix after ESA's Open Access Hub sets upper boundery for polygons..
+    if float(north) > 85.0513: # Upper boundery on map used at scihub/colhub
+        north = '85.0513'
 
     topLeft = str( float(east) - e_step ) + ',' + str( float(north) + n_step )
     topRight = str( float(east) + w_step ) + ',' + str( float(north) + n_step )
