@@ -5,7 +5,7 @@ Help function used when downloading and processing images.
 """
 
 from datetime import date, datetime, timedelta
-from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
+from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, SentinelAPIError
 import zipfile
 import subprocess, glob
 
@@ -20,23 +20,31 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     yestdate = (DATE - timedelta(time_window)).strftime('%Y%m%d')
 
     footprint = geojson_to_wkt(read_geojson(bbox))
-    if platform == 's1':
-        products = api.query(footprint,
-                        # ("20180805", "20180807"),
-                        (yestdate, date),
-                         platformname='Sentinel-1',
-                         producttype='GRD',
-                         sensoroperationalmode='EW'
-                         )
-    elif platform == 's2':
-        products = api.query(footprint,
-                        # ("20180805", "20180807"),
-                        (yestdate, date),
-                         platformname='Sentinel-2',
-                         cloudcoverpercentage=(0, 80) # TODO: find reasonable threshold
-                         )
-    else:
-        print('Not a valid platform!')
+    try:
+        if platform == 's1':
+            products = api.query(footprint,
+                            # ("20180805", "20180807"),
+                            (yestdate, date),
+                             platformname='Sentinel-1',
+                             producttype='GRD',
+                             sensoroperationalmode='EW'
+                             )
+        elif platform == 's2':
+            products = api.query(footprint,
+                            # ("20180805", "20180807"),
+                            (yestdate, date),
+                             platformname='Sentinel-2',
+                             cloudcoverpercentage=(0, 80) # TODO: find reasonable threshold
+                             )
+        else:
+            print('Not a valid platform!')
+            return [False]
+
+    except SentinelAPIError as e:
+        print(e)
+        return [False]
+    except:
+        print("Unknown error occurred while accessing Copernicus Open Access Hub")
         return [False]
 
     if len(products) == 0:
