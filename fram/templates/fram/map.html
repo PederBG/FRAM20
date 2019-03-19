@@ -84,7 +84,7 @@
       <div id="cross-y"></div>
       <div id="grid-display"></div>
       <div id="weather-display">
-        <u>Wind forecast (m/s)</u>
+        <u>Wind in m/s & Temperature</u>
         <div id=weather-div-buttons>
           <div id="weather-today"></div>
           <div id="weather-tomorrow"></div>
@@ -98,6 +98,7 @@
 
       <div id="historical-div">
         {% for elem in historical %}
+          <!-- If statement is just temp -->
           {% if elem.year|make_list|last != 'a' %}
             <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
           {% endif %}

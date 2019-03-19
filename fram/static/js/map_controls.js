@@ -87,21 +87,27 @@ function displayGridCallback(){
 
     let today_dir = times[0].getElementsByTagName("windDirection")[0].getAttribute("name");
     let today_speed = times[0].getElementsByTagName("windSpeed")[0].getAttribute("mps");
+    let today_temp = times[0].getElementsByTagName("temperature")[0].getAttribute("value");
 
     let tomorrow_dir = tomorrow.getElementsByTagName("windDirection")[0].getAttribute("name");
     let tomorrow_speed = tomorrow.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+    let tomorrow_temp = tomorrow.getElementsByTagName("temperature")[0].getAttribute("value");
 
     let threedays_dir = threedays.getElementsByTagName("windDirection")[0].getAttribute("name");
     let threedays_speed = threedays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+    let threedays_temp = threedays.getElementsByTagName("temperature")[0].getAttribute("value");
 
     let sevendays_dir = sevendays.getElementsByTagName("windDirection")[0].getAttribute("name");
     let sevendays_speed = sevendays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+    let sevendays_temp = sevendays.getElementsByTagName("temperature")[0].getAttribute("value");
 
-    $('#weather-today').html('<b>Today:</b><br>' + today_speed + ' ' + today_dir);
-    $('#weather-tomorrow').html('<b>' + dayNames[new Date().addDays(1).getDay()] + ':</b><br>' + tomorrow_speed + ' ' + tomorrow_dir);
-    $('#weather-threedays').html('<b>' + dayNames[new Date().addDays(3).getDay()] + ':</b><br>' + threedays_speed + ' ' + threedays_dir);
-    $('#weather-sevendays').html('<b>Next ' + dayNames[new Date().addDays(7).getDay()] + ':</b><br>' + sevendays_speed + ' ' + sevendays_dir);
-
+    $('#weather-today').html('<b>Today:</b><br>' + today_speed + ' ' + today_dir + "<br>" + today_temp + "&#8451;");
+    $('#weather-tomorrow').html('<b>Tomorrow:</b><br>' + tomorrow_speed + ' ' + tomorrow_dir + "<br>" + tomorrow_temp + "&#8451;");
+    $('#weather-threedays').html('<b>3-days:</b><br>' + threedays_speed + ' ' + threedays_dir + "<br>" + threedays_temp + "&#8451;");
+    $('#weather-sevendays').html('<b>7-days:</b><br>' + sevendays_speed + ' ' + sevendays_dir + "<br>" + sevendays_temp + "&#8451;");
+    // $('#weather-tomorrow').html('<b>' + dayNames[new Date().addDays(1).getDay()] + ':</b><br>' + tomorrow_speed + ' ' + tomorrow_dir + "<br>" + tomorrow_temp + "&#8451;");
+    // $('#weather-threedays').html('<b>' + dayNames[new Date().addDays(3).getDay()] + ':</b><br>' + threedays_speed + ' ' + threedays_dir + "<br>" + threedays_temp + "&#8451;");
+    // $('#weather-sevendays').html('<b>Next ' + dayNames[new Date().addDays(7).getDay()] + ':</b><br>' + sevendays_speed + ' ' + sevendays_dir + "<br>" + sevendays_temp + "&#8451;");
   });
 }
 
