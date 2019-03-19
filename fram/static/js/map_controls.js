@@ -4,6 +4,9 @@
 let win = $(window);
 let arrowDown = true;
 let activeHistoricals = {};
+let times;
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 
 // Show/hide geoserver map layers
 function ToggleLayer(bt){
@@ -45,17 +48,64 @@ function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
 }
 
-// Help function for toggleCrosshair
+// Help function for toggleCrosshair and get weather
 function displayGridCallback(){
   raw_grid = map.getView().getCenter();
-  conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' )
+  conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' );
 
-  output = conv_grid[1].toFixed(4) + ' N, '
-  if (conv_grid[0] < 0) output += conv_grid[0].toFixed(4) *-1 + ' W'
-  else output += conv_grid[0].toFixed(4) + ' E'
+  output = conv_grid[1].toFixed(4) + ' N, ';
+  if (conv_grid[0] < 0) output += conv_grid[0].toFixed(4) *-1 + ' W';
+  else output += conv_grid[0].toFixed(4) + ' E';
 
   $('#grid-display').html(output);
+
+  // Show weather
+  let url = "https://api.met.no/weatherapi/locationforecastlts/1.3/?lat=" + conv_grid[1] + "&lon=" + conv_grid[0];
+  console.log(url);
+  $.get( url, function(response) {
+    let times = response.getElementsByTagName("time");
+
+    // Getting first value for next day and 3 days
+    let tomorrow_string = new Date().addDays(1).toISOString().substring(0, 10);
+    let tomorrow = false;
+    let threedays_string = new Date().addDays(3).toISOString().substring(0, 10);
+    let threedays = false;
+    let sevendays_string = new Date().addDays(7).toISOString().substring(0, 10);
+    let sevendays = false;
+
+    for (var i = 0; i < times.length; i++) {
+      if ( times[i].getAttribute("from").substring(0,10) == tomorrow_string && !tomorrow ){
+        tomorrow = times[i]
+      }
+      else if ( times[i].getAttribute("from").substring(0,10) == threedays_string && !threedays ){
+        threedays = times[i]
+      }
+      else if ( times[i].getAttribute("from").substring(0,10) == sevendays_string && !sevendays ){
+        sevendays = times[i]
+      }
+    }
+
+    let today_dir = times[0].getElementsByTagName("windDirection")[0].getAttribute("name");
+    let today_speed = times[0].getElementsByTagName("windSpeed")[0].getAttribute("mps");
+
+    let tomorrow_dir = tomorrow.getElementsByTagName("windDirection")[0].getAttribute("name");
+    let tomorrow_speed = tomorrow.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+
+    let threedays_dir = threedays.getElementsByTagName("windDirection")[0].getAttribute("name");
+    let threedays_speed = threedays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+
+    let sevendays_dir = sevendays.getElementsByTagName("windDirection")[0].getAttribute("name");
+    let sevendays_speed = sevendays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
+
+    $('#weather-today').html('<b>Today:</b><br>' + today_speed + ' ' + today_dir);
+    $('#weather-tomorrow').html('<b>' + dayNames[new Date().addDays(1).getDay()] + ':</b><br>' + tomorrow_speed + ' ' + tomorrow_dir);
+    $('#weather-threedays').html('<b>' + dayNames[new Date().addDays(3).getDay()] + ':</b><br>' + threedays_speed + ' ' + threedays_dir);
+    $('#weather-sevendays').html('<b>Next ' + dayNames[new Date().addDays(7).getDay()] + ':</b><br>' + sevendays_speed + ' ' + sevendays_dir);
+
+  });
 }
+
+
 // Display grid for a spesific location on the map
 function toggleCrosshair(){
   if($('#cross-x').css('display')=='none'){
@@ -68,7 +118,7 @@ function toggleCrosshair(){
     map.un("moveend", displayGridCallback);
 
   }
-  $('#cross-x, #cross-y, #grid-display').toggle();
+  $('#cross-x, #cross-y, #grid-display, #weather-display').toggle();
   checkMenus();
 }
 
@@ -188,22 +238,27 @@ function showHistorical(btn){
 // Hard coding ftw..
 function checkMenus(){
   if($(window).width() < 600){
+
     if($('#historical-div').css('display')=='block' && $('#grid-display').css('display') =='block'){
       $('#grid-display').css('margin-top', '0.5em');
-      $('#historical-div').css('margin-top', '3.5em');
+      $('#weather-display').css('margin-top', '3.05em');
+      $('#historical-div').css('margin-top', '10em');
     }
     else{
       $('#grid-display').css('margin-top', '0.5em');
       $('#historical-div').css('margin-top', '0.5em');
     }
   }
+
   else{
     if($('#historical-div').css('display')=='block'){
       $('#grid-display').css('margin-top', '3.5em');
+      $('#weather-display').css('margin-top', '6.9em');
       $('#historical-div').css('margin-top', '0.5em');
     }
     else{
       $('#grid-display').css('margin-top', '0.5em');
+      $('#weather-display').css('margin-top', '3.05em');
     }
   }
 }
@@ -222,3 +277,10 @@ function uglifyDate(dateString){
 window.onload = function() {
   checkMenus();
 };
+
+// Help function to add days to date Object
+Date.prototype.addDays = function(days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+}

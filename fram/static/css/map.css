@@ -160,13 +160,38 @@ button:hover{
   font-size: large;
 }
 
+#weather-display{
+  background-color: rgba(30, 30, 30, 0.95);
+  position: absolute;
+  z-index: 101;
+  right: 1em;
+  margin-top: 3.05em;
+  text-align: center;
+  display: none;
+  padding: 0.2em;
+  max-width: 80%;
+}
+
+#weather-div-buttons{
+  display: flex;
+  font-size: 90%;
+}
+
+#weather-display u{
+  font-size: 110%;
+}
+
+#weather-today, #weather-tomorrow, #weather-threedays{
+  margin-right: 1em;
+}
+
 #historical-div{
   right: 1em;
   margin-top: 0.5em;
   background-color: gray;
   display: none;
   position: absolute;
-  z-index: 102;
+  z-index: 103;
   padding: 0.5em;
   border-radius: 4%;
 }
@@ -197,6 +222,9 @@ button:hover{
 }
 #btn-2018a, #btn-2018b{
   background-color: Sienna;
+}
+#btn-OLDDRIFT{
+  background-color: red;
 }
 
 #historical-div span{

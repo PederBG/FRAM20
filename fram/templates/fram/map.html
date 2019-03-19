@@ -83,13 +83,24 @@
       <div id="cross-x"></div>
       <div id="cross-y"></div>
       <div id="grid-display"></div>
+      <div id="weather-display">
+        <u>Wind forecast (m/s)</u>
+        <div id=weather-div-buttons>
+          <div id="weather-today"></div>
+          <div id="weather-tomorrow"></div>
+          <div id="weather-threedays"></div>
+          <div id="weather-sevendays"></div>
+        </div>
+      </div>
       <div class="ol-control center-view">
         <button onclick="setDefaultView()">&#9974;</button>
       </div>
 
       <div id="historical-div">
         {% for elem in historical %}
-          <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
+          {% if elem.year|make_list|last != 'a' %}
+            <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
+          {% endif %}
         {% endfor %}
         <span class="glyphicon glyphicon-remove" onclick="toggleHistorical()"></span>
 
