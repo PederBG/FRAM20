@@ -37,10 +37,17 @@ class Weekly(models.Model):
     def __str__(self):
         return "Weekly letter: {}".format(self.title)
 
+class InfoPDF(models.Model):
+    title = models.CharField(max_length=250, default='No title')
+    filename = models.CharField(max_length=250, default='No data')
+
+    def __str__(self):
+        return "Info PDF: {}".format(self.title)
+
 class HistoricalDrift(models.Model):
     year = models.CharField(max_length=30, default='No data')
-    lons = models.CharField(max_length=20000, default='No data')
-    lats = models.CharField(max_length=20000, default='No data')
+    lons = models.CharField(max_length=100000, default='No data')
+    lats = models.CharField(max_length=100000, default='No data')
 
     def __str__(self):
         return "Historical drift from: {}".format(self.year)

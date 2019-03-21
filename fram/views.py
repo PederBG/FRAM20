@@ -44,7 +44,17 @@ def read_daily(request, dailyID):
 
 
 def info(request):
-    return render(request, 'fram/info.html')
+    if request.GET:
+        try: # Using as_attachment because phones/tablets get errors reading pdf in browser. TODO: fix this
+            return FileResponse(open('data/infopdfs/' + request.GET.get('name'), 'rb'), content_type='application/pdf', as_attachment=True)
+        except FileNotFoundError:
+            raise Http404()
+
+    context = {
+        'infopdfs': InfoPDF.objects.all().order_by('-id')
+    }
+
+    return render(request, 'fram/info.html', context)
 
 
 def weekly(request):

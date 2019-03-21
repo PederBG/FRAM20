@@ -191,7 +191,23 @@
           </p>
         </div>
 
+
       </div>
 
+      <div class="col-md-6 col-md-offset-3">
+        <!-- Syntax stolen from weekly page -->
+        <div class="weekly-info">
+          <br>
+          <h1>More Info</h1>
+          <br>
+          <h4>PDF's uploaded by the Fram Expedition Team</h4>
+        </div>
+        <form action="#" method="get">
+          {% for infopdf in infopdfs %}
+          <input class="info-files btn btn-primary" type="submit" class="btn" value="{{infopdf.filename}}" name="name"><br>
+          {% endfor %}
+        </form>
+        <br><br><br>
+      </div>
   </body>
 </html>

@@ -1,0 +1,54 @@
+import os, sys, subprocess
+from django.core.management.base import BaseCommand
+from fram.models import InfoPDF
+from django_mailbox.models import Message, Mailbox, MessageAttachment
+from datetime import datetime
+
+class Command(BaseCommand):
+    args = '<foo bar ..>'
+    help = "No options needed"
+
+    def handle(self, *args, **options):
+        # Other emails are also blocked in the gmail client
+        allowed_addresses = ['pedergrbr@gmail.com', 'jan-erik.lie@lundin-norway.no', 'Yngve.Kristoffersen@uib.no']
+
+
+        print("Getting new mails...")
+        Mailbox.objects.first().get_new_mail()
+
+        mails = Message.objects.all()
+        if len(mails) == 0:
+            "No mails recieved"
+            exit(0)
+
+        for mail in reversed(mails):
+            # Check sender address
+            sender = mail.from_header.split('<')[1].split('>')[0]
+            if sender not in allowed_addresses:
+                print("Address " + sender + " is not in allowed_addresses, going to next mail..")
+                continue
+
+            if mail.subject=='infopdf':
+
+                pdf = MessageAttachment.objects.filter(message_id=mail.id).first()
+                fName = mail.text.replace(" ", "_")
+
+                if str(pdf)[-4:] != '.pdf':
+                    print("Format needs to be pdf!")
+                    continue
+
+                if InfoPDF.objects.filter(title = fName):
+                    print("A PDF with this name already exist.")
+                    continue
+
+                cmd = "cp {} data/infopdfs/{}.pdf".format(str(pdf), fName)
+                print("COMMAND: " + cmd)
+                subprocess.call(cmd ,shell=True)
+
+                # Creating new db row
+                w = InfoPDF()
+                w.title = fName
+                w.filename = fName + ".pdf"
+                w.save()
+                print("Info PDF added!")
+                quit()
