@@ -434,6 +434,17 @@ div.ol-attribution{
 
 
 /* Media queries */
+@media only screen and (max-width: 950px) {
+  #historical-div button{
+    font-size: x-small;
+  }
+}
+
+@media only screen and (max-width: 850px) and (min-width: 700px) {
+  #historical-div button{
+    padding: 6px 7px 6px 7px;
+  }
+}
 
 @media only screen and (max-width: 900px) {
   #LayerInfoContainer{
@@ -443,6 +454,13 @@ div.ol-attribution{
     display: block;
   }
 }
+
+@media only screen and (max-width: 700px) and (min-width: 600px) {
+  #historical-div button{
+    padding: 5px 3px 5px 3px;
+  }
+}
+
 @media only screen and (max-width: 600px) {
   #LayerInfoContainer{
     width: 75%;
@@ -466,15 +484,16 @@ div.ol-attribution{
 
   #historical-div button{
     display: block;
-    margin-bottom: 0.1em;
+    margin-bottom: 0.05em;
     font-size: x-small;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
   }
   #historical-div span{
     text-align: center;
     width: 60%;
     margin-left: 19%;
   }
-
 }
 
 /* Force navbar collapse earlier than native bootstrap */

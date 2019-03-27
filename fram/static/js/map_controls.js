@@ -118,11 +118,13 @@ function toggleCrosshair(){
     $('#btCrosshair').css('background-color', 'gray');
     map.on("moveend", displayGridCallback);
     displayGridCallback();
+
+    // Small screens don't have the space for both..
+    if ($('#historical-div').css('display')=='block' && $(window).width() < 600) toggleHistorical();
   }
   else{
     $('#btCrosshair').css('background-color', 'transparent');
     map.un("moveend", displayGridCallback);
-
   }
   $('#cross-x, #cross-y, #grid-display, #weather-display').toggle();
   checkMenus();
@@ -178,12 +180,17 @@ function toggleHistorical(){
     $('#btHistorical').css('background-color', 'gray');
     $('#btHistoricalInfo').css('visibility', 'visible')
 
+    // Small screens don't have the space for both..
+    if ($('#grid-display').css('display')=='block' && $(window).width() < 600){
+      $('#btCrosshair').css('background-color', 'transparent');
+      map.un("moveend", displayGridCallback);
+      $('#cross-x, #cross-y, #grid-display, #weather-display').toggle();
+      checkMenus();
+    }
   }
   else{
     $('#btHistorical').css('background-color', 'transparent');
     $('#btHistoricalInfo').css('visibility', 'hidden')
-
-
   }
   $('#historical-div').toggle();
   checkMenus();
