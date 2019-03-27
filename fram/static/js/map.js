@@ -36,7 +36,7 @@ else{
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
   center: centerGrid,
-  zoom: 4,
+  zoom: 3,
   minZoom: MIN_ZOOM,
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
