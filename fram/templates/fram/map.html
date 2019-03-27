@@ -98,10 +98,7 @@
 
       <div id="historical-div">
         {% for elem in historical %}
-          <!-- If statement is just temp -->
-          {% if elem.year|make_list|last != 'a' %}
-            <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
-          {% endif %}
+          <button class='btn historical-btn' id='btn-{{elem.year}}' type="button" value="{{ elem.lons }}|{{ elem.lats }}" onclick='showHistorical(this)'>{{ elem.year }}</button>
         {% endfor %}
         <span class="glyphicon glyphicon-remove" onclick="toggleHistorical()"></span>
 

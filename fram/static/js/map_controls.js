@@ -204,8 +204,8 @@ function showHistorical(btn){
   else{
     $(btn).css({"border-color": "black", "border-width":"0.15em", "border-style":"solid", "opacity": "1"});
     // Get data
-    let lons = $(btn)[0].value.split('|')[0].split(', ');
-    let lats = $(btn)[0].value.split('|')[1].split(', ');
+    let lons = $(btn)[0].value.split('|')[0].replace(/ /g,'').split(',');
+    let lats = $(btn)[0].value.split('|')[1].replace(/ /g,'').split(',');
 
     // Make grids in right projection
     let points = [];
