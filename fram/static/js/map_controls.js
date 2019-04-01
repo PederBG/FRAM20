@@ -135,8 +135,10 @@ function toggleCrosshair(){
 
 // Scrolling window up/down
 function scrollWindow(){
-  if (arrowDown) $('body').animate({ scrollTop: $(document).height()}, 'fast');
-  else $('body').animate({ scrollTop: 0 }, 'fast');
+  let target = (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) ? "body" : "html, body";
+  console.log(target);
+  if (arrowDown) $(target).animate({ scrollTop: $(document).height()}, 'fast');
+  else $(target).animate({ scrollTop: 0 }, 'fast');
 }
 
 // Control button for scrolling up/down

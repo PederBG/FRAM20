@@ -24,12 +24,8 @@ $("#index-dropdown").click(function() {
   let secondPagePos = $(".second-page").offset().top;
 
   // Possible fix for scrolling erros on iphones/ipads
-  if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)){
-    $("body").animate({ scrollTop: secondPagePos }, 600);
-  }
-  else{
-    $("html, body").animate({ scrollTop: secondPagePos }, 600);
-  }
+  let target = (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) ? "body" : "html, body";
+  $(target).animate({ scrollTop: secondPagePos }, 600);
 });
 
 // Init variables
