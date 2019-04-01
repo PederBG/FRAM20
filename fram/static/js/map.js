@@ -2,7 +2,7 @@
 
 // Init variables
 const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms';
-//const HOST_IP = 'http://localhost:8080/geoserver/wms';
+// const HOST_IP = 'http://localhost:8080/geoserver/wms';
 const MIN_ZOOM = 3.5;
 
 var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
@@ -186,7 +186,7 @@ $.get( url, function(response) {
 // ------------------- INIT LAYER BUTTONS ----------------- \\
 
 // TODO: Use same names everywere and maybe set names in db
-ids = ['OpticClose', 'OpticMos', 'SARClose', 'SARMos', 'Bathymetry', 'Magnetic', 'Gravity', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
+ids = ['OpticClose', 'OpticMosaic', 'SARClose', 'SARMosaic', 'Bathymetry', 'Magnetic', 'Gravity', 'SeaIce', 'IceDrift', 'LandEdge', 'Graticule']
 $(document).ready(function() {
 
     ids.forEach(function(id) {

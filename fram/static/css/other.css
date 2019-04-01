@@ -1,0 +1,98 @@
+/* CSS of all other pages */
+html, body {
+  background-color: #232426;
+}
+
+/* Daily Reports Page */
+.daily-info, .weekly-info{
+  text-align: center;
+}
+.info-files{
+  width: 100%;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+}
+
+.info-div, .read-daily-div{
+  text-align: center;
+  background-color: whitesmoke;
+  color: #040404;
+}
+
+.read-daily-div{
+  padding-bottom: 20vh;
+}
+.read-daily-div h1{
+  bottom: 0;
+  position: absolute;
+  font-size: 4em;
+  cursor: pointer;
+  color: #1C2833;
+}
+.read-daily-div h1:hover{
+  color: black;
+}
+
+.daily-date{
+  text-align: left;
+  margin-bottom: -1em;
+  padding-top: 0.3em;
+}
+/* End Daily Reports Page */
+
+
+/* Info Page, Links Page */
+.text-body{
+  text-align: left;
+}
+.links-page{
+  text-align: center;
+}
+
+.text-body img{
+  width: 100%;
+}
+
+.text-body h2, .text-body h3, .links-page h1{
+  text-align: center;
+}
+
+.text-body td:nth-child(2){
+  padding-left: 3em;
+  padding-bottom: 1em;
+}
+/* End Info Page, Links Page */
+
+
+/* Contact Page */
+.contact-div h2{
+  text-align: center;
+}
+
+.contact-info{
+  margin-left: 20%;
+  width: 60%;
+  font-size: medium;
+}
+
+.contact-info b{
+  margin-left: -1em;
+  font-style: italic;
+}
+
+.page-stat{
+  text-align: center;
+}
+
+.counter-numb{
+  font-size: 4em;
+  color: #93081b;
+}
+
+@media(max-width:768px){
+  .contact-info{
+    margin-left: 3%;
+    width: 94%;
+  }
+}
+/* End Contact Page */

@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
     <link href="{% static 'css/map.css' %}" rel="stylesheet">
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
 
     <!-- The next line is only needed for old environments like Internet Explorer and Android 4.x -->
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
@@ -118,84 +120,15 @@
     </div>
 
     <ul class="layercontrol-container">
+    {% for name in layernames %}
       <li class="layercontrol">
-        <button name="s2c" class='btn btn-primary' id="btOpticClose" type="button">Optic-Close</button>
+        <button name="{{ name.1|rem }}" class='btn btn-primary' id="bt{{ name.0|rem }}" type="button">{{ name.0 }}</button>
         <div class='layer-options-container'>
-          <input name="s2c" type="range" min="1" max="100" value="100" class="slider" id="OpticClose">
-          <button class='layer-info' id="btOpticCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
+          <input name="{{ name.1|rem }}" type="range" min="1" max="100" value="100" class="slider" id="{{ name.0|rem }}">
+          <button class='layer-info' id="bt{{ name.0|rem }}Info" type="button" onclick='toggleInfo(this)'>Info</button>
         </div>
       </li>
-      <li class="layercontrol">
-        <button name="terramos" class='btn btn-primary' id="btOpticMos" type="button">Optic-Mosaic</button>
-        <div class='layer-options-container'>
-          <input name="terramos" type="range" min="1" max="100" value="100" class="slider" id="OpticMos">
-          <button class='layer-info' id="btOpticMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="s1c" class='btn btn-primary' id="btSARClose" type="button">SAR-Close</button>
-        <div class='layer-options-container'>
-          <input name="s1c" type="range" min="1" max="100" value="100" class="slider" id="SARClose">
-          <button class='layer-info' id="btSARCloseInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="s1mos" class='btn btn-primary' id="btSARMos" type="button">SAR-Mosaic</button>
-        <div class='layer-options-container'>
-          <input name="s1mos" type="range" min="1" max="100" value="100" class="slider" id="SARMos">
-          <button class='layer-info' id="btSARMosInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="bathymetry" class='btn btn-primary' id="btBathymetry" type="button">Bathymetry</button>
-        <div class='layer-options-container'>
-          <input name="bathymetry" type="range" min="1" max="100" value="100" class="slider" id="Bathymetry">
-          <button class='layer-info' id="btBathymetryInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="magnetic" class='btn btn-primary' id="btMagnetic" type="button">Magnetic</button>
-        <div class='layer-options-container'>
-          <input name="magnetic" type="range" min="1" max="100" value="100" class="slider" id="Magnetic">
-          <button class='layer-info' id="btMagneticInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="gravity" class='btn btn-primary' id="btGravity" type="button">Gravity</button>
-        <div class='layer-options-container'>
-          <input name="gravity" type="range" min="1" max="100" value="100" class="slider" id="Gravity">
-          <button class='layer-info' id="btGravityInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="seaice" class='btn btn-primary' id="btSeaIce" type="button">Sea-ice</button>
-        <div class='layer-options-container'>
-          <input name="seaice" type="range" min="1" max="100" value="100" class="slider" id="SeaIce">
-          <button class='layer-info' id="btSeaIceInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="icedrift" class='btn btn-primary' id="btIceDrift" type="button">Ice-Drift</button>
-        <div class='layer-options-container'>
-          <input name="icedrift" type="range" min="1" max="100" value="100" class="slider" id="IceDrift">
-          <button class='layer-info' id="btIceDriftInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="landedge" class='btn btn-primary' id="btLandEdge" type="button">Land-Edge</button>
-        <div class='layer-options-container'>
-          <input name="landedge" type="range" min="1" max="100" value="100" class="slider" id="LandEdge">
-          <button class='layer-info' id="btLandEdgeInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-      <li class="layercontrol">
-        <button name="graticule" class='btn btn-primary' id="btGraticule" type="button">Graticule</button>
-        <div class='layer-options-container'>
-          <input name="graticule" type="range" min="1" max="100" value="100" class="slider" id="Graticule">
-          <button class='layer-info' id="btGraticuleInfo" type="button" onclick='toggleInfo(this)'>Info</button>
-        </div>
-      </li>
-
+    {% endfor %}
       <!-- Not geoserver layers -->
       <li class="layercontrol">
         <button class='btn btn-primary' id="btCrosshair" type="button" onclick='toggleCrosshair()'>Crosshair</button>

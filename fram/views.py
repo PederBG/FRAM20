@@ -11,7 +11,7 @@ def map(request):
     if not Position.objects.all():
         return render(request, 'fram/map.html', {'positions': 'None'})
 
-    # If time is over 11:00 + 10 minutes a new layer will be published.
+    # If time is over 11:00 +  maximum 10 minutes a new layer will be published.
     # Since this layer only have partial information, default is set to the day before.
     if datetime.now() > datetime.now().replace(hour=11, minute=10):
         default_date = Layer.objects.all().order_by('-position__date')[1]
@@ -22,6 +22,10 @@ def map(request):
         'layers': Layer.objects.all().order_by('position__date'),
         'default_date': default_date.position.date,
         'historical': HistoricalDrift.objects.all().order_by('year'),
+        
+        'layernames': [('Optic-Close', 's2c'), ('Optic-Mosaic', 'terramos'), ('SAR-Close', 's1c'),
+         ('SAR-Mosaic', 's1mos'), ('Bathymetry', 'bathymetry'), ('Magnetic', 'magnetic'), ('Gravity', 'gravity'),
+         ('SeaIce', 'seaice'), ('IceDrift', 'icedrift'), ('LandEdge', 'landedge'), ('Graticule', 'graticule')],
         }
     return render(request, 'fram/map.html', context)
 

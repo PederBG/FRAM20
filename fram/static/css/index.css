@@ -1,33 +1,10 @@
-/* Index Page */
+html, body {
+  background-color: none;
+}
 
 h3{
   color: #93081b;
   font-weight: bold;
-}
-
-.navbar{
-    margin-bottom: 0;
-    z-index: 1;
-    font-size: 1.2em;
-}
-
-.nav.navbar-nav li a:hover{
-    background-color: #707070;
-}
-
-.nav.navbar-nav li.active a{
-   background-color: #506070;
-}
-.nav.navbar-nav li.active a:hover{
-    background-color: #707070;
-}
-
-#nav-title{
-  color: whitesmoke;
-  font-size: 1.4em;
-}
-#nav-title:hover{
-  color: #ffffff;
 }
 
 .cover-image{
@@ -44,7 +21,7 @@ h3{
   height: 100%;
   width: 100%;
   background-size: cover;
-  background-image: url('../../static/img/bg1.jpeg');
+  background-image: url('../../static/img/bg1.jpeg'); /* First image in slideshow */
   background-repeat: no-repeat;
   background-attachment: scroll;
 }
@@ -254,44 +231,6 @@ h3{
   }
 }
 
-/* Force navbar collapse earlier than native bootstrap */
-@media (max-width: 1040px) {
-    .navbar-header {
-        float: none;
-    }
-    .navbar-left,.navbar-right {
-        float: none !important;
-    }
-    .navbar-toggle {
-        display: block;
-    }
-    .navbar-collapse {
-        border-top: 1px solid transparent;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .navbar-fixed-top {
-        top: 0;
-        border-width: 0 0 1px;
-    }
-    .navbar-collapse.collapse {
-        display: none!important;
-    }
-    .navbar-nav {
-        float: none!important;
-        margin-top: 7.5px;
-    }
-    .navbar-nav>li {
-        float: none;
-    }
-    .navbar-nav>li>a {
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .collapse.in{
-        display:block !important;
-    }
-}
-
 @media(max-width:768px){
   .first-page{
     height:89vh;
@@ -347,5 +286,3 @@ h3{
     height:88vh;
   }
 }
-
-/* End Index Page */
