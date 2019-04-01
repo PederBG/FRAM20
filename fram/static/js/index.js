@@ -6,7 +6,7 @@ const background = $('.inner-div');
 
 // Get background images
 let images = [];
-for (var j = 0; j < NUMB_IMAGES; j++) {
+for (let j = 0; j < NUMB_IMAGES; j++) {
   images.push("../../static/img/bg" + j.toString() + ".jpeg" );
 }
 
@@ -22,7 +22,14 @@ preload();
 // Dropdown handler
 $("#index-dropdown").click(function() {
   let secondPagePos = $(".second-page").offset().top;
-  $("html, body").animate({ scrollTop: secondPagePos }, 600);
+
+  // Possible fix for scrolling erros on iphones/ipads
+  if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)){
+    $("body").animate({ scrollTop: secondPagePos }, 600);
+  }
+  else{
+    $("html, body").animate({ scrollTop: secondPagePos }, 600);
+  }
 });
 
 // Init variables
@@ -30,7 +37,7 @@ let i = 0;
 let pause = false;
 let win = $(window);
 
-// TODO Stop slideshow when page-tab is not active
+// TODO: Stop slideshow when page tab is not active
 // win.blur(function() {
 //   if (!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )){
 //     console.log("blur");
@@ -54,14 +61,8 @@ win.scroll(function() {
     pause = false;
     $('.second-page').css('background-color', 'rgba(245, 245, 245, 0.5)');
   }
-
-  if ( ( win.scrollTop() + 0.5 * win.innerHeight() ) > window.innerHeight ) {
-    console.log("UP");
-  }
-  else{
-    console.log("DOWN");
-  }
 });
+
 
 $('document').ready(function(){
 

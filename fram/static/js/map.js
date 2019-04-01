@@ -4,8 +4,6 @@
 const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms';
 // const HOST_IP = 'http://localhost:8080/geoserver/wms';
 const MIN_ZOOM = 3.5;
-
-var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
 const STATIC_LAYERINFO = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
   'Magnetic': "<p><h5>Magnetic Anomali Overlay</h5></p>",
@@ -14,6 +12,8 @@ const STATIC_LAYERINFO = {
   'Graticule': "<p><h5>Graticule Overlay</h5></p>",
   'Historical': "<p><h5>Ice drift 1. April - 1. August for 2013-2018</h5></p><b>a: </b>Sea-ice trajectories computed from TOPAZ reanalysis.<br><b>b: </b>Sea-ice trajectories computed by T. Lavergne (MET Norway) using EUMETSAT OSI SAF data.<br><b>Source:</b> E.U. Copernicus Marine Service Information - drift trajectories from MET Norway, OpenDrift  model."
 }
+
+var map, allPointFeatures, activePointFeatures, markerStyle, layernames, layerdict, vectorLayer, centerGrid;
 
 
 
@@ -32,7 +32,6 @@ else{
   let grid = positions[positions.length-1][1].split(',');
   centerGrid = ol.proj.transform([parseFloat(grid[0]), parseFloat(grid[1])],"WGS84", "EPSG:3413");
 }
-
 var defaultView = new ol.View({
   projection: 'EPSG:3413',
   center: centerGrid,
@@ -40,6 +39,7 @@ var defaultView = new ol.View({
   minZoom: MIN_ZOOM,
   extent: ol.proj.get("EPSG:3413").getExtent()
 })
+
 
 // Define function to get raster data from geoserver
 function setCustomLayerSource (workspace, name){
@@ -59,7 +59,7 @@ function setCustomLayerSource (workspace, name){
     })
 }
 
-// Getting base map using jquery get-syntax
+// Getting base map using jquery's get function
 var parser = new ol.format.WMTSCapabilities();
 var url = 'https://map1.vis.earthdata.nasa.gov/wmts-arctic/' +
     'wmts.cgi?SERVICE=WMTS&request=GetCapabilities';

@@ -1,4 +1,4 @@
-// ------ CONTROLS FOR MAP-PAGE ------ \\
+// ------ CONTROLS FOR MAP PAGE ------ \\
 
 // Init variables
 let win = $(window);
@@ -10,7 +10,7 @@ const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 
 // Show/hide geoserver map layers
 function ToggleLayer(bt){
-  var active = layerdict[bt.name].getVisible();
+  let active = layerdict[bt.name].getVisible();
   layerdict[bt.name].setVisible(!active);
   if (!active){
     $('#'+bt.id).css("background-color", "gray")
@@ -22,7 +22,7 @@ function ToggleLayer(bt){
   }
 }
 
-// Move map view to default view area
+// Move map view to default area
 function setDefaultView(){
   if (positions.length == 0) centerGrid = ol.proj.transform([-4, 83.5],"WGS84", "EPSG:3413");
   else centerGrid = activePointFeatures[activePointFeatures.length-1].getProperties().geometry.A;
@@ -31,6 +31,7 @@ function setDefaultView(){
     zoom: 4
   });
 }
+
 
 // Show/hide info box for a geoserver layer
 function toggleInfo(bt){
@@ -48,20 +49,21 @@ function closeLayerInfo(){
   $('#LayerInfoContainer').toggle();
 }
 
+
 // Help function for toggleCrosshair and get weather
 function displayGridCallback(){
   raw_grid = map.getView().getCenter();
   conv_grid = ol.proj.transform( [parseFloat( raw_grid[0] ), parseFloat( raw_grid[1] )] , 'EPSG:3413', 'EPSG:4326' );
 
+  // Beautify lat/lon grid
   output = conv_grid[1].toFixed(4) + ' N, ';
   if (conv_grid[0] < 0) output += conv_grid[0].toFixed(4) *-1 + ' W';
   else output += conv_grid[0].toFixed(4) + ' E';
 
   $('#grid-display').html(output);
 
-  // Show weather
+  // Show weather (requesting xml-file from an api provided by yr.no)
   let url = "https://api.met.no/weatherapi/locationforecastlts/1.3/?lat=" + conv_grid[1] + "&lon=" + conv_grid[0];
-  console.log(url);
   $.get( url, function(response) {
     let times = response.getElementsByTagName("time");
 
@@ -73,7 +75,7 @@ function displayGridCallback(){
     let sevendays_string = new Date().addDays(7).toISOString().substring(0, 10);
     let sevendays = false;
 
-    for (var i = 0; i < times.length; i++) {
+    for (let i = 0; i < times.length; i++) {
       if ( times[i].getAttribute("from").substring(0,10) == tomorrow_string && !tomorrow ){
         tomorrow = times[i]
       }
@@ -130,10 +132,11 @@ function toggleCrosshair(){
   checkMenus();
 }
 
+
 // Scrolling window up/down
 function scrollWindow(){
-  if (arrowDown) $('html').animate({ scrollTop: $(document).height()}, 'fast');
-  else $('html').animate({ scrollTop: 0 }, 'fast');
+  if (arrowDown) $('body').animate({ scrollTop: $(document).height()}, 'fast');
+  else $('body').animate({ scrollTop: 0 }, 'fast');
 }
 
 // Control button for scrolling up/down
@@ -147,6 +150,7 @@ win.scroll(function() {
     $('#scroll-window').css('transform','rotate(' + 0 + 'deg)');
   }
 });
+
 
 // Changing date for the geoserver layers
 function changeDate(btn){
@@ -216,27 +220,26 @@ function showHistorical(btn){
 
     // Make grids in right projection
     let points = [];
-    for (var i = 0; i < lons.length; i++) {
+    for (let i = 0; i < lons.length; i++) {
       points.push(
           ol.proj.transform( [parseFloat( lons[i] ), parseFloat( lats[i] )] , 'EPSG:4326', 'EPSG:3413' )
       );
     }
 
-    var vectorStyle = new ol.style.Style({
+    let vectorStyle = new ol.style.Style({
        stroke : new ol.style.Stroke({color : $(btn).css("background-color"), width: 2
      })
     });
-    var vectorStyleA = new ol.style.Style({
+    let vectorStyleA = new ol.style.Style({
        stroke : new ol.style.Stroke({color : $(btn).css("background-color"), width: 2, lineDash: [.1, 3]
      })
     });
 
     // Make OpenLayers vector
-
     vectorFeature = new ol.Feature({ geometry: new ol.geom.LineString(points) });
     ($(btn).html()[4] == 'a') ? vectorFeature.setStyle(vectorStyleA) : vectorFeature.setStyle(vectorStyle)
 
-    var vectorLine = new ol.layer.Vector({
+    let vectorLine = new ol.layer.Vector({
         source: new ol.source.Vector({
           features: [ vectorFeature ]
         })
@@ -247,8 +250,8 @@ function showHistorical(btn){
   }
 }
 
-// Fixing flow of different menus on the map
-// Hard coding ftw..
+
+// Fixing flow of different menus on the map (hard coding ftw..)
 function checkMenus(){
   if($(window).width() < 600){
 
@@ -281,19 +284,22 @@ $( window ).resize(function() {
   checkMenus();
 });
 
+
 // Help function to convert easy-to-read date into database date
 function uglifyDate(dateString){
   let tmp = new Date(dateString);
   return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 }
 
-window.onload = function() {
-  checkMenus();
-};
 
 // Help function to add days to date Object
 Date.prototype.addDays = function(days) {
-  var date = new Date(this.valueOf());
+  let date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
   return date;
 }
+
+
+window.onload = function() {
+  checkMenus();
+};
