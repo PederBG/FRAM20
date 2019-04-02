@@ -11,4 +11,5 @@ urlpatterns = [
     path('weekly', views.weekly, name='weekly'),
     path('links', views.links, name='links'),
     path('contact', views.contact, name='contact'),
+    path('cookiepolicy', views.cookiepolicy, name='cookiepolicy'),
 ]

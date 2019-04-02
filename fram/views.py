@@ -22,7 +22,7 @@ def map(request):
         'layers': Layer.objects.all().order_by('position__date'),
         'default_date': default_date.position.date,
         'historical': HistoricalDrift.objects.all().order_by('year'),
-        
+
         'layernames': [('Optic-Close', 's2c'), ('Optic-Mosaic', 'terramos'), ('SAR-Close', 's1c'),
          ('SAR-Mosaic', 's1mos'), ('Bathymetry', 'bathymetry'), ('Magnetic', 'magnetic'), ('Gravity', 'gravity'),
          ('SeaIce', 'seaice'), ('IceDrift', 'icedrift'), ('LandEdge', 'landedge'), ('Graticule', 'graticule')],
@@ -87,3 +87,7 @@ def contact(request):
         'alltime_users': len(AccessLog.objects.all().values_list('ip', flat=True).distinct()),
         }
     return render(request, 'fram/contact.html', context)
+
+
+def cookiepolicy(request):
+    return render(request, 'fram/cookiepolicy.html')
