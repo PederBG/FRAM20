@@ -99,7 +99,7 @@ class DownloadManager(object):
 
     # ---------------------------------------------------------
 
-    # Download and process each layer...
+    # Methods used to download and process each layer...
 
     # ------------------------------ S2 CLOSE-UP ----------------------------- #
     def getS2(self, outfile):
@@ -111,7 +111,7 @@ class DownloadManager(object):
         ds = gdal.Open(s2FileName, GA_ReadOnly)
         rawEPSG = ds.GetSubDatasets()[0][0].split(':')[-1]
 
-        # Get layerInfoFile
+        # Add info about the layer to layerInfoFile
         self.infoFile.write('s2c_time|' + str(ds.GetMetadataItem("PRODUCT_START_TIME") + "\n"))
         self.infoFile.write('s2c_clouds|' + str(ds.GetMetadataItem("CLOUD_COVERAGE_ASSESSMENT") + "\n"))
         self.infoFile.close()
@@ -132,9 +132,9 @@ class DownloadManager(object):
 
     # --------------------------------- TERRA MOSAIC ------------------------------- #
     def getTerra(self, outfile):
-        # DOWNLOADING NEWEST FILE WITH HTTP
-        # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)
+        # Download newest file using urllib2
         time = str(self.DATE) # NASA changed the date format
+        # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)
         extent = '-2251630.1978347152,-1767716.822874052,2386588.9709421024,1917931.4225647242'
         layers = 'MODIS_Terra_CorrectedReflectance_TrueColor'
 
@@ -174,7 +174,7 @@ class DownloadManager(object):
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
     def getS1(self, outfile, max_num=3):
 
-        tmpfiles = '' # arguments when making virtual mosaic
+        tmpfiles = '' # arguments passed to gdal when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
         if not downloadNames[0]:
             return False
@@ -199,7 +199,7 @@ class DownloadManager(object):
     # --------------------------------- S1 MOSAIC -------------------------------- #
     def getS1Mos(self, outfile, max_num=50):
 
-        tmpfiles = "" # arguments when making virtual mosaic
+        tmpfiles = "" # arguments passed to gdal when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=1)
         if not downloadNames[0]:
             return False
@@ -231,7 +231,7 @@ class DownloadManager(object):
 
     # --------------------------------- SeaIce ----------------------------------- #
     def getSeaIce(self, outfile):
-        # DOWNLOADING NEWEST FILE WITH HTTP
+        # Download newest file using urllib2
         yestdate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
         month = (self.DATE - timedelta(1)).strftime("%b").lower()
         year = yestdate[:4]
@@ -271,7 +271,7 @@ class DownloadManager(object):
 
     # --------------------------------- IceDrift --------------------------------- #
     def getIceDrift(self, outfile):
-        # DOWNLOADING NEWEST FILE WITH FTP
+        # Download newest file using urllib
         enddate = (self.DATE - timedelta(1)).strftime('%Y%m%d')
         startdate = (self.DATE - timedelta(3)).strftime('%Y%m%d')
         m = (self.DATE - timedelta(1)).strftime('%m')
@@ -288,7 +288,7 @@ class DownloadManager(object):
             return False
 
 
-        # MAKE QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
+        # MAKE GEOREFERENCED QUIVERPLOT FROM X AND Y DRIFT ESTIMATES
         print('Converting NETCDF bands to numpy arrays')
         fh = nc.Dataset(tmpfile, mode='r')
         dx = (fh.variables['dX'][:][0])
@@ -300,8 +300,9 @@ class DownloadManager(object):
         x = np.linspace(0, xc, xc)
         y = np.linspace(yc, 0, yc)
 
+        # MAKE THE QUIVERPLOT
         print('Making quiverplot from dX and dY ice drift estimates')
-        fig = plt.figure(figsize=(11.9*5, 17.7*3), frameon=False) #TODO: fix hardcode
+        fig = plt.figure(figsize=(11.9*5, 17.7*3), frameon=False)
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)

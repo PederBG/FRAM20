@@ -3,7 +3,7 @@
 """
 Written by PederBG, 2018-08
 
-Main method used by FRAM19 for image overlay generating.
+Main method used by FRAM19 for generating image overlays.
 
 It uses a DownloadManager instance to download and process raw data and then
 uploads ready-to-use, georeferenced overlays to a locally running geoserver.
@@ -17,7 +17,6 @@ from geoserver.catalog import Catalog
 
 from downloadmanager import DownloadManager
 import fram_functions as funcs
-
 
 def main(argv):
     #  --------------------- Handler --------------------- #
@@ -41,7 +40,7 @@ def main(argv):
             )
             sys.exit()
         elif opt == ("--test"):
-            print("All packages and sytem variables seems to work properly.")
+            print("Success! All packages and sytem variables seems to work properly")
             sys.exit()
         elif opt in ("-d", "--date"):
             if '-' in arg:
@@ -57,7 +56,7 @@ def main(argv):
         elif opt in ("--overwrite"):
             overwrite = True
     if not opts:
-        print('WARNING: No arguments provided. Using defaults.')
+        print('WARNING: No arguments provided. Using default values')
     #  ------------------- Handler end ------------------- #
 
     d = DownloadManager(date=date, grid=grid, target=target) # Making download instance
@@ -82,7 +81,6 @@ def main(argv):
             print("")
 
     print('Created files: ' + str(outfiles) + '\n')
-    # d.clean()
     if all(file == False for file in outfiles):
         print("No images found")
         exit(1)
@@ -92,8 +90,9 @@ def main(argv):
     # --------------------- Upload to Geoserver -------------------- #
     cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", os.environ["GEOSERVER_SECRET_KEY"])
     # cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", "geoserver")
+    print(cat)
 
-    # BUG: ws is sometime cite instead of d.date
+    # BUG: ws is sometime cite instead of d.date (fixed?)
     ws = cat.get_workspace( str(d.DATE) )
     if ws is None:
         ws = cat.create_workspace(str(d.DATE), str(d.DATE) + 'uri')

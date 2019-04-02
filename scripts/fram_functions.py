@@ -10,7 +10,7 @@ import zipfile
 import subprocess, glob
 
 
-# Help function for downloading satellite products
+# Help function for downloading satellite products from scihub / colhub
 def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1', time_window=1):
     print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
         %(bbox, max_files, polarization, platform))
@@ -23,7 +23,6 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     try:
         if platform == 's1':
             products = api.query(footprint,
-                            # ("20180805", "20180807"),
                             (yestdate, date),
                              platformname='Sentinel-1',
                              producttype='GRD',
@@ -31,7 +30,6 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
                              )
         elif platform == 's2':
             products = api.query(footprint,
-                            # ("20180805", "20180807"),
                             (yestdate, date),
                              platformname='Sentinel-2',
                              cloudcoverpercentage=(0, 80) # TODO: find reasonable threshold
@@ -50,6 +48,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     if len(products) == 0:
         print("No files found at date: " + date)
         return [False]
+
     print("Found", len(products), "Sentinel images.")
 
     if platform == 's2':
@@ -70,6 +69,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
         product_clouds = ''
         if platform == 's2':
             product_clouds = ', Cloudcover: ' + str(products_df['cloudcoverpercentage'].values[i])
+
         print("Name: %s, size: %s MB%s" %(product_name, product_size, product_clouds))
 
         # if max_files == 1: # No point with ingestion date in mosaics with several images
@@ -114,6 +114,7 @@ def buildImageOverviews(GDALHOME, outfile, num=5):
     cmd = '%sgdaladdo -r gauss %s %s' %(GDALHOME, outfile, overviews[:-1]) # is Gaussian kernel better?
     subprocess.call(cmd, shell=True)
 
+# Warping image to right projection
 def warpImage(GDALHOME, proj, custom_args, infile, outfile):
         print("Warping to NSIDC Sea Ice Polar Stereographic North projection...")
         cmd = '%sgdalwarp -of GTiff -t_srs %s %s %s %s' %(GDALHOME, proj, custom_args, infile, outfile)
@@ -158,6 +159,7 @@ def makeGeojson(grid, outfile, e_step, w_step, n_step, s_step):
     return outfile
 
 
+# Help function for easy printing
 def printLayerStatus(str):
     print('--------------------------------------------------')
     print('Generating layer: %s' %(str))
