@@ -1,12 +1,12 @@
-# FRAM-2019
+# FRAM-2020
 
-### Website / GIS application used for the FRAM-2019 expedition, due to start spring 2019.
-#### Visit at: www.fram2019.com (still in dev)
+### Website / GIS application used for the FRAM-2020 expedition, due to start spring 2020.
+#### Visit at: www.fram2020.no
 
 ####  Using python to download and process up to date satellite imagery, and other sensor data, following specified locations in the Artic Ocean. Presenting this in a full-stack Django application with GeoServer and OpenLayers. Application deployed using NGINX and Gunicorn. All configurations and dependencies are handled by Docker.
 
 ###### Developed as an internship assignment for Lundin Norway. Source code published with their consent.
-![Github](https://preview.ibb.co/jC8s8A/fram.png "Preview")
+![Github](https://i.ibb.co/xLQTqB6/fram2020.jpg "Preview")
 
 ### Development
 ##### Note: *not updated to newest changes*
@@ -15,7 +15,7 @@
 
 - Fork the project and clone it in your own project folder:
   ```sh
-  git clone https://github.com/PederBG/FRAM19.git
+  git clone https://github.com/PederBG/FRAM20.git
   ```
 
 - Install Docker: https://docs.docker.com/install/
