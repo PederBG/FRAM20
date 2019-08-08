@@ -6,6 +6,14 @@ let arrowDown = true;
 let activeHistoricals = {};
 let times;
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const nameMap = {
+  's2c': 'OpticClose',
+  'terramos': 'OpticMosaic',
+  's1c': 'SARClose',
+  's1mos': 'SARMosaic',
+  'seaice': 'SeaIce',
+  'icedrift': 'IceDrift'
+}
 
 
 // Show/hide geoserver map layers
@@ -136,7 +144,6 @@ function toggleCrosshair(){
 // Scrolling window up/down
 function scrollWindow(){
   let target = (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) ? "body" : "html, body";
-  console.log(target);
   if (arrowDown) $(target).animate({ scrollTop: $(document).height()}, 'fast');
   else $(target).animate({ scrollTop: 0 }, 'fast');
 }
@@ -156,28 +163,43 @@ win.scroll(function() {
 
 // Changing date for the geoserver layers
 function changeDate(btn){
-  $('#LayerInfoContainer').hide();
-  if (btn.id == 'forward'){
-    if (activePointFeatures.length < allPointFeatures.length){
-      activePointFeatures.push(allPointFeatures[activePointFeatures.length])
-    } else return false;
+  if (btn != 0){
+    $('#LayerInfoContainer').hide();
+    if (btn.id == 'forward'){
+      if (activePointFeatures.length < allPointFeatures.length){
+        activePointFeatures.push(allPointFeatures[activePointFeatures.length])
+      } else return false;
+    }
+    else {
+      if (activePointFeatures.length > 1){
+        activePointFeatures.pop()
+      } else return false;
+    }
+    $('#used-date').html(positions[activePointFeatures.length-1][0]);
+    map.removeLayer(vectorLayer);
+    vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
+        style: markerStyle
+    });
+    map.addLayer(vectorLayer);
   }
-  else{
-    if (activePointFeatures.length > 1){
-      activePointFeatures.pop()
-    } else return false;
-  }
-  $('#used-date').html(positions[activePointFeatures.length-1][0]);
-  map.removeLayer(vectorLayer);
-  vectorLayer = new ol.layer.Vector({
-      source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
-      style: markerStyle
-  });
-  map.addLayer(vectorLayer);
-
   layernames.forEach(function(name) {
     let date = uglifyDate(positions[activePointFeatures.length-1][0]);
     layerdict[name].setSource( setCustomLayerSource( date, name ) );
+
+    // Disbale buttons for layers with no data
+    if ($.inArray(nameMap[name], Object.keys(positions[activePointFeatures.length-1][2])) != -1){
+      if ( positions[activePointFeatures.length-1][2][nameMap[name]].includes('<b>Sensing time:</b> No data<br>') ){
+        $('#bt'+nameMap[name]).attr("disabled", true);
+        $('#bt'+nameMap[name]).next().css('visibility', 'hidden');
+      }
+      else{
+        $('#bt'+nameMap[name]).attr("disabled", false);
+        if ($('#bt'+nameMap[name]).css('background-color') == 'rgb(128, 128, 128)')
+          $('#bt'+nameMap[name]).next().css('visibility', 'visible');
+      }
+    }
+
   });
 }
 

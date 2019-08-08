@@ -178,6 +178,8 @@ $.get( url, function(response) {
 
     map.addLayer(vectorLayer);
   }
+  // Disable buttons for layers with no data for the first date
+  changeDate(0)
 });
 
 
