@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 print("Address " + sender + " is not in allowed_addresses, going to next mail..")
                 continue
 
-            if mail.subject=='infopdf':
+            if mail.subject.lower()=='infopdf':
 
                 pdf = MessageAttachment.objects.filter(message_id=mail.id).first()
                 if len(mail.text) > 1 or ( len(mail.text) == 1 and mail.text[0] not in [' ', '_', '.', ','] ):
@@ -45,7 +45,7 @@ class Command(BaseCommand):
 
                 if InfoPDF.objects.filter(title = fName):
                     print("A PDF with this name already exist.")
-                    continue
+                    quit()
 
                 cmd = "cp {} data/infopdfs/{}.pdf".format(str(pdf), fName)
                 print("COMMAND: " + cmd)

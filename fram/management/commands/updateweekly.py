@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 print("Address " + sender + " is not in allowed_addresses, going to next mail..")
                 continue
 
-            if mail.subject=='weekly':
+            if mail.subject.lower()=='weekly':
                 pdf = MessageAttachment.objects.filter(message_id=mail.id).first()
 
                 fName = "Letter_week_{}".format(datetime.now().strftime("%V"))

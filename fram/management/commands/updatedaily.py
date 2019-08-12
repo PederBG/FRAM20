@@ -12,7 +12,6 @@ class Command(BaseCommand):
         # Other emails are also blocked in the gmail client
         allowed_addresses = os.environ['ALLOWED_ADDRESSES'].split(',')
 
-
         print("Getting new mails...")
         Mailbox.objects.first().get_new_mail()
 
@@ -29,7 +28,7 @@ class Command(BaseCommand):
                 print("Address " + sender + " is not in allowed_addresses, going to next mail..")
                 continue
 
-            if mail.subject=='daily':
+            if mail.subject.lower()=='daily':
 
                 try:
                     # Test syntax
