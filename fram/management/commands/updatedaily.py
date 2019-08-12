@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Other emails are also blocked in the gmail client
-        allowed_addresses = ['pedergrbr@gmail.com', 'jan-erik.lie@lundin-norway.no', 'Yngve.Kristoffersen@uib.no']
+        allowed_addresses = os.environ['ALLOWED_ADDRESSES'].split(',')
 
 
         print("Getting new mails...")
