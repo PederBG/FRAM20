@@ -205,4 +205,10 @@ $(document).ready(function() {
     $('#back').click(function() {
       changeDate(this)
     });
+    $('#fast-forward').click(function() {
+      changeDate(this)
+    });
+    $('#fast-back').click(function() {
+      changeDate(this)
+    });
 });

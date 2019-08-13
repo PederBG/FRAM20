@@ -170,10 +170,24 @@ function changeDate(btn){
         activePointFeatures.push(allPointFeatures[activePointFeatures.length])
       } else return false;
     }
-    else {
+    else if (btn.id == 'back') {
       if (activePointFeatures.length > 1){
         activePointFeatures.pop()
       } else return false;
+    }
+    else if (btn.id == 'fast-forward'){
+      for (let i = 0; i < 20; i++) {
+        if (activePointFeatures.length < allPointFeatures.length){
+          activePointFeatures.push(allPointFeatures[activePointFeatures.length])
+        } else break;
+      }
+    }
+    else if (btn.id == 'fast-back'){
+      for (let i = 0; i < 20; i++) {
+        if (activePointFeatures.length > 1){
+          activePointFeatures.pop()
+        } else break;
+      }
     }
     $('#used-date').html(positions[activePointFeatures.length-1][0]);
     map.removeLayer(vectorLayer);
