@@ -111,15 +111,15 @@
         <div id='LayerInfo'></div>
         <span id="close" onclick="closeLayerInfo()">&times;</span>
       </div>
-      <img src="{% static 'img/arrowdown.png' %}" alt="Fram Logo" id="scroll-window" onclick="scrollWindow()">
+      <img src="{% static 'img/arrowdown.png' %}" alt="Arrow down" id="scroll-window" onclick="scrollWindow()">
     </div>
 
     <div id='dates-div'>
-        <span class='arrow' id='fast-back'><span id='fast-first'>&#9664;</span>&#9664;</span>
-        <span class='arrow' id='back'>&#9664;</span>
+        <img class='arrow' src="{% static 'img/fast_arrow_left.png' %}" alt="left_arrow" id="fast-back">
+        <img class='arrow' src="{% static 'img/slow_arrow_left.png' %}" alt="left_arrow" id="back">
         <span id='used-date'>{{default_date}}</span>
-        <span class='arrow' id='forward'>&#9654;</span>
-        <span class='arrow' id='fast-forward'><span id='fast-first'>&#9654;</span>&#9654;</span>
+        <img class='arrow' src="{% static 'img/slow_arrow_right.png' %}" alt="right_arrow" id="forward">
+        <img class='arrow' src="{% static 'img/fast_arrow_right.png' %}" alt="right_arrow" id="fast-forward">
     </div>
 
     <ul class="layercontrol-container">
