@@ -15,28 +15,32 @@ class Command(BaseCommand):
     args = '<foo bar ..>'
     help = "No options needed"
 
+    def add_arguments(self, parser):
+        parser.add_argument("-d", "--date", type=str)
+
+    @staticmethod
+    def toDatetime(input): # format yyyy-mm-dd
+        return datetime.strptime('{} 23:59:00'.format(input), '%Y-%m-%d %H:%M:%S')
+
     def handle(self, *args, **options):
+        DATETIME = Command.toDatetime(options['date']) if options['date'] else datetime.now()
 
-        # Set datetime when script starts
-        DATETIME = datetime.now()
+        try:
+            print("Found an existing position")
+            latest = Position.objects.get(date=DATETIME.date().strftime('%Y-%m-%d'))
+        except Position.DoesNotExist:
+            latest = Position.objects.all().order_by('-date')
 
-        latest = Position.objects.all().order_by('-date')
-
-        if latest:
-            latest = latest[0]
-        # If no positions added
-        else:
-            print("No positions found")
-            sys.exit(1)
-
-        # If latest position not from today
-        if latest.date != DATETIME.date():
-            print("No new position added today, using last added grid.")
-            p = Position()
-            p.grid = latest.grid
-            p.date = DATETIME.date()
-            p.save()
-            latest = p
+            if latest:
+                print("No new position added today, using last added grid")
+                p = Position()
+                p.grid = latest[0].grid
+                p.date = DATETIME.date()
+                p.save()
+                latest = p
+            else:
+                print("No positions found")
+                sys.exit(1)
 
         # Set paths
         scriptsPath = 'scripts/'
@@ -47,7 +51,7 @@ class Command(BaseCommand):
         grid = latest.grid
 
         if DATETIME < DATETIME.replace(hour=13):
-            print("Early running: only generating s1 image.")
+            print("Early running: only generating s1 image")
             only = '-o s1c'
 
         # Get data
