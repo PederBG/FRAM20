@@ -60,6 +60,7 @@ def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, p
     downloadNames = []
 
     for i in range(len(products_df)):
+        print("Image %s / %s" %(i, len(products_df)))
         if i == max_files: # Prevents too large mosaic file
             break
         product_size = float(products_df['size'].values[i].split(' ')[0])

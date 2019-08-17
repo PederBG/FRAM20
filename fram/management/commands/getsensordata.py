@@ -26,8 +26,8 @@ class Command(BaseCommand):
         DATETIME = Command.toDatetime(options['date']) if options['date'] else datetime.now()
 
         try:
-            print("Found an existing position")
             latest = Position.objects.get(date=DATETIME.date().strftime('%Y-%m-%d'))
+            print("Found an existing position")
         except Position.DoesNotExist:
             latest = Position.objects.all().order_by('-date')
 
