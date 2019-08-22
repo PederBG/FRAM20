@@ -14,6 +14,7 @@ The geoserver will then handle feeding layer-tiles to the front-end on request.
 from datetime import datetime
 import sys, getopt, os
 from geoserver.catalog import Catalog
+import traceback
 
 from downloadmanager import DownloadManager
 import fram_functions as funcs
@@ -76,9 +77,14 @@ def main(argv):
         outfiles.append( functions[only](d.OUTDIR + only + '.tif') )
     else:
         for k, v in functions.iteritems():
-            funcs.printLayerStatus(str(k))
-            outfiles.append( v(d.OUTDIR + k + '.tif') )
-            print("")
+            try:
+                funcs.printLayerStatus(str(k))
+                outfiles.append( v(d.OUTDIR + k + '.tif') )
+            except Exception as e:
+                print("Could not generate " + k + " layer")
+                print(traceback.print_exc())
+            finally:
+                print("")
 
     print('Created files: ' + str(outfiles) + '\n')
     if all(file == False for file in outfiles):
