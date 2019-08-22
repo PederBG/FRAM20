@@ -114,8 +114,6 @@ def main(argv):
 
     print('Sensor data for ' + str(d.DATE) + ' has been successfully uploaded!')
     # ------------------- Upload to Geoserver end ------------------ #
-    print('Process finished')
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])

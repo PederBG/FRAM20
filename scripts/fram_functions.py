@@ -1,7 +1,7 @@
 """
 Written by PederBG, 2018-08
 
-Help function used when downloading and processing images.
+Help functions used when downloading and processing images.
 """
 
 from datetime import date, datetime, timedelta
@@ -135,12 +135,15 @@ def makeGeojson(grid, outfile, e_step, w_step, n_step, s_step):
     east = grid.split(',')[0]
     north = grid.split(',')[1]
 
-    # Quick fix after ESA's Open Access Hub sets upper boundery for polygons..
-    if float(north) > 85.0513: # Upper boundery on map used at scihub/colhub
-        north = '85.0513'
+    # Fix after ESA's Open Access Hub sets upper boundery for polygons..
+    # if float(north) + n_step > 86.5513: # Upper boundery bug on map used at scihub/colhub
+    if float(north) + n_step > 90:
+        n_bound = 90
+    else:
+        n_bound = float(north) + n_step
 
-    topLeft = str( float(east) - e_step ) + ',' + str( float(north) + n_step )
-    topRight = str( float(east) + w_step ) + ',' + str( float(north) + n_step )
+    topLeft = str( float(east) - e_step ) + ',' + str(n_bound)
+    topRight = str( float(east) + w_step ) + ',' + str(n_bound)
     bottomRight = str( float(east) + w_step ) + ',' + str( float(north) - s_step )
     bottomLeft = str( float(east) - e_step ) + ',' + str( float(north) - s_step )
     json_string = '{"type":"FeatureCollection","features":[\n\

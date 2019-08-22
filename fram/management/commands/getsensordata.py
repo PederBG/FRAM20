@@ -1,8 +1,10 @@
 """
+Written by PederBG, 2018-08
+
 Calling an external python script that collects sensor data layers and upload
 them to geoserver.
 
-Note that this django app is using python3.6, while the external script is using
+Note that due to a dependency issue this django app is using python3.6, while the external script is using
 python2.7.
 """
 
@@ -13,7 +15,7 @@ from datetime import datetime, timedelta
 
 class Command(BaseCommand):
     args = '<foo bar ..>'
-    help = "No options needed"
+    help = "Initiate image generating scripts from django framework"
 
     def add_arguments(self, parser):
         parser.add_argument("-d", "--date", type=str)
@@ -115,5 +117,5 @@ class Command(BaseCommand):
 
         print("Deleting tmp folder...")
         subprocess.call('rm -r ' + scriptsPath + 'tmp', shell=True)
-        subprocess.call('rm -r /root/fram19/data/' + date.toString())
+        subprocess.call('rm -r /root/fram19/data/' + date.strftime("%Y-%m-%d"))
         print("Process finished")
