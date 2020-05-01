@@ -139,9 +139,9 @@ class DownloadManager(object):
         extent = '-2251630.1978347152,-1767716.822874052,2386588.9709421024,1917931.4225647242'
         layers = 'MODIS_Terra_CorrectedReflectance_TrueColor'
 
-        query = 'https://gibs.earthdata.nasa.gov/image-download?TIME=%s&' %time + \
-        'extent=%s&epsg=3413&layers=%s&opacities=1&worldfile=true&' %(extent, layers) + \
-        'format=image/jpeg&width=4530&height=3599'
+        query = 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&TIME=%s&' %time + \
+        'BBOX=%s&CRS=EPSG:3413&LAYERS=%s&OPACITIES=1&WORLDFILE=true&' %(extent, layers) + \
+        'FORMAT=image/jpeg&WIDTH=4530&HEIGHT=3599'
         print("Query: " + query)
 
         with open(self.TMPDIR + "terra.zip",'wb') as f:
