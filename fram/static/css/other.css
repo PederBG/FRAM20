@@ -61,6 +61,15 @@ html, body {
   padding-left: 3em;
   padding-bottom: 1em;
 }
+
+.text-body h4{
+  text-align: center;
+}
+
+.image-box h3{
+  margin-top: 2em;
+  text-align: left;
+}
 /* End Info Page, Links Page */
 
 
