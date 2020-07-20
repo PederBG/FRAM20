@@ -1,7 +1,6 @@
 // ------ LOGIC FOR OPENLAYERS AND GEOSERVER ------ \\
 
 // Init variables
-const EXPEDITION_START_DATE = "July 14, 2020"
 const HOST_IP = 'http://185.35.187.19:8080/geoserver/wms';
 // const HOST_IP = 'http://localhost:8080/geoserver/wms';
 const MIN_ZOOM = 3.5;
@@ -132,23 +131,19 @@ $.get( url, function(response) {
     let stopCondition = true;
 
     positions.forEach(function(element) {
-      // Do not show markers from before expedition starts
-        if ( Date.parse(element[0]) > Date.parse(EXPEDITION_START_DATE) ){
+      var grid = element[1].split(',');
+      var tmpPoint = new ol.geom.Point(
+          ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
+      );
+      var marker2 = new ol.Feature({
+      geometry: tmpPoint
+    });
+      tmp = new ol.Feature({ geometry: tmpPoint})
+      allPointFeatures.push(tmp);
+      if (stopCondition) activePointFeatures.push(tmp);
 
-        var grid = element[1].split(',');
-        var tmpPoint = new ol.geom.Point(
-            ol.proj.transform( [parseFloat( grid[0] ), parseFloat( grid[1] )] , 'EPSG:4326', 'EPSG:3413' )
-        );
-        var marker2 = new ol.Feature({
-        geometry: tmpPoint
-      });
-        tmp = new ol.Feature({ geometry: tmpPoint})
-        allPointFeatures.push(tmp);
-        if (stopCondition) activePointFeatures.push(tmp);
-
-        // If second-to-last layer is set to default
-        if (element[0] == latestDate) stopCondition = false;
-      }
+      // If second-to-last layer is set to default
+      if (element[0] == latestDate) stopCondition = false;
     });
 
     // Changing last point to an arrow (current station location)
@@ -164,6 +159,21 @@ $.get( url, function(response) {
             })
           })
       );
+      // Do not show markers from before expedition starts
+      // Worst quickfix ever..
+      for (var i = 0; i < 550; i++) {
+        allPointFeatures[i].setStyle(
+            new ol.style.Style({
+              image: new ol.style.Circle({
+                  fill: new ol.style.Fill({
+                      color: 'rgba(200, 50, 50, 0)'
+                  }),
+                  radius: 4
+              }),
+            })
+          );
+      }
+
     markerStyle = new ol.style.Style({
         image: new ol.style.Circle({
             fill: new ol.style.Fill({
