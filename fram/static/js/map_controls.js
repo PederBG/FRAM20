@@ -6,6 +6,7 @@ let arrowDown = true;
 let activeHistoricals = {};
 let times;
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const monthMap = {'Jan.': 'January', 'Feb.': 'February', 'March': 'March', 'April': 'April', 'May': 'May', 'June': 'June', 'July': 'July', 'Aug.': 'August', 'Sept.': 'September', 'Oct.': 'October', 'Nov.': 'November', 'Dec.': 'December'};
 const nameMap = {
   's2c': 'OpticClose',
   'terramos': 'OpticMosaic',
@@ -325,8 +326,16 @@ $( window ).resize(function() {
 
 // Help function to convert easy-to-read date into database date
 function uglifyDate(dateString){
-  let tmp = new Date(dateString);
-  return new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+  let tmp;
+  // Fix for bad date parsing in firefox
+  if(navigator.userAgent.indexOf("Firefox") != -1 ){
+    tmp = new Date(monthMap[dateString.split(' ')[0]] + ',' + dateString.split(' ').slice(1));
+  }
+  else{
+    tmp = new Date(dateString);
+  }
+  let newDate = new Date(tmp.getTime() - (tmp.getTimezoneOffset() * 60000));
+  return newDate.toISOString().split('T')[0];
 }
 
 
@@ -340,4 +349,10 @@ Date.prototype.addDays = function(days) {
 
 window.onload = function() {
   checkMenus();
+  swal({
+    icon: 'error',
+    title: 'Error loading image layers',
+    text: 'Because of a recent update some web browsers have issues loading image layers. Try a different browser! We are working on solving the problem.'
+  })
+
 };
