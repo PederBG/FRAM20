@@ -117,5 +117,5 @@ class Command(BaseCommand):
 
         print("Deleting tmp folder...")
         subprocess.call('rm -r ' + scriptsPath + 'tmp', shell=True)
-        subprocess.call('rm -r /root/fram19/data/' + date.strftime("%Y-%m-%d"))
+        # subprocess.call('rm -r /root/fram19/data/' + date.strftime("%Y-%m-%d"))
         print("Process finished")

@@ -85,9 +85,8 @@ class DownloadManager(object):
             subprocess.call('mkdir ' + self.OUTDIR, shell=True)
 
         if (self.GRID):
-            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 1, 1, 0.01, 0.01)
-            # self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 20, 70, 1.5, 6)
-            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 30, 80, 1.5, 10)
+            self.BBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '.geojson', 1, 1, 0.3, 0.3)
+            self.LARGEBBOX = funcs.makeGeojson(self.GRID, self.TMPDIR + str(self.DATE) + '_large.geojson', 35, 45, 2.5, 6)
 
 
         # Check gdalhome path
@@ -164,7 +163,7 @@ class DownloadManager(object):
             return False
 
         # FINDING FILE NAME
-        tmpfile = glob.glob(self.TMPDIR + 'nasa-worldview-**.jpg')[0]
+        tmpfile = glob.glob(self.TMPDIR + 'snapshot-**.jpg')[0]
 
         # PROCESSING FILE
         funcs.tileImage(self.GDALHOME, tmpfile, outfile)
@@ -198,7 +197,7 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, outfile, max_num=50):
+    def getS1Mos(self, outfile, max_num=55):
 
         tmpfiles = "" # arguments passed to gdal when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=1)

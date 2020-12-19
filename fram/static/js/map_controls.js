@@ -349,10 +349,10 @@ Date.prototype.addDays = function(days) {
 
 window.onload = function() {
   checkMenus();
-  swal({
+  /*swal({
     icon: 'error',
     title: 'Error loading image layers',
     text: 'Because of a recent update some web browsers have issues loading image layers. Try a different browser! We are working on solving the problem.'
-  })
+  });*/
 
 };
