@@ -72,9 +72,9 @@ function displayGridCallback(){
   $('#grid-display').html(output);
 
   // Show weather (requesting xml-file from an api provided by yr.no)
-  let url = "https://api.met.no/weatherapi/locationforecastlts/1.3/?lat=" + conv_grid[1] + "&lon=" + conv_grid[0];
+  let url = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + conv_grid[1] + "&lon=" + conv_grid[0];
   $.get( url, function(response) {
-    let times = response.getElementsByTagName("time");
+    let times = response["properties"]['timeseries'];
 
     // Getting first value for next day and 3 days
     let tomorrow_string = new Date().addDays(1).toISOString().substring(0, 10);
@@ -85,32 +85,32 @@ function displayGridCallback(){
     let sevendays = false;
 
     for (let i = 0; i < times.length; i++) {
-      if ( times[i].getAttribute("from").substring(0,10) == tomorrow_string && !tomorrow ){
+      if ( times[i]['time'].substring(0,10) == tomorrow_string && !tomorrow ){
         tomorrow = times[i]
       }
-      else if ( times[i].getAttribute("from").substring(0,10) == threedays_string && !threedays ){
+      else if ( times[i]['time'].substring(0,10) == threedays_string && !threedays ){
         threedays = times[i]
       }
-      else if ( times[i].getAttribute("from").substring(0,10) == sevendays_string && !sevendays ){
+      else if ( times[i]['time'].substring(0,10) == sevendays_string && !sevendays ){
         sevendays = times[i]
       }
     }
 
-    let today_dir = times[0].getElementsByTagName("windDirection")[0].getAttribute("name");
-    let today_speed = times[0].getElementsByTagName("windSpeed")[0].getAttribute("mps");
-    let today_temp = times[0].getElementsByTagName("temperature")[0].getAttribute("value");
+    let today_dir = times[0]['data']['instant']['details']['wind_from_direction'];
+    let today_speed = times[0]['data']['instant']['details']['wind_speed'];
+    let today_temp = times[0]['data']['instant']['details']['air_temperature'];
 
-    let tomorrow_dir = tomorrow.getElementsByTagName("windDirection")[0].getAttribute("name");
-    let tomorrow_speed = tomorrow.getElementsByTagName("windSpeed")[0].getAttribute("mps");
-    let tomorrow_temp = tomorrow.getElementsByTagName("temperature")[0].getAttribute("value");
+    let tomorrow_dir = tomorrow['data']['instant']['details']['wind_from_direction'];
+    let tomorrow_speed = tomorrow['data']['instant']['details']['wind_speed'];
+    let tomorrow_temp = tomorrow['data']['instant']['details']['air_temperature'];
 
-    let threedays_dir = threedays.getElementsByTagName("windDirection")[0].getAttribute("name");
-    let threedays_speed = threedays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
-    let threedays_temp = threedays.getElementsByTagName("temperature")[0].getAttribute("value");
+    let threedays_dir = threedays['data']['instant']['details']['wind_from_direction'];
+    let threedays_speed = threedays['data']['instant']['details']['wind_speed'];
+    let threedays_temp = threedays['data']['instant']['details']['air_temperature'];
 
-    let sevendays_dir = sevendays.getElementsByTagName("windDirection")[0].getAttribute("name");
-    let sevendays_speed = sevendays.getElementsByTagName("windSpeed")[0].getAttribute("mps");
-    let sevendays_temp = sevendays.getElementsByTagName("temperature")[0].getAttribute("value");
+    let sevendays_dir = sevendays['data']['instant']['details']['wind_from_direction'];
+    let sevendays_speed = sevendays['data']['instant']['details']['wind_speed'];
+    let sevendays_temp = sevendays['data']['instant']['details']['air_temperature'];
 
     $('#weather-today').html('<b>Today:</b><br>' + today_speed + ' ' + today_dir + "<br>" + today_temp + "&#8451;");
     $('#weather-tomorrow').html('<b>Tomorrow:</b><br>' + tomorrow_speed + ' ' + tomorrow_dir + "<br>" + tomorrow_temp + "&#8451;");
