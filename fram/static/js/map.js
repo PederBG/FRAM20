@@ -1,4 +1,5 @@
 // ------ LOGIC FOR OPENLAYERS AND GEOSERVER ------ \\
+// https://images-cdn.9gag.com/photo/a8GpvLd_700b.jpg
 
 // Init variables
 const HOST_IP = 'https://fram2020.no/geoserver/wms';

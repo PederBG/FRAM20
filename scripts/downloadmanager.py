@@ -134,6 +134,10 @@ class DownloadManager(object):
     def getTerra(self, outfile):
         # Download newest file using urllib2
         time = str(self.DATE) # NASA changed the date format
+        # Not download during winter time (Polar Night)
+        if time.month in [1, 2, 11, 12]:
+            print("Winter time, not downloading optical layer.")
+            return False
         # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)
         extent = '-2251630.1978347152,-1767716.822874052,2386588.9709421024,1917931.4225647242'
         layers = 'MODIS_Terra_CorrectedReflectance_TrueColor'
@@ -197,10 +201,10 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 MOSAIC -------------------------------- #
-    def getS1Mos(self, outfile, max_num=55):
+    def getS1Mos(self, outfile, max_num=50):
 
         tmpfiles = "" # arguments passed to gdal when making virtual mosaic
-        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=1)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=2)
         if not downloadNames[0]:
             return False
 

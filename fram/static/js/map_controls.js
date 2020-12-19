@@ -1,4 +1,5 @@
 // ------ CONTROLS FOR MAP PAGE ------ \\
+// https://images-cdn.9gag.com/photo/a8GpvLd_700b.jpg
 
 // Init variables
 let win = $(window);
