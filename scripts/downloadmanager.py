@@ -135,7 +135,7 @@ class DownloadManager(object):
         # Download newest file using urllib2
         time = str(self.DATE) # NASA changed the date format
         # Not download during winter time (Polar Night)
-        if time.month in [1, 2, 11, 12]:
+        if self.DATE.month in [1, 2, 11, 12]:
             print("Winter time, not downloading optical layer.")
             return False
         # time = str((date.today() - date(int(date.today().strftime('%Y')), 1, 1)).days -1)

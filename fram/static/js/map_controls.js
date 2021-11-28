@@ -197,7 +197,8 @@ function changeDate(btn){
         source: new ol.source.Vector({projection: 'EPSG:3413',features: activePointFeatures}),
         style: markerStyle
     });
-    map.addLayer(vectorLayer);
+    //DO NOT SHOW MARKERS
+    //map.addLayer(vectorLayer);
   }
   layernames.forEach(function(name) {
     let date = uglifyDate(positions[activePointFeatures.length-1][0]);

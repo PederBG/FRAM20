@@ -4,7 +4,7 @@
 // Init variables
 const HOST_IP = 'https://fram2020.no/geoserver/wms';
 // const HOST_IP = 'http://localhost:8080/geoserver/wms';
-const MIN_ZOOM = 3.5;
+const MIN_ZOOM = 2.5;
 const STATIC_LAYERINFO = {
   'Bathymetry': "<p><h5>Bathmetry Polar Map</h5><b>Orginal data:</b> SRTM30_Plus_v7_WinNorth50deg_Terrain_WGS84, warped to NSIDC Sea Ice Polar Stereographic North projection.</p>",
   'Magnetic': "<p><h5>Magnetic Anomali Overlay</h5></p>",
@@ -191,8 +191,8 @@ $.get( url, function(response) {
         style: markerStyle
     });
     vectorLayer.setZIndex(3);
-
-    map.addLayer(vectorLayer);
+    //DO NOT SHOW MARKERS
+    //map.addLayer(vectorLayer);
   }
   // Disable buttons for layers with no data for the first date
   changeDate(0)
