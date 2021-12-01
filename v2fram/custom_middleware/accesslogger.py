@@ -12,6 +12,7 @@ class AccessLoggerMiddleware:
         #print("Called", flush=True) # How to print to gunicorn
         response = self.get_response(request)
         user_ip = request.META['HTTP_X_REAL_IP'] # Need real ip, not the one proxied by nginx
+        # user_ip = "127.0.0.1"
 
         last_record = AccessLog.objects.order_by('date').last()
         today = datetime.now().date()
@@ -45,7 +46,8 @@ class AccessLoggerMiddleware:
 
     @staticmethod
     def getIPInfo(ip):
-        response = urlopen('https://extreme-ip-lookup.com/json/' + ip).read().decode('UTF-8')
+        APIkey = "o8Q3OCrBOVOjlQRUK8aT"
+        response = urlopen('https://extreme-ip-lookup.com/json/' + ip + "?key=" + APIkey).read().decode('UTF-8')
         data = json.loads(response)
 
         ret = ""
