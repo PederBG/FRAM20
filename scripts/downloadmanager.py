@@ -13,20 +13,18 @@ Layers:
     Low Resolution Sea Ice Drift (icedrift)
     S1 Mosaic using ESA's quicklooks (not in use)
 
-NOTE: This script is written for Python 2.7. This is due to some library restrictions.
-
 """
 
 from datetime import date, datetime, timedelta
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
+from osgeo import gdal
+from osgeo.gdalconst import *
+from PIL import Image
 import zipfile
 import os, sys, subprocess, glob, getopt
 import numpy as np
 import numpy.ma as ma
-import gdal
-from gdalconst import *
-import urllib, urllib2
-import Image
+import urllib
 import netCDF4 as nc
 
 import matplotlib
@@ -149,10 +147,10 @@ class DownloadManager(object):
 
         with open(self.TMPDIR + "terra.zip",'wb') as f:
             try:
-                f.write(urllib2.urlopen(query).read())
+                f.write(urllib.request.urlopen(query).read())
                 print(self.TMPDIR + "terra.zip")
                 f.close()
-            except urllib2.HTTPError, e:
+            except urllib.error.HTTPError as e:
                 print('Can not retrieve data. Error code: %s' %(str(e.code)))
                 f.close()
                 return False
@@ -176,7 +174,7 @@ class DownloadManager(object):
         return outfile
 
     # --------------------------------- S1 CLOSE-UP ------------------------------- #
-    def getS1(self, outfile, max_num=3):
+    def getS1(self, outfile, max_num=1):
 
         tmpfiles = '' # arguments passed to gdal when making virtual mosaic
         downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.BBOX, max_files=max_num)
@@ -204,7 +202,7 @@ class DownloadManager(object):
     def getS1Mos(self, outfile, max_num=50):
 
         tmpfiles = "" # arguments passed to gdal when making virtual mosaic
-        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=4)
+        downloadNames = funcs.getSentinelFiles(self.DATE, self.COLHUB_UNAME, self.COLHUB_PW, self.TMPDIR, self.LARGEBBOX, max_files=max_num, time_window=2)
         if not downloadNames[0]:
             return False
 
@@ -247,9 +245,9 @@ class DownloadManager(object):
         rawfile = self.TMPDIR + 'seaiceraw.tif'
         with open(rawfile,'wb') as f:
             try:
-                f.write(urllib2.urlopen(query).read())
+                f.write(urllib.request.urlopen(query).read())
                 f.close()
-            except urllib2.HTTPError, e:
+            except urllib.error.HTTPError as e:
                 print('Can not retrieve data. Error code: %s' %(str(e.code)))
                 f.close()
                 return False
@@ -264,7 +262,7 @@ class DownloadManager(object):
             return False
 
         print('Converting from palette to rgba')
-        cmd = '%spct2rgb.py -of GTiff -rgba %s %s' %(self.GDALHOME, tmpfile, tmpfile2)
+        cmd = '%spct2rgb.py -rgba %s %s' %(self.GDALHOME, tmpfile, tmpfile2)
         subprocess.call(cmd, shell=True)
 
         funcs.tileImage(self.GDALHOME, tmpfile2, outfile)
@@ -286,7 +284,7 @@ class DownloadManager(object):
         print('Query: ' + query)
         tmpfile = self.TMPDIR + 'tmpfile.nc'
         try:
-            urllib.urlretrieve(query, tmpfile)
+            urllib.request.urlretrieve(query, tmpfile)
         except IOError:
             print("Could not download image")
             return False

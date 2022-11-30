@@ -1,7 +1,7 @@
 import os
 from geoserver.catalog import Catalog
 
-PATH = '/root/fram19/data_dir/data'
+PATH = '/root/fram/data_dir/data'
 layers = [os.path.join(dp, f) for dp, dn, filenames in os.walk(PATH) for f in filenames if os.path.splitext(f)[1] == '.geotiff']
 
 cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", os.environ["GEOSERVER_SECRET_KEY"])
