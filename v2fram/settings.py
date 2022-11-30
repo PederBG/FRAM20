@@ -36,9 +36,6 @@ if DEBUG:
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-        'v2fram.custom_middleware.accesslogger.AccessLoggerMiddleware',
-
     ]
 
 # Production settings
@@ -101,7 +98,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_mailbox',
 ]
 
 ROOT_URLCONF = 'v2fram.urls'
