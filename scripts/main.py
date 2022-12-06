@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 Written by PederBG, 2018-08
@@ -76,7 +76,7 @@ def main(argv):
     if only:
         outfiles.append( functions[only](d.OUTDIR + only + '.tif') )
     else:
-        for k, v in functions.iteritems():
+        for k, v in functions.items():
             try:
                 funcs.printLayerStatus(str(k))
                 outfiles.append( v(d.OUTDIR + k + '.tif') )

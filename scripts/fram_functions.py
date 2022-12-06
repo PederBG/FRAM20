@@ -11,7 +11,7 @@ import subprocess, glob
 
 
 # Help function for downloading satellite products from scihub / colhub
-def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1', time_window=3):
+def getSentinelFiles(DATE, COLHUB_UNAME, COLHUB_PW, TMPDIR, bbox, max_files=1, polarization='hh', platform='s1', time_window=1):
     print('Arguments -> Box: %s, Max downloads: %s, Polarization: %s, Platform: %s' \
         %(bbox, max_files, polarization, platform))
     # api = SentinelAPI(COLHUB_UNAME, COLHUB_PW, 'https://colhub.met.no/#/home')
