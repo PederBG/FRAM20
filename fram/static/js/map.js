@@ -2,7 +2,7 @@
 // https://images-cdn.9gag.com/photo/a8GpvLd_700b.jpg
 
 // Init variables
-const HOST_IP = 'https://fram2020.no/geoserver/wms';
+const HOST_IP = 'https://fram.northeurope.cloudapp.azure.com/geoserver/wms';
 // const HOST_IP = 'http://localhost:8080/geoserver/wms';
 const MIN_ZOOM = 2.5;
 const STATIC_LAYERINFO = {
@@ -163,6 +163,7 @@ $.get( url, function(response) {
       );
       // Do not show markers from before expedition starts
       // Worst quickfix ever..
+      /*
       for (var i = 0; i < 550; i++) {
         allPointFeatures[i].setStyle(
             new ol.style.Style({
@@ -175,7 +176,7 @@ $.get( url, function(response) {
             })
           );
       }
-
+      */
     markerStyle = new ol.style.Style({
         image: new ol.style.Circle({
             fill: new ol.style.Fill({

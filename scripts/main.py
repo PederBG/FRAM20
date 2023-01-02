@@ -94,13 +94,13 @@ def main(argv):
 
 
     # --------------------- Upload to Geoserver -------------------- #
-    cat = Catalog("http://localhost:8080/geoserver/rest/", "admin", os.environ["GEOSERVER_SECRET_KEY"])
+    cat = Catalog("http://localhost:8080/geoserver/rest/", "peder", os.environ["GEOSERVER_SECRET_KEY"])
     print(cat)
 
     # BUG: ws is sometime cite instead of d.date (fixed?)
     ws = cat.get_workspace( str(d.DATE) )
     if ws is None:
-        ws = cat.create_workspace(str(d.DATE), str(d.DATE) + 'uri')
+        ws = cat.create_workspace(str(d.DATE))
 
     for layerdata in outfiles:
         if layerdata:

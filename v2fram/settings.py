@@ -44,6 +44,7 @@ else:
     SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
     ALLOWED_HOSTS = ['*'] # Fix this
+    CSRF_TRUSTED_ORIGINS = ["https://fram.northeurope.cloudapp.azure.com"]
 
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
