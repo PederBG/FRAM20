@@ -1,7 +1,7 @@
 from fram.models import AccessLog
 from datetime import datetime
 from urllib.request import urlopen
-import json
+import json, os
 
 class AccessLoggerMiddleware:
     def __init__(self, get_response):
@@ -46,7 +46,7 @@ class AccessLoggerMiddleware:
 
     @staticmethod
     def getIPInfo(ip):
-        APIkey = "o8Q3OCrBOVOjlQRUK8aT"
+        APIkey = os.environ["IP_LOOKUP_API_KEY"]
         response = urlopen('https://extreme-ip-lookup.com/json/' + ip + "?key=" + APIkey).read().decode('UTF-8')
         data = json.loads(response)
 
