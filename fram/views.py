@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import *
 from django.http import FileResponse, Http404
 from datetime import datetime
+import os
 
 def index(request):
     return render(request, 'fram/index.html')
@@ -48,29 +49,35 @@ def read_daily(request, dailyID):
 
 
 def info(request):
-    if request.GET:
-        try: # Using as_attachment because phones/tablets get errors reading pdf in browser. TODO: fix this
-            return FileResponse(open('data/infopdfs/' + request.GET.get('name'), 'rb'), content_type='application/pdf', as_attachment=True)
-        except FileNotFoundError:
-            raise Http404()
-
     context = {
         'infopdfs': InfoPDF.objects.all().order_by('-id')
     }
+    if request.GET:
+        path = '/root/fram/data/infopdfs/' + request.GET.get('name')
+        if os.path.commonprefix((os.path.realpath(path),'/root/fram/data/infopdfs/')) and path[-4:] == '.pdf':
+            try:
+                return FileResponse(open('data/infopdfs/' + request.GET.get('name'), 'rb'), content_type='application/pdf', as_attachment=True)
+            except FileNotFoundError:
+                raise Http404()
+        else:
+            return render(request, 'fram/info.html', context)
 
     return render(request, 'fram/info.html', context)
 
 
 def weekly(request):
-    if request.GET:
-        try: # Using as_attachment because phones/tablets get errors reading pdf in browser. TODO: fix this
-            return FileResponse(open('data/weekly/' + request.GET.get('name'), 'rb'), content_type='application/pdf', as_attachment=True)
-        except FileNotFoundError:
-            raise Http404()
-
     context = {
         'weeklys': Weekly.objects.all().order_by('-id')
     }
+    if request.GET:
+        path = '/root/fram/data/weekly/' + request.GET.get('name')
+        if os.path.commonprefix((os.path.realpath(path),'/root/fram/data/weekly/')) and path[-4:] == '.pdf':
+            try:
+                return FileResponse(open(path, 'rb'), content_type='application/pdf', as_attachment=True)
+            except FileNotFoundError:
+                raise Http404()
+        else:
+            return render(request, 'fram/weekly.html', context)
 
     return render(request, 'fram/weekly.html', context)
 
