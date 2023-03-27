@@ -117,4 +117,6 @@ class Command(BaseCommand):
 
         print("Deleting tmp folder...")
         subprocess.call('rm -r ' + scriptsPath + 'tmp', shell=True)
+        print("Deleting generated .tif files")
+        subprocess.call('rm ' + targetPath + '/' + date + '/*.tif*', shell=True)
         print("Process finished")

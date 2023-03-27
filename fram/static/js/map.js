@@ -89,7 +89,8 @@ $.get( url, function(response) {
 
   // This is added first to set lowest z-index
   layerdict['bathymetry'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'bathymetry') });
-  layerdict['bathymetry'].setVisible(false);
+  layerdict['bathymetry'].setVisible(true);
+  $("#btBathymetry").css("background-color", "gray")
   layerdict['magnetic'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'magnetic') });
   layerdict['magnetic'].setVisible(false);
   layerdict['gravity'] = new ol.layer.Tile({ source: setCustomLayerSource('cite', 'gravity') });

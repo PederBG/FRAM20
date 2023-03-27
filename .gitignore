@@ -16,3 +16,6 @@ env.bak/
 venv.bak/
 
 fram/migrations/
+
+data_dir/
+fram/static/admin/
